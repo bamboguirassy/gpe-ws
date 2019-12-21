@@ -1,0 +1,261 @@
+<p-toast></p-toast>
+<div class="row" *ngIf="'Inscriptionacad'|listable">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <p-fieldset legend="Liste des inscriptionacads" [toggleable]="true">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+          <p-toolbar>
+            <button *ngIf="'Inscriptionacad'|listable" type="button" class="btn btn-outline-secondary" (click)="refreshList()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+            </button>
+            <button *ngIf="'Inscriptionacad'|deletable" (click)="deleteSelectedInscriptionacads()" type="button"
+              class="btn btn-outline-danger pull-right ml-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'Inscriptionacad'|creable" [routerLink]="['/'+inscriptionacadSrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary pull-right ml-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+          <p-table #tt [value]="inscriptionacads" [paginator]="true" [rows]="50" sortMode="multiple" selectionMode="multiple"
+            [(selection)]="selectedInscriptionacads" [resizableColumns]="true" [responsive]="true"
+            [contextMenu]="contextMenu" [(contextMenuSelection)]="selectedInscriptionacad" [scrollable]="true"
+            scrollHeight="400px" [globalFilterFields]="globalFilterFields" dataKey="id">
+            <ng-template pTemplate="caption">
+              Liste des inscriptionacads<br>
+              <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+              <input type="text" pInputText size="50" placeholder="Rechercher dans le tableau"
+                (input)="tt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+              <div class="ui-helper-clearfix" style="text-align: left">
+                <button *ngIf="'Inscriptionacad'|listable" type="button" pButton icon="pi pi-file-pdf" iconPos="left" label="PDF"
+                  (click)="exportPdf()" class="ui-button-warning pull-right ml-1"></button>
+                <button *ngIf="'Inscriptionacad'|listable" type="button" pButton icon="pi pi-file-excel" iconPos="left"
+                  label="EXCEL" (click)="exportExcel()" style="margin-right: 0.5em;" class="ui-button-success pull-right"></button>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="colgroup">
+              <colgroup>
+                                  <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                    </colgroup>
+            </ng-template>
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                                <th [pSortableColumn]="'dateinscacad'" pResizableColumn>
+                  Dateinscacad <p-sortIcon [field]="'dateinscacad'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'passage'" pResizableColumn>
+                  Passage <p-sortIcon [field]="'passage'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'etat'" pResizableColumn>
+                  Etat <p-sortIcon [field]="'etat'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'montantinscriptionacad'" pResizableColumn>
+                  Montantinscriptionacad <p-sortIcon [field]="'montantinscriptionacad'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'coutformation'" pResizableColumn>
+                  Coutformation <p-sortIcon [field]="'coutformation'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'numquittance'" pResizableColumn>
+                  Numquittance <p-sortIcon [field]="'numquittance'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'cartetiree'" pResizableColumn>
+                  Cartetiree <p-sortIcon [field]="'cartetiree'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'certificattire'" pResizableColumn>
+                  Certificattire <p-sortIcon [field]="'certificattire'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'valide'" pResizableColumn>
+                  Valide <p-sortIcon [field]="'valide'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'quitusBu'" pResizableColumn>
+                  QuitusBu <p-sortIcon [field]="'quitusBu'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'quitusSocial'" pResizableColumn>
+                  QuitusSocial <p-sortIcon [field]="'quitusSocial'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'quitusMedical'" pResizableColumn>
+                  QuitusMedical <p-sortIcon [field]="'quitusMedical'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'quitusComptabilite'" pResizableColumn>
+                  QuitusComptabilite <p-sortIcon [field]="'quitusComptabilite'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'quitusVieUniversitaire'" pResizableColumn>
+                  QuitusVieUniversitaire <p-sortIcon [field]="'quitusVieUniversitaire'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'universitepartenaire'" pResizableColumn>
+                  Universitepartenaire <p-sortIcon [field]="'universitepartenaire'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'sourcefinancement'" pResizableColumn>
+                  Sourcefinancement <p-sortIcon [field]="'sourcefinancement'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'coencadreur'" pResizableColumn>
+                  Coencadreur <p-sortIcon [field]="'coencadreur'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'premiereanneeinscription'" pResizableColumn>
+                  Premiereanneeinscription <p-sortIcon [field]="'premiereanneeinscription'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'datemodification'" pResizableColumn>
+                  Datemodification <p-sortIcon [field]="'datemodification'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'moyenneAnnuelle'" pResizableColumn>
+                  MoyenneAnnuelle <p-sortIcon [field]="'moyenneAnnuelle'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'totalCredit'" pResizableColumn>
+                  TotalCredit <p-sortIcon [field]="'totalCredit'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'creditCapitalise'" pResizableColumn>
+                  CreditCapitalise <p-sortIcon [field]="'creditCapitalise'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'decisionConseil'" pResizableColumn>
+                  DecisionConseil <p-sortIcon [field]="'decisionConseil'"></p-sortIcon>
+              </th>
+                    </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-inscriptionacad let-editing="editing">
+              <tr [pEditableRow]="inscriptionacad" [pSelectableRow]="inscriptionacad" [pContextMenuRow]="inscriptionacad">
+                <td style="width: 3em">
+                  <p-tableCheckbox [value]="inscriptionacad"></p-tableCheckbox>
+                </td>
+                                                  <td class="ui-resizable-column">
+                  {{ inscriptionacad.dateinscacad ? inscriptionacad.dateinscacad|date('Y-m-d H:i:s') : '' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.passage }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.etat }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.montantinscriptionacad }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.coutformation }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.numquittance }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.cartetiree ? 'Yes' : 'No' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.certificattire ? 'Yes' : 'No' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.valide ? 'Yes' : 'No' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.quitusBu ? 'Yes' : 'No' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.quitusSocial ? 'Yes' : 'No' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.quitusMedical ? 'Yes' : 'No' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.quitusComptabilite ? 'Yes' : 'No' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.quitusVieUniversitaire ? 'Yes' : 'No' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.universitepartenaire }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.sourcefinancement }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.coencadreur }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.premiereanneeinscription }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.datemodification ? inscriptionacad.datemodification|date('Y-m-d H:i:s') : '' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.moyenneAnnuelle }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.totalCredit }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.creditCapitalise }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionacad.decisionConseil }}
+                </td>
+                          </tr>
+            </ng-template>
+            <ng-template pTemplate="footer" let-columns>
+              <tr>
+                <td style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </td>
+                                   <td>Dateinscacad</td>
+                             <td>Passage</td>
+                             <td>Etat</td>
+                             <td>Montantinscriptionacad</td>
+                             <td>Coutformation</td>
+                             <td>Numquittance</td>
+                             <td>Cartetiree</td>
+                             <td>Certificattire</td>
+                             <td>Valide</td>
+                             <td>QuitusBu</td>
+                             <td>QuitusSocial</td>
+                             <td>QuitusMedical</td>
+                             <td>QuitusComptabilite</td>
+                             <td>QuitusVieUniversitaire</td>
+                             <td>Universitepartenaire</td>
+                             <td>Sourcefinancement</td>
+                             <td>Coencadreur</td>
+                             <td>Premiereanneeinscription</td>
+                             <td>Datemodification</td>
+                             <td>MoyenneAnnuelle</td>
+                             <td>TotalCredit</td>
+                             <td>CreditCapitalise</td>
+                             <td>DecisionConseil</td>
+                    </tr>
+            </ng-template>
+          </p-table>
+          <p-contextMenu #contextMenu [model]="cMenuItems"></p-contextMenu>
+          <p-toolbar>
+            <button *ngIf="'Inscriptionacad'|deletable" (click)="deleteSelectedInscriptionacads()" type="button"
+              class="btn btn-outline-danger mr-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'Inscriptionacad'|creable" [routerLink]="['/'+inscriptionacadSrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary mr-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+        </div>
+      </div>
+    </p-fieldset>
+  </div>
+</div>

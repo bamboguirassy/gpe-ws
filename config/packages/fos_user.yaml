@@ -1,0 +1,9 @@
+fos_user:
+    db_driver: orm # other valid values are 'mongodb' and 'couchdb'
+    firewall_name: main
+    user_class: App\Entity\FosUser
+    group:
+        group_class: App\Entity\FosGroup
+    from_email:
+        address: "didegassama@gmail.com"
+        sender_name: "GPE 3"

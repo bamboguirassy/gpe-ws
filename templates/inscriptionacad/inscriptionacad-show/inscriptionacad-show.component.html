@@ -1,0 +1,135 @@
+<p-toast></p-toast>
+<p-fieldset *ngIf="'Inscriptionacad'|showable" legend="Affichage des informations - Utilisateur" [toggleable]="true">
+  <p-toolbar>
+    <button *ngIf="'Inscriptionacad'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+      [routerLink]="['/'+inscriptionacadSrv.getRoutePrefix(),inscriptionacad.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+      Modifier</button>
+    <button *ngIf="'Inscriptionacad'|clonable" [routerLink]="['/'+inscriptionacadSrv.getRoutePrefix(),inscriptionacad.id,'clone']" type="button"
+      class="btn btn-outline-secondary pull-right ml-1">
+      <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+    </button>
+    <button *ngIf="'Inscriptionacad'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeInscriptionacad()"><i
+        class="fa fa-trash-o"></i> Supprimer</button>
+    <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+        class="fa fa-reply"></i> Retour</button>
+  </p-toolbar>
+  <p-tabView>
+    <p-tabPanel header="Détails">
+      <p-fieldset [legend]="inscriptionacad.id">
+        <table class="table">
+                                    <tr>
+                <th>Dateinscacad</th>
+                <td>{{ inscriptionacad.dateinscacad ? inscriptionacad.dateinscacad|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+                                    <tr>
+                <th>Passage</th>
+                <td>{{ inscriptionacad.passage }}</td>
+            </tr>
+                                    <tr>
+                <th>Etat</th>
+                <td>{{ inscriptionacad.etat }}</td>
+            </tr>
+                                    <tr>
+                <th>Montantinscriptionacad</th>
+                <td>{{ inscriptionacad.montantinscriptionacad }}</td>
+            </tr>
+                                    <tr>
+                <th>Coutformation</th>
+                <td>{{ inscriptionacad.coutformation }}</td>
+            </tr>
+                                    <tr>
+                <th>Numquittance</th>
+                <td>{{ inscriptionacad.numquittance }}</td>
+            </tr>
+                                    <tr>
+                <th>Cartetiree</th>
+                <td>{{ inscriptionacad.cartetiree ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>Certificattire</th>
+                <td>{{ inscriptionacad.certificattire ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>Valide</th>
+                <td>{{ inscriptionacad.valide ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>QuitusBu</th>
+                <td>{{ inscriptionacad.quitusBu ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>QuitusSocial</th>
+                <td>{{ inscriptionacad.quitusSocial ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>QuitusMedical</th>
+                <td>{{ inscriptionacad.quitusMedical ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>QuitusComptabilite</th>
+                <td>{{ inscriptionacad.quitusComptabilite ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>QuitusVieUniversitaire</th>
+                <td>{{ inscriptionacad.quitusVieUniversitaire ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>Universitepartenaire</th>
+                <td>{{ inscriptionacad.universitepartenaire }}</td>
+            </tr>
+                                    <tr>
+                <th>Sourcefinancement</th>
+                <td>{{ inscriptionacad.sourcefinancement }}</td>
+            </tr>
+                                    <tr>
+                <th>Coencadreur</th>
+                <td>{{ inscriptionacad.coencadreur }}</td>
+            </tr>
+                                    <tr>
+                <th>Premiereanneeinscription</th>
+                <td>{{ inscriptionacad.premiereanneeinscription }}</td>
+            </tr>
+                                    <tr>
+                <th>Datemodification</th>
+                <td>{{ inscriptionacad.datemodification ? inscriptionacad.datemodification|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+                                    <tr>
+                <th>MoyenneAnnuelle</th>
+                <td>{{ inscriptionacad.moyenneAnnuelle }}</td>
+            </tr>
+                                    <tr>
+                <th>TotalCredit</th>
+                <td>{{ inscriptionacad.totalCredit }}</td>
+            </tr>
+                                    <tr>
+                <th>CreditCapitalise</th>
+                <td>{{ inscriptionacad.creditCapitalise }}</td>
+            </tr>
+                                    <tr>
+                <th>DecisionConseil</th>
+                <td>{{ inscriptionacad.decisionConseil }}</td>
+            </tr>
+                    </table>
+        <p-toolbar>
+          <button *ngIf="'Inscriptionacad'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+            [routerLink]="['/'+inscriptionacadSrv.getRoutePrefix(),inscriptionacad.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+            Modifier</button>
+          <button *ngIf="'Inscriptionacad'|clonable" [routerLink]="['/'+inscriptionacadSrv.getRoutePrefix(),inscriptionacad.id,'clone']" type="button"
+            class="btn btn-outline-secondary pull-right ml-1">
+            <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+          </button>
+          <button *ngIf="'Inscriptionacad'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeInscriptionacad()"><i
+              class="fa fa-trash-o"></i> Supprimer</button>
+          <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+              class="fa fa-reply"></i> Retour</button>
+          <button *ngIf="'Inscriptionacad'|showable" type="button" class="btn btn-secondary ml-1" (click)="refresh()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+          </button>
+        </p-toolbar>
+      </p-fieldset>
+    </p-tabPanel>
+    <p-tabPanel header="Liste associée">
+      
+    </p-tabPanel>
+  </p-tabView>
+</p-fieldset>

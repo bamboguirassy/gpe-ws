@@ -1,0 +1,179 @@
+<p-toast></p-toast>
+<p-fieldset *ngIf="'Etudiant'|showable" legend="Affichage des informations - Utilisateur" [toggleable]="true">
+  <p-toolbar>
+    <button *ngIf="'Etudiant'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+      [routerLink]="['/'+etudiantSrv.getRoutePrefix(),etudiant.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+      Modifier</button>
+    <button *ngIf="'Etudiant'|clonable" [routerLink]="['/'+etudiantSrv.getRoutePrefix(),etudiant.id,'clone']" type="button"
+      class="btn btn-outline-secondary pull-right ml-1">
+      <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+    </button>
+    <button *ngIf="'Etudiant'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeEtudiant()"><i
+        class="fa fa-trash-o"></i> Supprimer</button>
+    <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+        class="fa fa-reply"></i> Retour</button>
+  </p-toolbar>
+  <p-tabView>
+    <p-tabPanel header="Détails">
+      <p-fieldset [legend]="etudiant.id">
+        <table class="table">
+                                    <tr>
+                <th>Cni</th>
+                <td>{{ etudiant.cni }}</td>
+            </tr>
+                                    <tr>
+                <th>Ine</th>
+                <td>{{ etudiant.ine }}</td>
+            </tr>
+                                    <tr>
+                <th>Numinterne</th>
+                <td>{{ etudiant.numinterne }}</td>
+            </tr>
+                                    <tr>
+                <th>Nometudiant</th>
+                <td>{{ etudiant.nometudiant }}</td>
+            </tr>
+                                    <tr>
+                <th>Prenometudiant</th>
+                <td>{{ etudiant.prenometudiant }}</td>
+            </tr>
+                                    <tr>
+                <th>Genre</th>
+                <td>{{ etudiant.genre }}</td>
+            </tr>
+                                    <tr>
+                <th>Datenaiss</th>
+                <td>{{ etudiant.datenaiss ? etudiant.datenaiss|date('Y-m-d') : '' }}</td>
+            </tr>
+                                    <tr>
+                <th>Lieunaiss</th>
+                <td>{{ etudiant.lieunaiss }}</td>
+            </tr>
+                                    <tr>
+                <th>Regionnaiss</th>
+                <td>{{ etudiant.regionnaiss }}</td>
+            </tr>
+                                    <tr>
+                <th>Adville</th>
+                <td>{{ etudiant.adville }}</td>
+            </tr>
+                                    <tr>
+                <th>Adquartier</th>
+                <td>{{ etudiant.adquartier }}</td>
+            </tr>
+                                    <tr>
+                <th>Adruevilla</th>
+                <td>{{ etudiant.adruevilla }}</td>
+            </tr>
+                                    <tr>
+                <th>Email</th>
+                <td>{{ etudiant.email }}</td>
+            </tr>
+                                    <tr>
+                <th>EmailUniv</th>
+                <td>{{ etudiant.emailUniv }}</td>
+            </tr>
+                                    <tr>
+                <th>Notifmail</th>
+                <td>{{ etudiant.notifmail ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>Photo</th>
+                <td>{{ etudiant.photo }}</td>
+            </tr>
+                                    <tr>
+                <th>Lyceedeprovenance</th>
+                <td>{{ etudiant.lyceedeprovenance }}</td>
+            </tr>
+                                    <tr>
+                <th>Teletudiant</th>
+                <td>{{ etudiant.teletudiant }}</td>
+            </tr>
+                                    <tr>
+                <th>Teletudiant2</th>
+                <td>{{ etudiant.teletudiant2 }}</td>
+            </tr>
+                                    <tr>
+                <th>Seriebac</th>
+                <td>{{ etudiant.seriebac }}</td>
+            </tr>
+                                    <tr>
+                <th>Diplomeentree</th>
+                <td>{{ etudiant.diplomeentree }}</td>
+            </tr>
+                                    <tr>
+                <th>Moyennebac</th>
+                <td>{{ etudiant.moyennebac }}</td>
+            </tr>
+                                    <tr>
+                <th>Mentionbac</th>
+                <td>{{ etudiant.mentionbac }}</td>
+            </tr>
+                                    <tr>
+                <th>Groupepassage</th>
+                <td>{{ etudiant.groupepassage }}</td>
+            </tr>
+                                    <tr>
+                <th>AnneeBac</th>
+                <td>{{ etudiant.anneeBac }}</td>
+            </tr>
+                                    <tr>
+                <th>Handicap</th>
+                <td>{{ etudiant.handicap }}</td>
+            </tr>
+                                    <tr>
+                <th>TypeHandicap</th>
+                <td>{{ etudiant.typeHandicap }}</td>
+            </tr>
+                                    <tr>
+                <th>DescriptionHandicap</th>
+                <td>{{ etudiant.descriptionHandicap }}</td>
+            </tr>
+                                    <tr>
+                <th>Orphelin</th>
+                <td>{{ etudiant.orphelin }}</td>
+            </tr>
+                                    <tr>
+                <th>SituationMatrimoniale</th>
+                <td>{{ etudiant.situationMatrimoniale }}</td>
+            </tr>
+                                    <tr>
+                <th>Nomconjoint</th>
+                <td>{{ etudiant.nomconjoint }}</td>
+            </tr>
+                                    <tr>
+                <th>Nbreenfant</th>
+                <td>{{ etudiant.nbreenfant }}</td>
+            </tr>
+                                    <tr>
+                <th>Nomcontact</th>
+                <td>{{ etudiant.nomcontact }}</td>
+            </tr>
+                                    <tr>
+                <th>Telcontact</th>
+                <td>{{ etudiant.telcontact }}</td>
+            </tr>
+                    </table>
+        <p-toolbar>
+          <button *ngIf="'Etudiant'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+            [routerLink]="['/'+etudiantSrv.getRoutePrefix(),etudiant.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+            Modifier</button>
+          <button *ngIf="'Etudiant'|clonable" [routerLink]="['/'+etudiantSrv.getRoutePrefix(),etudiant.id,'clone']" type="button"
+            class="btn btn-outline-secondary pull-right ml-1">
+            <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+          </button>
+          <button *ngIf="'Etudiant'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeEtudiant()"><i
+              class="fa fa-trash-o"></i> Supprimer</button>
+          <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+              class="fa fa-reply"></i> Retour</button>
+          <button *ngIf="'Etudiant'|showable" type="button" class="btn btn-secondary ml-1" (click)="refresh()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+          </button>
+        </p-toolbar>
+      </p-fieldset>
+    </p-tabPanel>
+    <p-tabPanel header="Liste associée">
+      
+    </p-tabPanel>
+  </p-tabView>
+</p-fieldset>

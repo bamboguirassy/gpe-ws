@@ -1,0 +1,115 @@
+<p-toast></p-toast>
+<p-fieldset *ngIf="'FosUser'|showable" legend="Affichage des informations - Utilisateur" [toggleable]="true">
+  <p-toolbar>
+    <button *ngIf="'FosUser'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+      [routerLink]="['/'+fos_userSrv.getRoutePrefix(),fos_user.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+      Modifier</button>
+    <button *ngIf="'FosUser'|clonable" [routerLink]="['/'+fos_userSrv.getRoutePrefix(),fos_user.id,'clone']" type="button"
+      class="btn btn-outline-secondary pull-right ml-1">
+      <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+    </button>
+    <button *ngIf="'FosUser'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeFosUser()"><i
+        class="fa fa-trash-o"></i> Supprimer</button>
+    <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+        class="fa fa-reply"></i> Retour</button>
+  </p-toolbar>
+  <p-tabView>
+    <p-tabPanel header="Détails">
+      <p-fieldset [legend]="fos_user.id">
+        <table class="table">
+                        <tr>
+                <th>Username</th>
+                <td>{{ fos_user.username }}</td>
+            </tr>
+                                    <tr>
+                <th>UsernameCanonical</th>
+                <td>{{ fos_user.usernameCanonical }}</td>
+            </tr>
+                                    <tr>
+                <th>Email</th>
+                <td>{{ fos_user.email }}</td>
+            </tr>
+                                    <tr>
+                <th>EmailCanonical</th>
+                <td>{{ fos_user.emailCanonical }}</td>
+            </tr>
+                                    <tr>
+                <th>Enabled</th>
+                <td>{{ fos_user.enabled ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>Salt</th>
+                <td>{{ fos_user.salt }}</td>
+            </tr>
+                                    <tr>
+                <th>Password</th>
+                <td>{{ fos_user.password }}</td>
+            </tr>
+                                    <tr>
+                <th>LastLogin</th>
+                <td>{{ fos_user.lastLogin ? fos_user.lastLogin|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+                                    <tr>
+                <th>ConfirmationToken</th>
+                <td>{{ fos_user.confirmationToken }}</td>
+            </tr>
+                                    <tr>
+                <th>PasswordRequestedAt</th>
+                <td>{{ fos_user.passwordRequestedAt ? fos_user.passwordRequestedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+                                    <tr>
+                <th>Roles</th>
+                <td>{{ fos_user.roles ? fos_user.roles|join(', ') : '' }}</td>
+            </tr>
+                                                <tr>
+                <th>Prenom</th>
+                <td>{{ fos_user.prenom }}</td>
+            </tr>
+                                    <tr>
+                <th>Nom</th>
+                <td>{{ fos_user.nom }}</td>
+            </tr>
+                                    <tr>
+                <th>Sexe</th>
+                <td>{{ fos_user.sexe }}</td>
+            </tr>
+                                    <tr>
+                <th>Titre</th>
+                <td>{{ fos_user.titre }}</td>
+            </tr>
+                                    <tr>
+                <th>Photo</th>
+                <td>{{ fos_user.photo }}</td>
+            </tr>
+                                    <tr>
+                <th>Statut</th>
+                <td>{{ fos_user.statut ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>Last_activity</th>
+                <td>{{ fos_user.lastActivity ? fos_user.lastActivity|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+                    </table>
+        <p-toolbar>
+          <button *ngIf="'FosUser'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+            [routerLink]="['/'+fos_userSrv.getRoutePrefix(),fos_user.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+            Modifier</button>
+          <button *ngIf="'FosUser'|clonable" [routerLink]="['/'+fos_userSrv.getRoutePrefix(),fos_user.id,'clone']" type="button"
+            class="btn btn-outline-secondary pull-right ml-1">
+            <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+          </button>
+          <button *ngIf="'FosUser'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeFosUser()"><i
+              class="fa fa-trash-o"></i> Supprimer</button>
+          <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+              class="fa fa-reply"></i> Retour</button>
+          <button *ngIf="'FosUser'|showable" type="button" class="btn btn-secondary ml-1" (click)="refresh()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+          </button>
+        </p-toolbar>
+      </p-fieldset>
+    </p-tabPanel>
+    <p-tabPanel header="Liste associée">
+      
+    </p-tabPanel>
+  </p-tabView>
+</p-fieldset>

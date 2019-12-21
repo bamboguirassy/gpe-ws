@@ -1,0 +1,168 @@
+
+<p-toast></p-toast>
+<!-- form inscriptionacad info -->
+<form *ngIf="'Inscriptionacad'|editable" class="form" role="form" #inscriptionacadForm="ngForm" autocomplete="off" (ngSubmit)="updateInscriptionacad()">
+  <p-fieldset legend="Modification utilisateur" [toggleable]="true">
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="inscriptionacadForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+    <!-- debut body -->
+    <div class="row">
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="dateinscacad">Dateinscacad</label>
+                    <input [(ngModel)]="inscriptionacad.dateinscacad" class="form-control" type="text" name="dateinscacad" id="dateinscacad">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="passage">Passage</label>
+                    <input [(ngModel)]="inscriptionacad.passage" class="form-control" type="text" name="passage" id="passage">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="etat">Etat</label>
+                    <input [(ngModel)]="inscriptionacad.etat" class="form-control" type="text" name="etat" id="etat">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="montantinscriptionacad">Montantinscriptionacad</label>
+                    <input [(ngModel)]="inscriptionacad.montantinscriptionacad" class="form-control" type="text" name="montantinscriptionacad" id="montantinscriptionacad">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="coutformation">Coutformation</label>
+                    <input [(ngModel)]="inscriptionacad.coutformation" class="form-control" type="text" name="coutformation" id="coutformation">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="numquittance">Numquittance</label>
+                    <input [(ngModel)]="inscriptionacad.numquittance" class="form-control" type="text" name="numquittance" id="numquittance">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="cartetiree">Cartetiree</label>
+                    <input [(ngModel)]="inscriptionacad.cartetiree" class="form-control" type="text" name="cartetiree" id="cartetiree">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="certificattire">Certificattire</label>
+                    <input [(ngModel)]="inscriptionacad.certificattire" class="form-control" type="text" name="certificattire" id="certificattire">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="valide">Valide</label>
+                    <input [(ngModel)]="inscriptionacad.valide" class="form-control" type="text" name="valide" id="valide">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="quitusBu">QuitusBu</label>
+                    <input [(ngModel)]="inscriptionacad.quitusBu" class="form-control" type="text" name="quitusBu" id="quitusBu">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="quitusSocial">QuitusSocial</label>
+                    <input [(ngModel)]="inscriptionacad.quitusSocial" class="form-control" type="text" name="quitusSocial" id="quitusSocial">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="quitusMedical">QuitusMedical</label>
+                    <input [(ngModel)]="inscriptionacad.quitusMedical" class="form-control" type="text" name="quitusMedical" id="quitusMedical">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="quitusComptabilite">QuitusComptabilite</label>
+                    <input [(ngModel)]="inscriptionacad.quitusComptabilite" class="form-control" type="text" name="quitusComptabilite" id="quitusComptabilite">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="quitusVieUniversitaire">QuitusVieUniversitaire</label>
+                    <input [(ngModel)]="inscriptionacad.quitusVieUniversitaire" class="form-control" type="text" name="quitusVieUniversitaire" id="quitusVieUniversitaire">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="universitepartenaire">Universitepartenaire</label>
+                    <input [(ngModel)]="inscriptionacad.universitepartenaire" class="form-control" type="text" name="universitepartenaire" id="universitepartenaire">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="sourcefinancement">Sourcefinancement</label>
+                    <input [(ngModel)]="inscriptionacad.sourcefinancement" class="form-control" type="text" name="sourcefinancement" id="sourcefinancement">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="coencadreur">Coencadreur</label>
+                    <input [(ngModel)]="inscriptionacad.coencadreur" class="form-control" type="text" name="coencadreur" id="coencadreur">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="premiereanneeinscription">Premiereanneeinscription</label>
+                    <input [(ngModel)]="inscriptionacad.premiereanneeinscription" class="form-control" type="text" name="premiereanneeinscription" id="premiereanneeinscription">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="datemodification">Datemodification</label>
+                    <input [(ngModel)]="inscriptionacad.datemodification" class="form-control" type="text" name="datemodification" id="datemodification">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="moyenneAnnuelle">MoyenneAnnuelle</label>
+                    <input [(ngModel)]="inscriptionacad.moyenneAnnuelle" class="form-control" type="text" name="moyenneAnnuelle" id="moyenneAnnuelle">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="totalCredit">TotalCredit</label>
+                    <input [(ngModel)]="inscriptionacad.totalCredit" class="form-control" type="text" name="totalCredit" id="totalCredit">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="creditCapitalise">CreditCapitalise</label>
+                    <input [(ngModel)]="inscriptionacad.creditCapitalise" class="form-control" type="text" name="creditCapitalise" id="creditCapitalise">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="decisionConseil">DecisionConseil</label>
+                    <input [(ngModel)]="inscriptionacad.decisionConseil" class="form-control" type="text" name="decisionConseil" id="decisionConseil">
+                </div>
+            </div>
+                
+      
+    </div>
+    <!-- fin body -->
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="inscriptionacadForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+  </p-fieldset>
+</form>
+<!-- /form inscriptionacad info -->

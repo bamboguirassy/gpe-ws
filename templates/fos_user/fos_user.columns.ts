@@ -1,0 +1,43 @@
+const fos_userColumns = [
+    { header: 'Username', field: 'username', dataKey: 'username' },
+            { header: 'UsernameCanonical', field: 'usernameCanonical', dataKey: 'usernameCanonical' },
+            { header: 'Email', field: 'email', dataKey: 'email' },
+            { header: 'EmailCanonical', field: 'emailCanonical', dataKey: 'emailCanonical' },
+            { header: 'Enabled', field: 'enabled', dataKey: 'enabled' },
+            { header: 'Salt', field: 'salt', dataKey: 'salt' },
+            { header: 'Password', field: 'password', dataKey: 'password' },
+            { header: 'LastLogin', field: 'lastLogin', dataKey: 'lastLogin' },
+            { header: 'ConfirmationToken', field: 'confirmationToken', dataKey: 'confirmationToken' },
+            { header: 'PasswordRequestedAt', field: 'passwordRequestedAt', dataKey: 'passwordRequestedAt' },
+            { header: 'Roles', field: 'roles', dataKey: 'roles' },
+                    { header: 'Prenom', field: 'prenom', dataKey: 'prenom' },
+            { header: 'Nom', field: 'nom', dataKey: 'nom' },
+            { header: 'Sexe', field: 'sexe', dataKey: 'sexe' },
+            { header: 'Titre', field: 'titre', dataKey: 'titre' },
+            { header: 'Photo', field: 'photo', dataKey: 'photo' },
+            { header: 'Statut', field: 'statut', dataKey: 'statut' },
+            { header: 'Last_activity', field: 'last_activity', dataKey: 'last_activity' },
+        ];
+
+const allowedFosUserFieldsForFilter = [
+    'username',
+    'usernameCanonical',
+    'email',
+    'emailCanonical',
+    'enabled',
+    'salt',
+    'password',
+    'lastLogin',
+    'confirmationToken',
+    'passwordRequestedAt',
+    'roles',
+    'prenom',
+    'nom',
+    'sexe',
+    'titre',
+    'photo',
+    'statut',
+    'last_activity',
+];
+
+export { fos_userColumns,allowedFosUserFieldsForFilter };

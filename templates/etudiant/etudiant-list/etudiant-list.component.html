@@ -1,0 +1,349 @@
+<p-toast></p-toast>
+<div class="row" *ngIf="'Etudiant'|listable">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <p-fieldset legend="Liste des etudiants" [toggleable]="true">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+          <p-toolbar>
+            <button *ngIf="'Etudiant'|listable" type="button" class="btn btn-outline-secondary" (click)="refreshList()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+            </button>
+            <button *ngIf="'Etudiant'|deletable" (click)="deleteSelectedEtudiants()" type="button"
+              class="btn btn-outline-danger pull-right ml-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'Etudiant'|creable" [routerLink]="['/'+etudiantSrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary pull-right ml-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+          <p-table #tt [value]="etudiants" [paginator]="true" [rows]="50" sortMode="multiple" selectionMode="multiple"
+            [(selection)]="selectedEtudiants" [resizableColumns]="true" [responsive]="true"
+            [contextMenu]="contextMenu" [(contextMenuSelection)]="selectedEtudiant" [scrollable]="true"
+            scrollHeight="400px" [globalFilterFields]="globalFilterFields" dataKey="id">
+            <ng-template pTemplate="caption">
+              Liste des etudiants<br>
+              <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+              <input type="text" pInputText size="50" placeholder="Rechercher dans le tableau"
+                (input)="tt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+              <div class="ui-helper-clearfix" style="text-align: left">
+                <button *ngIf="'Etudiant'|listable" type="button" pButton icon="pi pi-file-pdf" iconPos="left" label="PDF"
+                  (click)="exportPdf()" class="ui-button-warning pull-right ml-1"></button>
+                <button *ngIf="'Etudiant'|listable" type="button" pButton icon="pi pi-file-excel" iconPos="left"
+                  label="EXCEL" (click)="exportExcel()" style="margin-right: 0.5em;" class="ui-button-success pull-right"></button>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="colgroup">
+              <colgroup>
+                                  <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                    </colgroup>
+            </ng-template>
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                                <th [pSortableColumn]="'cni'" pResizableColumn>
+                  Cni <p-sortIcon [field]="'cni'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'ine'" pResizableColumn>
+                  Ine <p-sortIcon [field]="'ine'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'numinterne'" pResizableColumn>
+                  Numinterne <p-sortIcon [field]="'numinterne'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'nometudiant'" pResizableColumn>
+                  Nometudiant <p-sortIcon [field]="'nometudiant'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'prenometudiant'" pResizableColumn>
+                  Prenometudiant <p-sortIcon [field]="'prenometudiant'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'genre'" pResizableColumn>
+                  Genre <p-sortIcon [field]="'genre'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'datenaiss'" pResizableColumn>
+                  Datenaiss <p-sortIcon [field]="'datenaiss'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'lieunaiss'" pResizableColumn>
+                  Lieunaiss <p-sortIcon [field]="'lieunaiss'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'regionnaiss'" pResizableColumn>
+                  Regionnaiss <p-sortIcon [field]="'regionnaiss'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'adville'" pResizableColumn>
+                  Adville <p-sortIcon [field]="'adville'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'adquartier'" pResizableColumn>
+                  Adquartier <p-sortIcon [field]="'adquartier'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'adruevilla'" pResizableColumn>
+                  Adruevilla <p-sortIcon [field]="'adruevilla'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'email'" pResizableColumn>
+                  Email <p-sortIcon [field]="'email'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'emailUniv'" pResizableColumn>
+                  EmailUniv <p-sortIcon [field]="'emailUniv'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'notifmail'" pResizableColumn>
+                  Notifmail <p-sortIcon [field]="'notifmail'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'photo'" pResizableColumn>
+                  Photo <p-sortIcon [field]="'photo'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'lyceedeprovenance'" pResizableColumn>
+                  Lyceedeprovenance <p-sortIcon [field]="'lyceedeprovenance'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'teletudiant'" pResizableColumn>
+                  Teletudiant <p-sortIcon [field]="'teletudiant'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'teletudiant2'" pResizableColumn>
+                  Teletudiant2 <p-sortIcon [field]="'teletudiant2'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'seriebac'" pResizableColumn>
+                  Seriebac <p-sortIcon [field]="'seriebac'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'diplomeentree'" pResizableColumn>
+                  Diplomeentree <p-sortIcon [field]="'diplomeentree'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'moyennebac'" pResizableColumn>
+                  Moyennebac <p-sortIcon [field]="'moyennebac'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'mentionbac'" pResizableColumn>
+                  Mentionbac <p-sortIcon [field]="'mentionbac'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'groupepassage'" pResizableColumn>
+                  Groupepassage <p-sortIcon [field]="'groupepassage'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'anneeBac'" pResizableColumn>
+                  AnneeBac <p-sortIcon [field]="'anneeBac'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'handicap'" pResizableColumn>
+                  Handicap <p-sortIcon [field]="'handicap'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'typeHandicap'" pResizableColumn>
+                  TypeHandicap <p-sortIcon [field]="'typeHandicap'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'descriptionHandicap'" pResizableColumn>
+                  DescriptionHandicap <p-sortIcon [field]="'descriptionHandicap'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'orphelin'" pResizableColumn>
+                  Orphelin <p-sortIcon [field]="'orphelin'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'situationMatrimoniale'" pResizableColumn>
+                  SituationMatrimoniale <p-sortIcon [field]="'situationMatrimoniale'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'nomconjoint'" pResizableColumn>
+                  Nomconjoint <p-sortIcon [field]="'nomconjoint'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'nbreenfant'" pResizableColumn>
+                  Nbreenfant <p-sortIcon [field]="'nbreenfant'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'nomcontact'" pResizableColumn>
+                  Nomcontact <p-sortIcon [field]="'nomcontact'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'telcontact'" pResizableColumn>
+                  Telcontact <p-sortIcon [field]="'telcontact'"></p-sortIcon>
+              </th>
+                    </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-etudiant let-editing="editing">
+              <tr [pEditableRow]="etudiant" [pSelectableRow]="etudiant" [pContextMenuRow]="etudiant">
+                <td style="width: 3em">
+                  <p-tableCheckbox [value]="etudiant"></p-tableCheckbox>
+                </td>
+                                                  <td class="ui-resizable-column">
+                  {{ etudiant.cni }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.ine }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.numinterne }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.nometudiant }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.prenometudiant }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.genre }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.datenaiss ? etudiant.datenaiss|date('Y-m-d') : '' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.lieunaiss }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.regionnaiss }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.adville }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.adquartier }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.adruevilla }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.email }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.emailUniv }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.notifmail ? 'Yes' : 'No' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.photo }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.lyceedeprovenance }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.teletudiant }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.teletudiant2 }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.seriebac }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.diplomeentree }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.moyennebac }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.mentionbac }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.groupepassage }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.anneeBac }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.handicap }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.typeHandicap }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.descriptionHandicap }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.orphelin }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.situationMatrimoniale }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.nomconjoint }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.nbreenfant }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.nomcontact }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ etudiant.telcontact }}
+                </td>
+                          </tr>
+            </ng-template>
+            <ng-template pTemplate="footer" let-columns>
+              <tr>
+                <td style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </td>
+                                   <td>Cni</td>
+                             <td>Ine</td>
+                             <td>Numinterne</td>
+                             <td>Nometudiant</td>
+                             <td>Prenometudiant</td>
+                             <td>Genre</td>
+                             <td>Datenaiss</td>
+                             <td>Lieunaiss</td>
+                             <td>Regionnaiss</td>
+                             <td>Adville</td>
+                             <td>Adquartier</td>
+                             <td>Adruevilla</td>
+                             <td>Email</td>
+                             <td>EmailUniv</td>
+                             <td>Notifmail</td>
+                             <td>Photo</td>
+                             <td>Lyceedeprovenance</td>
+                             <td>Teletudiant</td>
+                             <td>Teletudiant2</td>
+                             <td>Seriebac</td>
+                             <td>Diplomeentree</td>
+                             <td>Moyennebac</td>
+                             <td>Mentionbac</td>
+                             <td>Groupepassage</td>
+                             <td>AnneeBac</td>
+                             <td>Handicap</td>
+                             <td>TypeHandicap</td>
+                             <td>DescriptionHandicap</td>
+                             <td>Orphelin</td>
+                             <td>SituationMatrimoniale</td>
+                             <td>Nomconjoint</td>
+                             <td>Nbreenfant</td>
+                             <td>Nomcontact</td>
+                             <td>Telcontact</td>
+                    </tr>
+            </ng-template>
+          </p-table>
+          <p-contextMenu #contextMenu [model]="cMenuItems"></p-contextMenu>
+          <p-toolbar>
+            <button *ngIf="'Etudiant'|deletable" (click)="deleteSelectedEtudiants()" type="button"
+              class="btn btn-outline-danger mr-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'Etudiant'|creable" [routerLink]="['/'+etudiantSrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary mr-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+        </div>
+      </div>
+    </p-fieldset>
+  </div>
+</div>

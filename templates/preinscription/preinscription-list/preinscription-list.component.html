@@ -1,0 +1,237 @@
+<p-toast></p-toast>
+<div class="row" *ngIf="'Preinscription'|listable">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <p-fieldset legend="Liste des preinscriptions" [toggleable]="true">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+          <p-toolbar>
+            <button *ngIf="'Preinscription'|listable" type="button" class="btn btn-outline-secondary" (click)="refreshList()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+            </button>
+            <button *ngIf="'Preinscription'|deletable" (click)="deleteSelectedPreinscriptions()" type="button"
+              class="btn btn-outline-danger pull-right ml-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'Preinscription'|creable" [routerLink]="['/'+preinscriptionSrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary pull-right ml-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+          <p-table #tt [value]="preinscriptions" [paginator]="true" [rows]="50" sortMode="multiple" selectionMode="multiple"
+            [(selection)]="selectedPreinscriptions" [resizableColumns]="true" [responsive]="true"
+            [contextMenu]="contextMenu" [(contextMenuSelection)]="selectedPreinscription" [scrollable]="true"
+            scrollHeight="400px" [globalFilterFields]="globalFilterFields" dataKey="id">
+            <ng-template pTemplate="caption">
+              Liste des preinscriptions<br>
+              <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+              <input type="text" pInputText size="50" placeholder="Rechercher dans le tableau"
+                (input)="tt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+              <div class="ui-helper-clearfix" style="text-align: left">
+                <button *ngIf="'Preinscription'|listable" type="button" pButton icon="pi pi-file-pdf" iconPos="left" label="PDF"
+                  (click)="exportPdf()" class="ui-button-warning pull-right ml-1"></button>
+                <button *ngIf="'Preinscription'|listable" type="button" pButton icon="pi pi-file-excel" iconPos="left"
+                  label="EXCEL" (click)="exportExcel()" style="margin-right: 0.5em;" class="ui-button-success pull-right"></button>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="colgroup">
+              <colgroup>
+                                  <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                    </colgroup>
+            </ng-template>
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                                <th [pSortableColumn]="'idfiliere'" pResizableColumn>
+                  Idfiliere <p-sortIcon [field]="'idfiliere'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'idanneeacad'" pResizableColumn>
+                  Idanneeacad <p-sortIcon [field]="'idanneeacad'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'idniveau'" pResizableColumn>
+                  Idniveau <p-sortIcon [field]="'idniveau'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'cni'" pResizableColumn>
+                  Cni <p-sortIcon [field]="'cni'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'idtypeadmission'" pResizableColumn>
+                  Idtypeadmission <p-sortIcon [field]="'idtypeadmission'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'ine'" pResizableColumn>
+                  Ine <p-sortIcon [field]="'ine'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'passage'" pResizableColumn>
+                  Passage <p-sortIcon [field]="'passage'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'prenometudiant'" pResizableColumn>
+                  Prenometudiant <p-sortIcon [field]="'prenometudiant'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'nometudiant'" pResizableColumn>
+                  Nometudiant <p-sortIcon [field]="'nometudiant'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'datenaiss'" pResizableColumn>
+                  Datenaiss <p-sortIcon [field]="'datenaiss'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'lieunaiss'" pResizableColumn>
+                  Lieunaiss <p-sortIcon [field]="'lieunaiss'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'email'" pResizableColumn>
+                  Email <p-sortIcon [field]="'email'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'tel'" pResizableColumn>
+                  Tel <p-sortIcon [field]="'tel'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'datenotif'" pResizableColumn>
+                  Datenotif <p-sortIcon [field]="'datenotif'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'datedelai'" pResizableColumn>
+                  Datedelai <p-sortIcon [field]="'datedelai'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'estinscrit'" pResizableColumn>
+                  Estinscrit <p-sortIcon [field]="'estinscrit'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'codeOperateur'" pResizableColumn>
+                  CodeOperateur <p-sortIcon [field]="'codeOperateur'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'datePaiement'" pResizableColumn>
+                  DatePaiement <p-sortIcon [field]="'datePaiement'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'numeroTransaction'" pResizableColumn>
+                  NumeroTransaction <p-sortIcon [field]="'numeroTransaction'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'montant'" pResizableColumn>
+                  Montant <p-sortIcon [field]="'montant'"></p-sortIcon>
+              </th>
+                    </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-preinscription let-editing="editing">
+              <tr [pEditableRow]="preinscription" [pSelectableRow]="preinscription" [pContextMenuRow]="preinscription">
+                <td style="width: 3em">
+                  <p-tableCheckbox [value]="preinscription"></p-tableCheckbox>
+                </td>
+                                                  <td class="ui-resizable-column">
+                  {{ preinscription.idfiliere }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.idanneeacad }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.idniveau }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.cni }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.idtypeadmission }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.ine }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.passage }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.prenometudiant }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.nometudiant }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.datenaiss ? preinscription.datenaiss|date('Y-m-d') : '' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.lieunaiss }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.email }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.tel }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.datenotif ? preinscription.datenotif|date('Y-m-d') : '' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.datedelai ? preinscription.datedelai|date('Y-m-d') : '' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.estinscrit ? 'Yes' : 'No' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.codeOperateur }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.datePaiement }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.numeroTransaction }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ preinscription.montant }}
+                </td>
+                          </tr>
+            </ng-template>
+            <ng-template pTemplate="footer" let-columns>
+              <tr>
+                <td style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </td>
+                                   <td>Idfiliere</td>
+                             <td>Idanneeacad</td>
+                             <td>Idniveau</td>
+                             <td>Cni</td>
+                             <td>Idtypeadmission</td>
+                             <td>Ine</td>
+                             <td>Passage</td>
+                             <td>Prenometudiant</td>
+                             <td>Nometudiant</td>
+                             <td>Datenaiss</td>
+                             <td>Lieunaiss</td>
+                             <td>Email</td>
+                             <td>Tel</td>
+                             <td>Datenotif</td>
+                             <td>Datedelai</td>
+                             <td>Estinscrit</td>
+                             <td>CodeOperateur</td>
+                             <td>DatePaiement</td>
+                             <td>NumeroTransaction</td>
+                             <td>Montant</td>
+                    </tr>
+            </ng-template>
+          </p-table>
+          <p-contextMenu #contextMenu [model]="cMenuItems"></p-contextMenu>
+          <p-toolbar>
+            <button *ngIf="'Preinscription'|deletable" (click)="deleteSelectedPreinscriptions()" type="button"
+              class="btn btn-outline-danger mr-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'Preinscription'|creable" [routerLink]="['/'+preinscriptionSrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary mr-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+        </div>
+      </div>
+    </p-fieldset>
+  </div>
+</div>
