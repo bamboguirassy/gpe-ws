@@ -8,4 +8,4 @@ jms_serializer:
         auto_detection: false
     handlers:
         datetime:
-            default_format: "Y-m-d H:i:s"
+            default_format: ~
