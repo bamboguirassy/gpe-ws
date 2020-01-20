@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Preinscription
  *
- * @ORM\Table(name="preinscription", uniqueConstraints={@ORM\UniqueConstraint(name="idFiliere", columns={"idFiliere", "cni", "idAnneeAcad"})}, indexes={@ORM\Index(name="fk_preisncription_Niveau1_idx", columns={"idNiveau"}), @ORM\Index(name="fk_preisncription_Filiere1_idx", columns={"idFiliere"}), @ORM\Index(name="fk_preisncription_AnneeAcad1_idx", columns={"idAnneeAcad"}), @ORM\Index(name="fk_preisncription_TypeAdmission1_idx", columns={"idTypeAdmission"})})
+ * @ORM\Table(name="preinscription", uniqueConstraints={@ORM\UniqueConstraint(name="idFiliere", columns={"idFiliere", "cni", "idAnneeAcad"})}, indexes={@ORM\Index(name="fk_preisncription_AnneeAcad1_idx", columns={"idAnneeAcad"}), @ORM\Index(name="fk_preisncription_Filiere1_idx", columns={"idFiliere"}), @ORM\Index(name="fk_preisncription_Niveau1_idx", columns={"idNiveau"}), @ORM\Index(name="fk_preisncription_TypeAdmission1_idx", columns={"idTypeAdmission"})})
  * @ORM\Entity
  */
 class Preinscription
@@ -22,39 +22,11 @@ class Preinscription
     private $id;
 
     /**
-     * @var int
-     *
-     * @ORM\Column(name="idFiliere", type="integer", nullable=false)
-     */
-    private $idfiliere;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idAnneeAcad", type="integer", nullable=false)
-     */
-    private $idanneeacad;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idNiveau", type="integer", nullable=false)
-     */
-    private $idniveau;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="cni", type="string", length=45, nullable=false)
      */
     private $cni;
-
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="idTypeAdmission", type="integer", nullable=true)
-     */
-    private $idtypeadmission;
 
     /**
      * @var string|null
@@ -161,45 +133,49 @@ class Preinscription
      */
     private $montant;
 
+    /**
+     * @var \Anneeacad
+     *
+     * @ORM\ManyToOne(targetEntity="Anneeacad")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idAnneeAcad", referencedColumnName="id")
+     * })
+     */
+    private $idanneeacad;
+
+    /**
+     * @var \Filiere
+     *
+     * @ORM\ManyToOne(targetEntity="Filiere")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idFiliere", referencedColumnName="id")
+     * })
+     */
+    private $idfiliere;
+
+    /**
+     * @var \Niveau
+     *
+     * @ORM\ManyToOne(targetEntity="Niveau")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idNiveau", referencedColumnName="id")
+     * })
+     */
+    private $idniveau;
+
+    /**
+     * @var \Typeadmission
+     *
+     * @ORM\ManyToOne(targetEntity="Typeadmission")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idTypeAdmission", referencedColumnName="id")
+     * })
+     */
+    private $idtypeadmission;
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getIdfiliere(): ?int
-    {
-        return $this->idfiliere;
-    }
-
-    public function setIdfiliere(int $idfiliere): self
-    {
-        $this->idfiliere = $idfiliere;
-
-        return $this;
-    }
-
-    public function getIdanneeacad(): ?int
-    {
-        return $this->idanneeacad;
-    }
-
-    public function setIdanneeacad(int $idanneeacad): self
-    {
-        $this->idanneeacad = $idanneeacad;
-
-        return $this;
-    }
-
-    public function getIdniveau(): ?int
-    {
-        return $this->idniveau;
-    }
-
-    public function setIdniveau(int $idniveau): self
-    {
-        $this->idniveau = $idniveau;
-
-        return $this;
     }
 
     public function getCni(): ?string
@@ -210,18 +186,6 @@ class Preinscription
     public function setCni(string $cni): self
     {
         $this->cni = $cni;
-
-        return $this;
-    }
-
-    public function getIdtypeadmission(): ?int
-    {
-        return $this->idtypeadmission;
-    }
-
-    public function setIdtypeadmission(?int $idtypeadmission): self
-    {
-        $this->idtypeadmission = $idtypeadmission;
 
         return $this;
     }
@@ -402,6 +366,54 @@ class Preinscription
     public function setMontant(?int $montant): self
     {
         $this->montant = $montant;
+
+        return $this;
+    }
+
+    public function getIdanneeacad(): ?Anneeacad
+    {
+        return $this->idanneeacad;
+    }
+
+    public function setIdanneeacad(?Anneeacad $idanneeacad): self
+    {
+        $this->idanneeacad = $idanneeacad;
+
+        return $this;
+    }
+
+    public function getIdfiliere(): ?Filiere
+    {
+        return $this->idfiliere;
+    }
+
+    public function setIdfiliere(?Filiere $idfiliere): self
+    {
+        $this->idfiliere = $idfiliere;
+
+        return $this;
+    }
+
+    public function getIdniveau(): ?Niveau
+    {
+        return $this->idniveau;
+    }
+
+    public function setIdniveau(?Niveau $idniveau): self
+    {
+        $this->idniveau = $idniveau;
+
+        return $this;
+    }
+
+    public function getIdtypeadmission(): ?Typeadmission
+    {
+        return $this->idtypeadmission;
+    }
+
+    public function setIdtypeadmission(?Typeadmission $idtypeadmission): self
+    {
+        $this->idtypeadmission = $idtypeadmission;
 
         return $this;
     }

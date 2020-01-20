@@ -45,15 +45,15 @@ class EtudiantController extends AbstractController {
         $nombrePreinscriptionActive = 0;
 
         return [
-        'nombreInscription' => $nombreInscription,
-        'nombreClasseRedoublee' => $nombreClasseRedoublee,
-        'nombrePassageConditionnel' => $nombrePassageConditionnel,
-        'nombreUeNonValidee' => $nombreUeNonValidee,
-        'nombreUeValidee' => $nombreUeValidee,
-        'nombrePreinscriptionActive' => $nombrePreinscriptionActive,
+            'nombreInscription' => $nombreInscription,
+            'nombreClasseRedoublee' => $nombreClasseRedoublee,
+            'nombrePassageConditionnel' => $nombrePassageConditionnel,
+            'nombreUeNonValidee' => $nombreUeNonValidee,
+            'nombreUeValidee' => $nombreUeValidee,
+            'nombrePreinscriptionActive' => $nombrePreinscriptionActive,
         ];
     }
-    
+
     /**
      * @Rest\Get(path="/statistique-parcours/{id}", name="etudiant_statistique_globale")
      * @Rest\View(StatusCode = 200)
@@ -68,12 +68,12 @@ class EtudiantController extends AbstractController {
         $nombreUeAnterieureReprise = 0;
 
         return [
-        'nombreUeInscrite' => $nombreUeInscrite,
-        'totalCreditInscrit' => $totalCreditInscrit,
-        'totalCreditCapitalise' => $totalCreditCapitalise,
-        'nombreUeNonValidee' => $nombreUeNonValidee,
-        'nombreUeValidee' => $nombreUeValidee,
-        'nombreUeAnterieureReprise' => $nombreUeAnterieureReprise,
+            'nombreUeInscrite' => $nombreUeInscrite,
+            'totalCreditInscrit' => $totalCreditInscrit,
+            'totalCreditCapitalise' => $totalCreditCapitalise,
+            'nombreUeNonValidee' => $nombreUeNonValidee,
+            'nombreUeValidee' => $nombreUeValidee,
+            'nombreUeAnterieureReprise' => $nombreUeAnterieureReprise,
         ];
     }
 
@@ -100,6 +100,19 @@ class EtudiantController extends AbstractController {
      * @IsGranted("ROLE_ETUDIANT_AFFICHAGE")
      */
     public function show(Etudiant $etudiant): Etudiant {
+        return $etudiant;
+    }
+
+    /**
+     * @Rest\Get(path="/cni/{cni}", name="etudiant_by_cni")
+     * @Rest\View(StatusCode=200)
+     */
+    public function findByCni($cni): Etudiant {
+        $em = $this->getDoctrine()->getManager();
+        $etudiant = $em->getRepository(Etudiant::class)->findOneByCni($cni);
+        if (!$etudiant) {
+            throw $this->createNotFoundException("Etudiant introuvable avec le cni :" . $cni);
+        }
         return $etudiant;
     }
 

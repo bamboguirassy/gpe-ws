@@ -65,7 +65,6 @@ class PreinscriptionController extends AbstractController {
     /**
      * @Rest\Get(path="/{id}", name="preinscription_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_PREINSCRIPTION_AFFICHAGE")
      */
     public function show(Preinscription $preinscription): Preinscription {
         return $preinscription;
