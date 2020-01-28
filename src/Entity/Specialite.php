@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Specialite
  *
- * @ORM\Table(name="specialite", uniqueConstraints={@ORM\UniqueConstraint(name="idFiliere", columns={"idFiliere", "codeSpecialite"})}, indexes={@ORM\Index(name="idTypeDiplome", columns={"idTypeDiplome"}), @ORM\Index(name="langueutilisee", columns={"langueutilisee"}), @ORM\Index(name="fk_Specialite_Filiere1_idx", columns={"idFiliere"})})
+ * @ORM\Table(name="specialite", uniqueConstraints={@ORM\UniqueConstraint(name="idFiliere", columns={"idFiliere", "codeSpecialite"})}, indexes={@ORM\Index(name="fk_Specialite_Filiere1_idx", columns={"idFiliere"}), @ORM\Index(name="idTypeDiplome", columns={"idTypeDiplome"}), @ORM\Index(name="langueutilisee", columns={"langueutilisee"})})
  * @ORM\Entity
  */
 class Specialite
@@ -20,13 +20,6 @@ class Specialite
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idFiliere", type="integer", nullable=false)
-     */
-    private $idfiliere;
 
     /**
      * @var string
@@ -64,34 +57,35 @@ class Specialite
     private $typeaccreditation;
 
     /**
-     * @var int
-     *
-     * @ORM\Column(name="idTypeDiplome", type="integer", nullable=false)
-     */
-    private $idtypediplome;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="code_sigesr_specialite", type="string", length=30, nullable=false)
      */
     private $codeSigesrSpecialite;
 
+    /**
+     * @var \Filiere
+     *
+     * @ORM\ManyToOne(targetEntity="Filiere")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idFiliere", referencedColumnName="id")
+     * })
+     */
+    private $idfiliere;
+
+    /**
+     * @var \Typediplome
+     *
+     * @ORM\ManyToOne(targetEntity="Typediplome")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idTypeDiplome", referencedColumnName="id")
+     * })
+     */
+    private $idtypediplome;
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getIdfiliere(): ?int
-    {
-        return $this->idfiliere;
-    }
-
-    public function setIdfiliere(int $idfiliere): self
-    {
-        $this->idfiliere = $idfiliere;
-
-        return $this;
     }
 
     public function getCodespecialite(): ?string
@@ -154,18 +148,6 @@ class Specialite
         return $this;
     }
 
-    public function getIdtypediplome(): ?int
-    {
-        return $this->idtypediplome;
-    }
-
-    public function setIdtypediplome(int $idtypediplome): self
-    {
-        $this->idtypediplome = $idtypediplome;
-
-        return $this;
-    }
-
     public function getCodeSigesrSpecialite(): ?string
     {
         return $this->codeSigesrSpecialite;
@@ -174,6 +156,30 @@ class Specialite
     public function setCodeSigesrSpecialite(string $codeSigesrSpecialite): self
     {
         $this->codeSigesrSpecialite = $codeSigesrSpecialite;
+
+        return $this;
+    }
+
+    public function getIdfiliere(): ?Filiere
+    {
+        return $this->idfiliere;
+    }
+
+    public function setIdfiliere(?Filiere $idfiliere): self
+    {
+        $this->idfiliere = $idfiliere;
+
+        return $this;
+    }
+
+    public function getIdtypediplome(): ?Typediplome
+    {
+        return $this->idtypediplome;
+    }
+
+    public function setIdtypediplome(?Typediplome $idtypediplome): self
+    {
+        $this->idtypediplome = $idtypediplome;
 
         return $this;
     }

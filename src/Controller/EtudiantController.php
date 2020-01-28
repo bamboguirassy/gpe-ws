@@ -104,6 +104,61 @@ class EtudiantController extends AbstractController {
     }
 
     /**
+     * @Rest\Get(path="/situation-matrimoniale/", name="situation_matrimoniale_list")
+     * @Rest\View(StatusCode=200)
+     */
+    public function getSituationMatrimonialeValues() {
+        return [
+            ["value" => 'C', "label" => 'Célibataire'],
+            ["value" => 'M', "label" => 'Marié (e)'],
+            ["value" => 'D', "label" => 'Divorcé (e)'],
+            ["value" => 'V', "label" => 'Veuf (ve)']
+        ];
+    }
+
+    /**
+     * @Rest\Get(path="/handicap/", name="handicap_list")
+     * @Rest\View(StatusCode=200)
+     */
+    public function getHandicapValues() {
+        return [
+            ["value" => 'Oui', "label" => 'Oui'],
+            ["value" => 'Non', "label" => 'Non']
+        ];
+    }
+
+    /**
+     * @Rest\Get(path="/orphelin/", name="orphelin_list")
+     * @Rest\View(StatusCode=200)
+     */
+    public function getOrphelinValues() {
+        return [
+            ["value" => 'Oui', "label" => 'Oui'],
+            ["value" => 'Non', "label" => 'Non']
+        ];
+    }
+
+    /**
+     * @Rest\Get(path="/type-handicap/", name="type_handicap_list")
+     * @Rest\View(StatusCode=200)
+     */
+    public function getTypeHandicapValues() {
+        return [
+            ["value" => 'Handicap mental (ou déficience intellectuelle)', "label" => 'Handicap mental (ou déficience intellectuelle'],
+            ["value" => 'Handicap auditif', "label" => 'Handicap auditif'],
+            ["value" => 'Handicap visuel', "label" => "Handicap visuel"],
+            ["value" => 'Handicap moteur', "label" => "Handicap moteur"],
+            ["value" => 'Autisme et Troubles Envahissants du Développement', "label" => 'Autisme et Troubles Envahissants du Développement'],
+            ["value" => 'Handicap Psychique', "label" => 'Handicap Psychique'],
+            ["value" => 'Plurihandicap', "label" => 'Plurihandicap'],
+            ["value" => 'Polyhandicap', "label" => 'Polyhandicap'],
+            ["value" => 'Traumatismes crâniens', "label" => 'Traumatismes crâniens'],
+            ["value" => 'Maladies dégénératives', "label" => 'Maladies dégénératives'],
+            ["value" => 'Troubles dys', "label" => 'Troubles dys']
+        ];
+    }
+
+    /**
      * @Rest\Get(path="/cni/{cni}", name="etudiant_by_cni")
      * @Rest\View(StatusCode=200)
      */
@@ -121,7 +176,6 @@ class EtudiantController extends AbstractController {
      * @Rest\View(StatusCode=200)
      */
     public function getMonCompteEtudiant(): Etudiant {
-        $em = $this->getDoctrine()->getManager();
         return EtudiantController::getEtudiantConnecte($this);
     }
 
@@ -139,11 +193,17 @@ class EtudiantController extends AbstractController {
     /**
      * @Rest\Put(path="/{id}/edit", name="etudiant_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_ETUDIANT_EDITION")
      */
     public function edit(Request $request, Etudiant $etudiant): Etudiant {
         $form = $this->createForm(EtudiantType::class, $etudiant);
         $form->submit(Utils::serializeRequestContent($request));
+        if ($etudiant->getAdPays()->getAlpha2() != 'SN') {
+            throw $this->createNotFoundException("Le pays d'adresse doit être Sénégal");
+        }
+        if($etudiant->getHandicap()=='Non'){
+            $etudiant->setTypeHandicap(null);
+            $etudiant->setDescriptionHandicap(null);
+        }
 
         $this->getDoctrine()->getManager()->flush();
 

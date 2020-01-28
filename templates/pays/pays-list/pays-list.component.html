@@ -1,0 +1,149 @@
+<p-toast></p-toast>
+<div class="row" *ngIf="'Pays'|listable">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <p-fieldset legend="Liste des pays" [toggleable]="true">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+          <p-toolbar>
+            <button *ngIf="'Pays'|listable" type="button" class="btn btn-outline-secondary" (click)="refreshList()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+            </button>
+            <button *ngIf="'Pays'|deletable" (click)="deleteSelectedPayss()" type="button"
+              class="btn btn-outline-danger pull-right ml-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'Pays'|creable" [routerLink]="['/'+paySrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary pull-right ml-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+          <p-table #tt [value]="pays" [paginator]="true" [rows]="50" sortMode="multiple" selectionMode="multiple"
+            [(selection)]="selectedPayss" [resizableColumns]="true" [responsive]="true"
+            [contextMenu]="contextMenu" [(contextMenuSelection)]="selectedPays" [scrollable]="true"
+            scrollHeight="400px" [globalFilterFields]="globalFilterFields" dataKey="id">
+            <ng-template pTemplate="caption">
+              Liste des pays<br>
+              <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+              <input type="text" pInputText size="50" placeholder="Rechercher dans le tableau"
+                (input)="tt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+              <div class="ui-helper-clearfix" style="text-align: left">
+                <button *ngIf="'Pays'|listable" type="button" pButton icon="pi pi-file-pdf" iconPos="left" label="PDF"
+                  (click)="exportPdf()" class="ui-button-warning pull-right ml-1"></button>
+                <button *ngIf="'Pays'|listable" type="button" pButton icon="pi pi-file-excel" iconPos="left"
+                  label="EXCEL" (click)="exportExcel()" style="margin-right: 0.5em;" class="ui-button-success pull-right"></button>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="colgroup">
+              <colgroup>
+                                  <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                    </colgroup>
+            </ng-template>
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                                <th [pSortableColumn]="'code'" pResizableColumn>
+                  Code <p-sortIcon [field]="'code'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'alpha2'" pResizableColumn>
+                  Alpha2 <p-sortIcon [field]="'alpha2'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'alpha3'" pResizableColumn>
+                  Alpha3 <p-sortIcon [field]="'alpha3'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'nomEnGb'" pResizableColumn>
+                  NomEnGb <p-sortIcon [field]="'nomEnGb'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'nomFrFr'" pResizableColumn>
+                  NomFrFr <p-sortIcon [field]="'nomFrFr'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'nationalite'" pResizableColumn>
+                  Nationalite <p-sortIcon [field]="'nationalite'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'montantInscriptionLicence'" pResizableColumn>
+                  MontantInscriptionLicence <p-sortIcon [field]="'montantInscriptionLicence'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'montantInscriptionMaster'" pResizableColumn>
+                  MontantInscriptionMaster <p-sortIcon [field]="'montantInscriptionMaster'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'montantInscriptionDoctorat'" pResizableColumn>
+                  MontantInscriptionDoctorat <p-sortIcon [field]="'montantInscriptionDoctorat'"></p-sortIcon>
+              </th>
+                    </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-pay let-editing="editing">
+              <tr [pEditableRow]="pay" [pSelectableRow]="pay" [pContextMenuRow]="pay">
+                <td style="width: 3em">
+                  <p-tableCheckbox [value]="pay"></p-tableCheckbox>
+                </td>
+                                                  <td class="ui-resizable-column">
+                  {{ pay.code }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ pay.alpha2 }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ pay.alpha3 }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ pay.nomEnGb }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ pay.nomFrFr }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ pay.nationalite }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ pay.montantInscriptionLicence }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ pay.montantInscriptionMaster }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ pay.montantInscriptionDoctorat }}
+                </td>
+                          </tr>
+            </ng-template>
+            <ng-template pTemplate="footer" let-columns>
+              <tr>
+                <td style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </td>
+                                   <td>Code</td>
+                             <td>Alpha2</td>
+                             <td>Alpha3</td>
+                             <td>NomEnGb</td>
+                             <td>NomFrFr</td>
+                             <td>Nationalite</td>
+                             <td>MontantInscriptionLicence</td>
+                             <td>MontantInscriptionMaster</td>
+                             <td>MontantInscriptionDoctorat</td>
+                    </tr>
+            </ng-template>
+          </p-table>
+          <p-contextMenu #contextMenu [model]="cMenuItems"></p-contextMenu>
+          <p-toolbar>
+            <button *ngIf="'Pays'|deletable" (click)="deleteSelectedPayss()" type="button"
+              class="btn btn-outline-danger mr-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'Pays'|creable" [routerLink]="['/'+paySrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary mr-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+        </div>
+      </div>
+    </p-fieldset>
+  </div>
+</div>

@@ -1,0 +1,67 @@
+<p-toast></p-toast>
+<p-fieldset *ngIf="'Specialite'|showable" legend="Affichage des informations - Utilisateur" [toggleable]="true">
+  <p-toolbar>
+    <button *ngIf="'Specialite'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+      [routerLink]="['/'+specialiteSrv.getRoutePrefix(),specialite.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+      Modifier</button>
+    <button *ngIf="'Specialite'|clonable" [routerLink]="['/'+specialiteSrv.getRoutePrefix(),specialite.id,'clone']" type="button"
+      class="btn btn-outline-secondary pull-right ml-1">
+      <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+    </button>
+    <button *ngIf="'Specialite'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeSpecialite()"><i
+        class="fa fa-trash-o"></i> Supprimer</button>
+    <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+        class="fa fa-reply"></i> Retour</button>
+  </p-toolbar>
+  <p-tabView>
+    <p-tabPanel header="Détails">
+      <p-fieldset [legend]="specialite.id">
+        <table class="table">
+                                    <tr>
+                <th>Codespecialite</th>
+                <td>{{ specialite.codespecialite }}</td>
+            </tr>
+                                    <tr>
+                <th>Libellespecialite</th>
+                <td>{{ specialite.libellespecialite }}</td>
+            </tr>
+                                    <tr>
+                <th>Description</th>
+                <td>{{ specialite.description }}</td>
+            </tr>
+                                    <tr>
+                <th>Langueutilisee</th>
+                <td>{{ specialite.langueutilisee }}</td>
+            </tr>
+                                    <tr>
+                <th>Typeaccreditation</th>
+                <td>{{ specialite.typeaccreditation }}</td>
+            </tr>
+                                    <tr>
+                <th>CodeSigesrSpecialite</th>
+                <td>{{ specialite.codeSigesrSpecialite }}</td>
+            </tr>
+                    </table>
+        <p-toolbar>
+          <button *ngIf="'Specialite'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+            [routerLink]="['/'+specialiteSrv.getRoutePrefix(),specialite.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+            Modifier</button>
+          <button *ngIf="'Specialite'|clonable" [routerLink]="['/'+specialiteSrv.getRoutePrefix(),specialite.id,'clone']" type="button"
+            class="btn btn-outline-secondary pull-right ml-1">
+            <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+          </button>
+          <button *ngIf="'Specialite'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeSpecialite()"><i
+              class="fa fa-trash-o"></i> Supprimer</button>
+          <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+              class="fa fa-reply"></i> Retour</button>
+          <button *ngIf="'Specialite'|showable" type="button" class="btn btn-secondary ml-1" (click)="refresh()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+          </button>
+        </p-toolbar>
+      </p-fieldset>
+    </p-tabPanel>
+    <p-tabPanel header="Liste associée">
+      
+    </p-tabPanel>
+  </p-tabView>
+</p-fieldset>

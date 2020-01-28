@@ -35,34 +35,5 @@ class Specialiteue
      */
     private $idue;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getIdspecialite(): ?int
-    {
-        return $this->idspecialite;
-    }
-
-    public function setIdspecialite(int $idspecialite): self
-    {
-        $this->idspecialite = $idspecialite;
-
-        return $this;
-    }
-
-    public function getIdue(): ?int
-    {
-        return $this->idue;
-    }
-
-    public function setIdue(int $idue): self
-    {
-        $this->idue = $idue;
-
-        return $this;
-    }
-
 
 }

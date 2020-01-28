@@ -1,0 +1,79 @@
+<p-toast></p-toast>
+<p-fieldset *ngIf="'Pays'|showable" legend="Affichage des informations - Utilisateur" [toggleable]="true">
+  <p-toolbar>
+    <button *ngIf="'Pays'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+      [routerLink]="['/'+paySrv.getRoutePrefix(),pay.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+      Modifier</button>
+    <button *ngIf="'Pays'|clonable" [routerLink]="['/'+paySrv.getRoutePrefix(),pay.id,'clone']" type="button"
+      class="btn btn-outline-secondary pull-right ml-1">
+      <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+    </button>
+    <button *ngIf="'Pays'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removePays()"><i
+        class="fa fa-trash-o"></i> Supprimer</button>
+    <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+        class="fa fa-reply"></i> Retour</button>
+  </p-toolbar>
+  <p-tabView>
+    <p-tabPanel header="Détails">
+      <p-fieldset [legend]="pay.id">
+        <table class="table">
+                                    <tr>
+                <th>Code</th>
+                <td>{{ pay.code }}</td>
+            </tr>
+                                    <tr>
+                <th>Alpha2</th>
+                <td>{{ pay.alpha2 }}</td>
+            </tr>
+                                    <tr>
+                <th>Alpha3</th>
+                <td>{{ pay.alpha3 }}</td>
+            </tr>
+                                    <tr>
+                <th>NomEnGb</th>
+                <td>{{ pay.nomEnGb }}</td>
+            </tr>
+                                    <tr>
+                <th>NomFrFr</th>
+                <td>{{ pay.nomFrFr }}</td>
+            </tr>
+                                    <tr>
+                <th>Nationalite</th>
+                <td>{{ pay.nationalite }}</td>
+            </tr>
+                                    <tr>
+                <th>MontantInscriptionLicence</th>
+                <td>{{ pay.montantInscriptionLicence }}</td>
+            </tr>
+                                    <tr>
+                <th>MontantInscriptionMaster</th>
+                <td>{{ pay.montantInscriptionMaster }}</td>
+            </tr>
+                                    <tr>
+                <th>MontantInscriptionDoctorat</th>
+                <td>{{ pay.montantInscriptionDoctorat }}</td>
+            </tr>
+                    </table>
+        <p-toolbar>
+          <button *ngIf="'Pays'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+            [routerLink]="['/'+paySrv.getRoutePrefix(),pay.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+            Modifier</button>
+          <button *ngIf="'Pays'|clonable" [routerLink]="['/'+paySrv.getRoutePrefix(),pay.id,'clone']" type="button"
+            class="btn btn-outline-secondary pull-right ml-1">
+            <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+          </button>
+          <button *ngIf="'Pays'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removePays()"><i
+              class="fa fa-trash-o"></i> Supprimer</button>
+          <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+              class="fa fa-reply"></i> Retour</button>
+          <button *ngIf="'Pays'|showable" type="button" class="btn btn-secondary ml-1" (click)="refresh()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+          </button>
+        </p-toolbar>
+      </p-fieldset>
+    </p-tabPanel>
+    <p-tabPanel header="Liste associée">
+      
+    </p-tabPanel>
+  </p-tabView>
+</p-fieldset>

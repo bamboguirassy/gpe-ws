@@ -272,24 +272,24 @@ class Inscriptionacad
      */
     private $idfosuser;
 
-    public function getId(): ?int
+    public function getId()
     {
         return $this->id;
     }
 
-    public function getDateinscacad(): ?\DateTimeInterface
+    public function getDateinscacad()
     {
         return $this->dateinscacad;
     }
 
-    public function setDateinscacad(\DateTimeInterface $dateinscacad): self
+    public function setDateinscacad($dateinscacad): self
     {
         $this->dateinscacad = $dateinscacad;
 
         return $this;
     }
 
-    public function getPassage(): ?string
+    public function getPassage()
     {
         return $this->passage;
     }
@@ -301,7 +301,7 @@ class Inscriptionacad
         return $this;
     }
 
-    public function getEtat(): ?string
+    public function getEtat()
     {
         return $this->etat;
     }
@@ -313,79 +313,79 @@ class Inscriptionacad
         return $this;
     }
 
-    public function getMontantinscriptionacad(): ?int
+    public function getMontantinscriptionacad()
     {
         return $this->montantinscriptionacad;
     }
 
-    public function setMontantinscriptionacad(?int $montantinscriptionacad): self
+    public function setMontantinscriptionacad($montantinscriptionacad): self
     {
         $this->montantinscriptionacad = $montantinscriptionacad;
 
         return $this;
     }
 
-    public function getCoutformation(): ?int
+    public function getCoutformation()
     {
         return $this->coutformation;
     }
 
-    public function setCoutformation(?int $coutformation): self
+    public function setCoutformation($coutformation): self
     {
         $this->coutformation = $coutformation;
 
         return $this;
     }
 
-    public function getNumquittance(): ?string
+    public function getNumquittance()
     {
         return $this->numquittance;
     }
 
-    public function setNumquittance(?string $numquittance): self
+    public function setNumquittance($numquittance): self
     {
         $this->numquittance = $numquittance;
 
         return $this;
     }
 
-    public function getCartetiree(): ?bool
+    public function getCartetiree()
     {
         return $this->cartetiree;
     }
 
-    public function setCartetiree(?bool $cartetiree): self
+    public function setCartetiree($cartetiree): self
     {
         $this->cartetiree = $cartetiree;
 
         return $this;
     }
 
-    public function getCertificattire(): ?bool
+    public function getCertificattire()
     {
         return $this->certificattire;
     }
 
-    public function setCertificattire(?bool $certificattire): self
+    public function setCertificattire($certificattire): self
     {
         $this->certificattire = $certificattire;
 
         return $this;
     }
 
-    public function getValide(): ?bool
+    public function getValide()
     {
         return $this->valide;
     }
 
-    public function setValide(?bool $valide): self
+    public function setValide($valide): self
     {
         $this->valide = $valide;
 
         return $this;
     }
 
-    public function getQuitusBu(): ?bool
+    public function getQuitusBu()
     {
         return $this->quitusBu;
     }
@@ -397,7 +397,7 @@ class Inscriptionacad
         return $this;
     }
 
-    public function getQuitusSocial(): ?bool
+    public function getQuitusSocial()
     {
         return $this->quitusSocial;
     }
@@ -409,7 +409,7 @@ class Inscriptionacad
         return $this;
     }
 
-    public function getQuitusMedical(): ?bool
+    public function getQuitusMedical()
     {
         return $this->quitusMedical;
     }
@@ -421,7 +421,7 @@ class Inscriptionacad
         return $this;
     }
 
-    public function getQuitusComptabilite(): ?bool
+    public function getQuitusComptabilite()
     {
         return $this->quitusComptabilite;
     }
@@ -433,7 +433,7 @@ class Inscriptionacad
         return $this;
     }
 
-    public function getQuitusVieUniversitaire(): ?bool
+    public function getQuitusVieUniversitaire()
     {
         return $this->quitusVieUniversitaire;
     }
@@ -445,216 +445,216 @@ class Inscriptionacad
         return $this;
     }
 
-    public function getUniversitepartenaire(): ?string
+    public function getUniversitepartenaire()
     {
         return $this->universitepartenaire;
     }
 
-    public function setUniversitepartenaire(?string $universitepartenaire): self
+    public function setUniversitepartenaire($universitepartenaire): self
     {
         $this->universitepartenaire = $universitepartenaire;
 
         return $this;
     }
 
-    public function getSourcefinancement(): ?string
+    public function getSourcefinancement()
     {
         return $this->sourcefinancement;
     }
 
-    public function setSourcefinancement(?string $sourcefinancement): self
+    public function setSourcefinancement($sourcefinancement): self
     {
         $this->sourcefinancement = $sourcefinancement;
 
         return $this;
     }
 
-    public function getCoencadreur(): ?string
+    public function getCoencadreur()
     {
         return $this->coencadreur;
     }
 
-    public function setCoencadreur(?string $coencadreur): self
+    public function setCoencadreur($coencadreur): self
     {
         $this->coencadreur = $coencadreur;
 
         return $this;
     }
 
-    public function getPremiereanneeinscription(): ?int
+    public function getPremiereanneeinscription()
     {
         return $this->premiereanneeinscription;
     }
 
-    public function setPremiereanneeinscription(?int $premiereanneeinscription): self
+    public function setPremiereanneeinscription($premiereanneeinscription): self
     {
         $this->premiereanneeinscription = $premiereanneeinscription;
 
         return $this;
     }
 
-    public function getDatemodification(): ?\DateTimeInterface
+    public function getDatemodification()
     {
         return $this->datemodification;
     }
 
-    public function setDatemodification(?\DateTimeInterface $datemodification): self
+    public function setDatemodification($datemodification): self
     {
         $this->datemodification = $datemodification;
 
         return $this;
     }
 
-    public function getMoyenneAnnuelle(): ?float
+    public function getMoyenneAnnuelle()
     {
         return $this->moyenneAnnuelle;
     }
 
-    public function setMoyenneAnnuelle(?float $moyenneAnnuelle): self
+    public function setMoyenneAnnuelle($moyenneAnnuelle): self
     {
         $this->moyenneAnnuelle = $moyenneAnnuelle;
 
         return $this;
     }
 
-    public function getTotalCredit(): ?int
+    public function getTotalCredit()
     {
         return $this->totalCredit;
     }
 
-    public function setTotalCredit(?int $totalCredit): self
+    public function setTotalCredit($totalCredit): self
     {
         $this->totalCredit = $totalCredit;
 
         return $this;
     }
 
-    public function getCreditCapitalise(): ?int
+    public function getCreditCapitalise()
     {
         return $this->creditCapitalise;
     }
 
-    public function setCreditCapitalise(?int $creditCapitalise): self
+    public function setCreditCapitalise($creditCapitalise): self
     {
         $this->creditCapitalise = $creditCapitalise;
 
         return $this;
     }
 
-    public function getDecisionConseil(): ?string
+    public function getDecisionConseil()
     {
         return $this->decisionConseil;
     }
 
-    public function setDecisionConseil(?string $decisionConseil): self
+    public function setDecisionConseil($decisionConseil): self
     {
         $this->decisionConseil = $decisionConseil;
 
         return $this;
     }
 
-    public function getIdclasse(): ?Classe
+    public function getIdclasse()
     {
         return $this->idclasse;
     }
 
-    public function setIdclasse(?Classe $idclasse): self
+    public function setIdclasse($idclasse): self
     {
         $this->idclasse = $idclasse;
 
         return $this;
     }
 
-    public function getIdmodaliteenseignement(): ?Modaliteenseignement
+    public function getIdmodaliteenseignement()
     {
         return $this->idmodaliteenseignement;
     }
 
-    public function setIdmodaliteenseignement(?Modaliteenseignement $idmodaliteenseignement): self
+    public function setIdmodaliteenseignement($idmodaliteenseignement): self
     {
         $this->idmodaliteenseignement = $idmodaliteenseignement;
 
         return $this;
     }
 
-    public function getIdmodepaiement(): ?Modepaiement
+    public function getIdmodepaiement()
     {
         return $this->idmodepaiement;
     }
 
-    public function setIdmodepaiement(?Modepaiement $idmodepaiement): self
+    public function setIdmodepaiement($idmodepaiement): self
     {
         $this->idmodepaiement = $idmodepaiement;
 
         return $this;
     }
 
-    public function getIdregimeinscription(): ?Regimeinscription
+    public function getIdregimeinscription()
     {
         return $this->idregimeinscription;
     }
 
-    public function setIdregimeinscription(?Regimeinscription $idregimeinscription): self
+    public function setIdregimeinscription($idregimeinscription): self
     {
         $this->idregimeinscription = $idregimeinscription;
 
         return $this;
     }
 
-    public function getIdspecialite(): ?Specialite
+    public function getIdspecialite()
     {
         return $this->idspecialite;
     }
 
-    public function setIdspecialite(?Specialite $idspecialite): self
+    public function setIdspecialite($idspecialite): self
     {
         $this->idspecialite = $idspecialite;
 
         return $this;
     }
 
-    public function getIdbourse(): ?Bourse
+    public function getIdbourse()
     {
         return $this->idbourse;
     }
 
-    public function setIdbourse(?Bourse $idbourse): self
+    public function setIdbourse($idbourse): self
     {
         $this->idbourse = $idbourse;
 
         return $this;
     }
 
-    public function getIdetudiant(): ?Etudiant
+    public function getIdetudiant()
     {
         return $this->idetudiant;
     }
 
-    public function setIdetudiant(?Etudiant $idetudiant): self
+    public function setIdetudiant($idetudiant): self
     {
         $this->idetudiant = $idetudiant;
 
         return $this;
     }
 
-    public function getEncadreur(): ?Enseignant
+    public function getEncadreur()
     {
         return $this->encadreur;
     }
 
-    public function setEncadreur(?Enseignant $encadreur): self
+    public function setEncadreur($encadreur): self
     {
         $this->encadreur = $encadreur;
 
         return $this;
     }
 
-    public function getIdfosuser(): ?FosUser
+    public function getIdfosuser()
     {
         return $this->idfosuser;
     }
 
-    public function setIdfosuser(?FosUser $idfosuser): self
+    public function setIdfosuser($idfosuser): self
     {
         $this->idfosuser = $idfosuser;
 

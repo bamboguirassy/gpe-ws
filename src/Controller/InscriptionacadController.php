@@ -3,6 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Inscriptionacad;
+use App\Entity\Classe;
+use App\Entity\Etudiant;
+use App\Entity\Modaliteenseignement;
+use App\Entity\Preinscription;
 use App\Form\InscriptionacadType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,28 +35,102 @@ class InscriptionacadController extends AbstractController {
     }
 
     /**
+     * @Rest\Get(path="/preinscription/{id}", name="inscriptionacad_by_preinscription")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findByPreinscription(Preinscription $preinscription) {
+        $em = $this->getDoctrine()->getManager();
+        $classe = $em->getRepository(Classe::class)->findOneBy(['idniveau' => $preinscription->getIdniveau(),
+            'idfiliere' => $preinscription->getIdfiliere(), 'idanneeacad' => $preinscription->getIdanneeacad()]);
+        if (!$classe) {
+            throw $this->createNotFoundException("Classe introuvable pour la preinscription selectionnée");
+        }
+        $inscriptionacads = $em->createQuery("select ia from App\Entity\Inscriptionacad ia, "
+                        . "App\Entity\Etudiant et where ia.idclasse=?1 and ia.idetudiant=et and et.cni=?2 ")
+                ->setParameter(1, $classe)
+                ->setParameter(2, $preinscription->getCni())
+                ->getResult();
+
+
+        return count($inscriptionacads) ? $inscriptionacads[0] : array('id' => null);
+    }
+
+    /**
      * @Rest\Get(path="/mes-inscriptions/", name="mes_inscriptionacad_index")
      * @Rest\View(StatusCode = 200)
      */
     public function getInscriptionEtudiantConnecte(): array {
         $em = $this->getDoctrine()->getManager();
         $inscriptionacads = $em->getRepository(Inscriptionacad::class)
-                ->findBy(['idetudiant'=>EtudiantController::getEtudiantConnecte($this),
-                    'etat'=>'V'],['id'=>'DESC']);
+                ->findBy(['idetudiant' => EtudiantController::getEtudiantConnecte($this),
+            'etat' => 'V'], ['id' => 'DESC']);
         return count($inscriptionacads) ? $inscriptionacads : [];
     }
 
     /**
      * @Rest\Post(Path="/create", name="inscriptionacad_new")
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_INSCRIPTIONACAD_NOUVEAU")
      */
     public function create(Request $request): Inscriptionacad {
         $inscriptionacad = new Inscriptionacad();
         $form = $this->createForm(InscriptionacadType::class, $inscriptionacad);
         $form->submit(Utils::serializeRequestContent($request));
 
+        $inscriptionacad->setDateinscacad(new \DateTime());
+
         $entityManager = $this->getDoctrine()->getManager();
+
+        $requestData = json_decode($request->getContent());
+        if (!isset($requestData->preinscirptionId)) {
+            throw $this->createNotFoundException("Préinscription correspondante introuvable...");
+        }
+        $preinscriptionId = $requestData->preinscirptionId;
+        $preinscription = $entityManager->getRepository(Preinscription::class)
+                ->find($preinscriptionId);
+        $inscriptionacad->setPassage($preinscription->getPassage());
+        $inscriptionacad->setIdfosuser($this->getUser());
+        $inscriptionacad->setEtat("I");
+
+        $etudiant = $entityManager->getRepository(Etudiant::class)
+                ->findOneByCni($preinscription->getCni());
+        if (!$etudiant) {
+            throw $this->createNotFoundException("Etudiant introuvable...");
+        }
+        $inscriptionacad->setIdetudiant($etudiant);
+
+        $classe = $entityManager->getRepository(Classe::class)
+                ->findOneBy(['idfiliere' => $preinscription->getIdfiliere(),
+            'idniveau' => $preinscription->getidniveau(),
+            'idanneeacad' => $preinscription->getIdanneeacad()]);
+        if (!$classe) {
+            throw $this->createNotFoundException("Aucune classe trouvée pour effectuer l'inscription...");
+        }
+
+        $inscriptionacad->setIdclasse($classe);
+
+        //set default modalité enseignement à presentiel
+        $modaliteEnseignementPresentiel = $entityManager
+                ->getRepository("App\Entity\Modaliteenseignement")
+                ->findOneByCodemodaliteenseignement('PRES');
+        if (!$modaliteEnseignementPresentiel) {
+            throw $this->createNotFoundException("Modalité enseignement presentiel introuvable...");
+        }
+        $inscriptionacad->setIdmodaliteenseignement($modaliteEnseignementPresentiel);
+        //find moyen paiement orange money
+        $modepaiement = $entityManager->getRepository("App\Entity\Modepaiement")
+                ->findOneByCodemodepaiement("OM");
+        if (!$modepaiement) {
+            throw $this->createNotFoundException("Mode de paiement orange money introuvable...");
+        }
+        $inscriptionacad->setIdmodepaiement($modepaiement);
+        //find non boursier et le definir
+        $typeBourseNonBoursier=$entityManager->getRepository("App\Entity\Bourse")
+                ->findOneByCodebourse("NB");
+        if(!$typeBourseNonBoursier){
+            throw $this->createNotFoundException("Type de bourse introuvable pour Non Boursier");
+        }
+        $inscriptionacad->setIdbourse($typeBourseNonBoursier);
+
         $entityManager->persist($inscriptionacad);
         $entityManager->flush();
 
@@ -71,7 +149,6 @@ class InscriptionacadController extends AbstractController {
     /**
      * @Rest\Put(path="/{id}/edit", name="inscriptionacad_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_INSCRIPTIONACAD_EDITION")
      */
     public function edit(Request $request, Inscriptionacad $inscriptionacad): Inscriptionacad {
         $form = $this->createForm(InscriptionacadType::class, $inscriptionacad);

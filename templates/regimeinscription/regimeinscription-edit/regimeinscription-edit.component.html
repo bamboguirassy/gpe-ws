@@ -1,0 +1,48 @@
+
+<p-toast></p-toast>
+<!-- form regimeinscription info -->
+<form *ngIf="'Regimeinscription'|editable" class="form" role="form" #regimeinscriptionForm="ngForm" autocomplete="off" (ngSubmit)="updateRegimeinscription()">
+  <p-fieldset legend="Modification utilisateur" [toggleable]="true">
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="regimeinscriptionForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+    <!-- debut body -->
+    <div class="row">
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="coderegimeinscription">Coderegimeinscription</label>
+                    <input [(ngModel)]="regimeinscription.coderegimeinscription" class="form-control" type="text" name="coderegimeinscription" id="coderegimeinscription">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="libelleregimeinscription">Libelleregimeinscription</label>
+                    <input [(ngModel)]="regimeinscription.libelleregimeinscription" class="form-control" type="text" name="libelleregimeinscription" id="libelleregimeinscription">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="description">Description</label>
+                    <input [(ngModel)]="regimeinscription.description" class="form-control" type="text" name="description" id="description">
+                </div>
+            </div>
+                
+      
+    </div>
+    <!-- fin body -->
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="regimeinscriptionForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+  </p-fieldset>
+</form>
+<!-- /form regimeinscription info -->
