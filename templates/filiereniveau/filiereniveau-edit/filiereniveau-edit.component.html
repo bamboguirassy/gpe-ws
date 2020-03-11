@@ -1,0 +1,30 @@
+
+<p-toast></p-toast>
+<!-- form filiereniveau info -->
+<form *ngIf="'Filiereniveau'|editable" class="form" role="form" #filiereniveauForm="ngForm" autocomplete="off" (ngSubmit)="updateFiliereniveau()">
+  <p-fieldset legend="Modification utilisateur" [toggleable]="true">
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="filiereniveauForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+    <!-- debut body -->
+    <div class="row">
+                
+      
+    </div>
+    <!-- fin body -->
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="filiereniveauForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+  </p-fieldset>
+</form>
+<!-- /form filiereniveau info -->
