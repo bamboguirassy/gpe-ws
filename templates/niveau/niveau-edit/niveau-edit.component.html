@@ -1,0 +1,60 @@
+
+<p-toast></p-toast>
+<!-- form niveau info -->
+<form *ngIf="'Niveau'|editable" class="form" role="form" #niveauForm="ngForm" autocomplete="off" (ngSubmit)="updateNiveau()">
+  <p-fieldset legend="Modification utilisateur" [toggleable]="true">
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="niveauForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+    <!-- debut body -->
+    <div class="row">
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="codeniveau">Codeniveau</label>
+                    <input [(ngModel)]="niveau.codeniveau" class="form-control" type="text" name="codeniveau" id="codeniveau">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="codeSigesr">CodeSigesr</label>
+                    <input [(ngModel)]="niveau.codeSigesr" class="form-control" type="text" name="codeSigesr" id="codeSigesr">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="libelleniveau">Libelleniveau</label>
+                    <input [(ngModel)]="niveau.libelleniveau" class="form-control" type="text" name="libelleniveau" id="libelleniveau">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="ddc">Ddc</label>
+                    <input [(ngModel)]="niveau.ddc" class="form-control" type="text" name="ddc" id="ddc">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="description">Description</label>
+                    <input [(ngModel)]="niveau.description" class="form-control" type="text" name="description" id="description">
+                </div>
+            </div>
+                
+      
+    </div>
+    <!-- fin body -->
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="niveauForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+  </p-fieldset>
+</form>
+<!-- /form niveau info -->
