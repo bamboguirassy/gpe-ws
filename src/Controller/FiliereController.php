@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Entite;
 use App\Entity\Filiere;
 use App\Form\FiliereType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,7 +29,7 @@ class FiliereController extends AbstractController
             ->getRepository(Filiere::class)
             ->findAll();
 
-        return count($filieres)?$filieres:[];
+        return count($filieres) ? $filieres : [];
     }
 
     /**
@@ -36,7 +37,8 @@ class FiliereController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERE_NOUVEAU")
      */
-    public function create(Request $request): Filiere    {
+    public function create(Request $request): Filiere
+    {
         $filiere = new Filiere();
         $form = $this->createForm(FiliereType::class, $filiere);
         $form->submit(Utils::serializeRequestContent($request));
@@ -53,17 +55,19 @@ class FiliereController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERE_AFFICHAGE")
      */
-    public function show(Filiere $filiere): Filiere    {
+    public function show(Filiere $filiere): Filiere
+    {
         return $filiere;
     }
 
-    
+
     /**
      * @Rest\Put(path="/{id}/edit", name="filiere_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERE_EDITION")
      */
-    public function edit(Request $request, Filiere $filiere): Filiere    {
+    public function edit(Request $request, Filiere $filiere): Filiere
+    {
         $form = $this->createForm(FiliereType::class, $filiere);
         $form->submit(Utils::serializeRequestContent($request));
 
@@ -71,15 +75,16 @@ class FiliereController extends AbstractController
 
         return $filiere;
     }
-    
+
     /**
      * @Rest\Put(path="/{id}/clone", name="filiere_clone",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERE_CLONE")
      */
-    public function cloner(Request $request, Filiere $filiere):  Filiere {
-        $em=$this->getDoctrine()->getManager();
-        $filiereNew=new Filiere();
+    public function cloner(Request $request, Filiere $filiere): Filiere
+    {
+        $em = $this->getDoctrine()->getManager();
+        $filiereNew = new Filiere();
         $form = $this->createForm(FiliereType::class, $filiereNew);
         $form->submit(Utils::serializeRequestContent($request));
         $em->persist($filiereNew);
@@ -94,20 +99,22 @@ class FiliereController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERE_SUPPRESSION")
      */
-    public function delete(Filiere $filiere): Filiere    {
+    public function delete(Filiere $filiere): Filiere
+    {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($filiere);
         $entityManager->flush();
 
         return $filiere;
     }
-    
+
     /**
      * @Rest\Post("/delete-selection/", name="filiere_selection_delete")
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERE_SUPPRESSION")
      */
-    public function deleteMultiple(Request $request): array {
+    public function deleteMultiple(Request $request): array
+    {
         $entityManager = $this->getDoctrine()->getManager();
         $filieres = Utils::getObjectFromRequest($request);
         if (!count($filieres)) {
@@ -120,5 +127,19 @@ class FiliereController extends AbstractController
         $entityManager->flush();
 
         return $filieres;
+    }
+
+    /**
+     * @Rest\Get("/entite/{id}", name="entite_filiere")
+     * @Rest\View(StatusCode=200)
+     * @IsGranted("ROLE_FILIERE_AFFICHAGE")
+     * @param Entite $entite
+     * @return mixed
+     */
+    public function findFiliereByEntite(Entite $entite)
+    {
+        $manager = $this->getDoctrine()->getManager();
+        return $entite;
+        return $manager->getRepository(Filiere::class)->findByIdentite($entite);
     }
 }
