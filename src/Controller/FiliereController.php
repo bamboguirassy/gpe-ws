@@ -25,16 +25,9 @@ class FiliereController extends AbstractController
      */
     public function index(): array
     {
-        $em = $this->getDoctrine()->getManager();
-        if ($this->getUser()->getIdgroup()->getCodegroupe() == 'SA') {
-            $filieres = $em->getRepository(Filiere::class)
-                ->findAll(['nomfiliere' => 'asc']);
-        } else {
-            $filieres = $em->createQuery('select f from App\Entity\Filiere f, '
-                . 'App\Entity\UserFiliere uf where uf.idfiliere=f and uf.iduser=?1')
-                ->setParameter(1, $this->getUser())
-                ->getResult();
-        }
+        $filieres = $this->getDoctrine()
+            ->getRepository(Filiere::class)
+            ->findAll();
 
         return count($filieres) ? $filieres : [];
     }
@@ -146,6 +139,7 @@ class FiliereController extends AbstractController
     public function findFiliereByEntite(Entite $entite)
     {
         $manager = $this->getDoctrine()->getManager();
+        return $entite;
         return $manager->getRepository(Filiere::class)->findByIdentite($entite);
     }
 }
