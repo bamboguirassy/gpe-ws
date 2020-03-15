@@ -24,9 +24,16 @@ class FiliereController extends AbstractController
      */
     public function index(): array
     {
-        $filieres = $this->getDoctrine()
-            ->getRepository(Filiere::class)
-            ->findAll();
+        $em = $this->getDoctrine()->getManager();
+        if ($this->getUser()->getIdgroup()->getCodegroupe() == 'SA') {
+            $filieres = $em->getRepository(Filiere::class)
+                    ->findAll(['nomfiliere'=>'asc']);
+        } else {
+            $filieres = $em->createQuery('select f from App\Entity\Filiere f, '
+                    . 'App\Entity\UserFiliere uf where uf.idfiliere=f and uf.iduser=?1')
+                    ->setParameter(1, $this->getUser())
+                    ->getResult();
+        }
 
         return count($filieres)?$filieres:[];
     }
