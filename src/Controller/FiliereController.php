@@ -139,7 +139,6 @@ class FiliereController extends AbstractController
     public function findFiliereByEntite(Entite $entite)
     {
         $manager = $this->getDoctrine()->getManager();
-        return $entite;
         return $manager->getRepository(Filiere::class)->findByIdentite($entite);
     }
 }

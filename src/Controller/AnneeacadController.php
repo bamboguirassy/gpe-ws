@@ -36,7 +36,7 @@ class AnneeacadController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_ANNEEACAD_NOUVEAU")
      */
-    public function create(Request $request): Anneeacad {
+    public function create(Request $request): Anneeacad    {
         $anneeacad = new Anneeacad();
         $form = $this->createForm(AnneeacadType::class, $anneeacad);
         $form->submit(Utils::serializeRequestContent($request));
@@ -53,10 +53,11 @@ class AnneeacadController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_ANNEEACAD_AFFICHAGE")
      */
-    public function show(Anneeacad $anneeacad): Anneeacad {
+    public function show(Anneeacad $anneeacad): Anneeacad    {
         return $anneeacad;
     }
 
+    
     /**
      * @Rest\Put(path="/{id}/edit", name="anneeacad_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
