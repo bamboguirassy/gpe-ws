@@ -24,9 +24,16 @@ class FiliereController extends AbstractController
      */
     public function index(): array
     {
-        $filieres = $this->getDoctrine()
-            ->getRepository(Filiere::class)
-            ->findAll();
+        $em = $this->getDoctrine()->getManager();
+        if ($this->getUser()->getIdgroup()->getCodegroupe() == 'SA') {
+            $filieres = $em->getRepository(Filiere::class)
+                    ->findAll(['nomfiliere'=>'asc']);
+        } else {
+            $filieres = $em->createQuery('select f from App\Entity\Filiere f, '
+                    . 'App\Entity\UserFiliere uf where uf.idfiliere=f and uf.iduser=?1')
+                    ->setParameter(1, $this->getUser())
+                    ->getResult();
+        }
 
         return count($filieres)?$filieres:[];
     }
@@ -121,20 +128,4 @@ class FiliereController extends AbstractController
 
         return $filieres;
     }
-<<<<<<< HEAD
-
-    /**
-     * @Rest\Get("/entite/{id}", name="entite_filiere")
-     * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_FILIERE_AFFICHAGE")
-     * @param Entite $entite
-     * @return mixed
-     */
-    public function findFiliereByEntite(Entite $entite)
-    {
-        $manager = $this->getDoctrine()->getManager();
-        return $manager->getRepository(Filiere::class)->findByIdentite($entite);
-    }
-=======
->>>>>>> parent of 7daa6ef... AnneeAcadController & FiliereContoller update
 }
