@@ -31,29 +31,23 @@ class PublicController extends AbstractController {
         $em = $this->getDoctrine()->getManager();
         $reqData = \App\Utils\Utils::getObjectFromRequest($request);
         if (!isset($reqData->identifiant)) {
-            throw $this->createNotFoundException("L'INE ou le CNI ou le numero de passe-port est obligatoire");
+            throw $this->createNotFoundException("Numéro de dossier est obligatoire");
         }
         $identifiant = $reqData->identifiant;
         //trouver l'étudiant
         $etudiants = $em->createQuery('select et from App\Entity\Etudiant et '
-                        . 'where et.cni=?1 or et.ine=?1')
+                        . 'where et.numinterne=?1')
                 ->setParameter(1, $identifiant)
                 ->getResult();
         if (!count($etudiants)) {
-            throw $this->createNotFoundException("Les informations d'identification saisie ne correspondent à aucun étudiant");
+            throw $this->createNotFoundException("Les informations d'identification saisies ne correspondent à aucun étudiant");
         }
         $etudiant = $etudiants[0];
-        if (!isset($reqData->email)) {
-            throw $this->createNotFoundException("L'adresse email est obligatoire");
-        }
-        $email = strtolower($reqData->email);
-        if (strcmp(strtolower($etudiant->getEmailUniv()), $email) == 1) {
-            throw $this->createNotFoundException("L'adresse email universitaire saisie invalide");
-        }
+        
         //check if the email is already associated to an account
-        $linkedEmailAccount = $em->getRepository(FosUser::class)->findByEmail($email);
+        $linkedEmailAccount = $em->getRepository(FosUser::class)->findByEmail($etudiant->getEmail());
         if ($linkedEmailAccount) {
-            throw $this->createAccessDeniedException("Un compte est déja associé à cette adresse email.");
+            throw $this->createAccessDeniedException("Vous avez déja un compte, merci de vous connecter.");
         }
 
         if (!isset($reqData->password)) {
@@ -66,9 +60,9 @@ class PublicController extends AbstractController {
         $user->setPassword($password);
         $user->setPrenom($etudiant->getPrenometudiant());
         $user->setNom($etudiant->getNometudiant());
-        $user->setEmail($email);
+        $user->setEmail($etudiant->getEmail());
         $user->setEnabled(false);
-        $user->setUsername($email);
+        $user->setUsername($etudiant->getEmail());
         $user->setSexe($etudiant->getGenre());
         $user->setTitre('Etudiant');
         $groupEtudiant = $em->getRepository(\App\Entity\FosGroup::class)->findOneByCodegroupe('ETU');
@@ -83,11 +77,11 @@ class PublicController extends AbstractController {
         $user->setProfession($profilEtudiant);
 
         $em->persist($user);
-        $em->flush();
+        //$em->flush();
         //send confirmation mail
         $message = (new \Swift_Message('Confirmation de compte'))
                 ->setFrom(\App\Utils\Utils::$senderEmail)
-                ->setTo($email)
+                ->setTo($etudiant->getEmail())
                 ->setBody(
                 $this->renderView(
                         'emails/registrations/etudiant.html.twig', ['user' => $user, 'link' => \App\Utils\Utils::$lienValidationCompteEtudiant . $user->getId()]
