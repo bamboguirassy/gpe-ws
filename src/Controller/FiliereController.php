@@ -21,21 +21,40 @@ class FiliereController extends AbstractController
      * @Rest\Get(path="/", name="filiere_index")
      * @Rest\View(StatusCode = 200)
      * @IsGranted("ROLE_FILIERE_LISTE")
+     * @return array
      */
     public function index(): array
     {
         $em = $this->getDoctrine()->getManager();
-        if ($this->getUser()->getIdgroup()->getCodegroupe() == 'SA') {
-            $filieres = $em->getRepository(Filiere::class)
-                    ->findAll(['nomfiliere'=>'asc']);
-        } else {
-            $filieres = $em->createQuery('select f from App\Entity\Filiere f, '
-                    . 'App\Entity\UserFiliere uf where uf.idfiliere=f and uf.iduser=?1')
-                    ->setParameter(1, $this->getUser())
-                    ->getResult();
-        }
+        $filieres = $em->getRepository(Filiere::class)
+            ->findAll(['nomfiliere'=>'asc']);
 
         return count($filieres)?$filieres:[];
+    }
+
+    /**
+     * Permet de recupérer la liste des filieres aux quelles l'utilisateur est autorisé
+     * En spécifiant le codeGroupe de l'utisateur dans la requete
+     *
+     * @Rest\Get(path="/userfiliere", name="user_filiere")
+     * @Rest\View(StatusCode = 200)
+     * @IsGranted("ROLE_FILIERE_LISTE")
+     * @param Request $request
+     * @return array
+     */
+    public function findUserFiliere(Request $request): array {
+        $em = $this->getDoctrine()->getManager();
+        $filieres = [];
+        $data = Utils::serializeRequestContent($request);
+        if ($this->getUser()->getIdgroup()->getCodegroupe() == $data['codeGroupe']) {
+            $filieres = $em->createQuery('select f from App\Entity\Filiere f,'
+                . 'App\Entity\UserFiliere uf where uf.idfiliere=f and f.libellefiliere=?1 and uf.iduser=?2')
+                ->setParameter(1, $data['libelleFiliere'])
+                ->setParameter(2, $this->getUser())
+                ->getResult();
+        }
+
+        return $filieres;
     }
 
     /**
@@ -51,7 +70,6 @@ class FiliereController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($filiere);
         $entityManager->flush();
-
         return $filiere;
     }
 
@@ -64,7 +82,7 @@ class FiliereController extends AbstractController
         return $filiere;
     }
 
-    
+
     /**
      * @Rest\Put(path="/{id}/edit", name="filiere_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
@@ -78,7 +96,7 @@ class FiliereController extends AbstractController
 
         return $filiere;
     }
-    
+
     /**
      * @Rest\Put(path="/{id}/clone", name="filiere_clone",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
@@ -108,7 +126,7 @@ class FiliereController extends AbstractController
 
         return $filiere;
     }
-    
+
     /**
      * @Rest\Post("/delete-selection/", name="filiere_selection_delete")
      * @Rest\View(StatusCode=200)

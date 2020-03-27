@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Filiere;
 use App\Entity\Filiereniveau;
 use App\Form\FiliereniveauType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,8 +20,7 @@ class FiliereniveauController extends AbstractController
 {
     /**
      * @Rest\Get(path="/", name="filiereniveau_index")
-     * @Rest\View(StatusCode = 200)
-     * @IsGranted("ROLE_FILIERENIVEAU_LISTE")
+     * @Rest\View(StatusCode=200)
      */
     public function index(): array
     {
@@ -28,15 +28,18 @@ class FiliereniveauController extends AbstractController
             ->getRepository(Filiereniveau::class)
             ->findAll();
 
-        return count($filiereniveaus)?$filiereniveaus:[];
+        return count($filiereniveaus) ? $filiereniveaus : [];
     }
 
     /**
      * @Rest\Post(Path="/create", name="filiereniveau_new")
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERENIVEAU_NOUVEAU")
+     * @param Request $request
+     * @return Filiereniveau
      */
-    public function create(Request $request): Filiereniveau    {
+    public function create(Request $request): Filiereniveau
+    {
         $filiereniveau = new Filiereniveau();
         $form = $this->createForm(FiliereniveauType::class, $filiereniveau);
         $form->submit(Utils::serializeRequestContent($request));
@@ -53,17 +56,19 @@ class FiliereniveauController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERENIVEAU_AFFICHAGE")
      */
-    public function show(Filiereniveau $filiereniveau): Filiereniveau    {
+    public function show(Filiereniveau $filiereniveau): Filiereniveau
+    {
         return $filiereniveau;
     }
 
-    
+
     /**
      * @Rest\Put(path="/{id}/edit", name="filiereniveau_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERENIVEAU_EDITION")
      */
-    public function edit(Request $request, Filiereniveau $filiereniveau): Filiereniveau    {
+    public function edit(Request $request, Filiereniveau $filiereniveau): Filiereniveau
+    {
         $form = $this->createForm(FiliereniveauType::class, $filiereniveau);
         $form->submit(Utils::serializeRequestContent($request));
 
@@ -71,15 +76,16 @@ class FiliereniveauController extends AbstractController
 
         return $filiereniveau;
     }
-    
+
     /**
      * @Rest\Put(path="/{id}/clone", name="filiereniveau_clone",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERENIVEAU_CLONE")
      */
-    public function cloner(Request $request, Filiereniveau $filiereniveau):  Filiereniveau {
-        $em=$this->getDoctrine()->getManager();
-        $filiereniveauNew=new Filiereniveau();
+    public function cloner(Request $request, Filiereniveau $filiereniveau): Filiereniveau
+    {
+        $em = $this->getDoctrine()->getManager();
+        $filiereniveauNew = new Filiereniveau();
         $form = $this->createForm(FiliereniveauType::class, $filiereniveauNew);
         $form->submit(Utils::serializeRequestContent($request));
         $em->persist($filiereniveauNew);
@@ -94,20 +100,22 @@ class FiliereniveauController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERENIVEAU_SUPPRESSION")
      */
-    public function delete(Filiereniveau $filiereniveau): Filiereniveau    {
+    public function delete(Filiereniveau $filiereniveau): Filiereniveau
+    {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($filiereniveau);
         $entityManager->flush();
 
         return $filiereniveau;
     }
-    
+
     /**
      * @Rest\Post("/delete-selection/", name="filiereniveau_selection_delete")
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERENIVEAU_SUPPRESSION")
      */
-    public function deleteMultiple(Request $request): array {
+    public function deleteMultiple(Request $request): array
+    {
         $entityManager = $this->getDoctrine()->getManager();
         $filiereniveaus = Utils::getObjectFromRequest($request);
         if (!count($filiereniveaus)) {
@@ -120,5 +128,22 @@ class FiliereniveauController extends AbstractController
         $entityManager->flush();
 
         return $filiereniveaus;
+    }
+
+
+    /**
+     * Permet de recupérer les niveaux en spécifiant le libelleFiliere dans la requete
+     *
+     * @Rest\Post("/niveau", name="filiereniveau_niveau")
+     * @Rest\View(statusCode=200)
+     * @param Request $request
+     * @return mixed
+     */
+    public function findNiveau(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $libelle = Utils::serializeRequestContent($request)['libelleFiliere'];
+        return $em->createQuery('SELECT n FROM App\Entity\Niveau n, App\Entity\Filiereniveau fn, App\Entity\Filiere f WHERE f.libellefiliere=?1 and fn.idfiliere = f and fn.idniveau = n')
+            ->setParameter(1, $libelle)->getResult();
     }
 }
