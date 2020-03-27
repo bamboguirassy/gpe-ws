@@ -181,11 +181,11 @@ class EtudiantController extends AbstractController {
 
     public static function getEtudiantConnecte($controller) {
         $etudiants = $controller->getDoctrine()->getManager()->createQuery('select et from App\Entity\Etudiant et '
-                        . 'where et.email=?1 or et.emailUniv=?1')
+                        . 'where et.email=?1')
                 ->setParameter(1, $controller->getUser()->getEmail())
                 ->getResult();
         if (count($etudiants) < 1) {
-            throw $controller->createAccessDeniedException("Votre compte n'est rataché à aucun étudiant.");
+            throw $controller->createAccessDeniedException("Votre compte n'est rattaché à aucun étudiant.");
         }
         return $etudiants[0];
     }
@@ -195,17 +195,20 @@ class EtudiantController extends AbstractController {
      * @Rest\View(StatusCode=200)
      */
     public function edit(Request $request, Etudiant $etudiant): Etudiant {
+        $em = $this->getDoctrine()->getManager();
         $form = $this->createForm(EtudiantType::class, $etudiant);
         $form->submit(Utils::serializeRequestContent($request));
+        //find
         if ($etudiant->getAdPays()->getAlpha2() != 'SN') {
-            throw $this->createNotFoundException("Le pays d'adresse doit être Sénégal");
+            $senegal= $em->getRepository(\App\Entity\Pays::class)->findOneByAlpha2('SN');
+            $etudiant->setAdpays($senegal);
         }
         if($etudiant->getHandicap()=='Non'){
             $etudiant->setTypeHandicap(null);
             $etudiant->setDescriptionHandicap(null);
         }
 
-        $this->getDoctrine()->getManager()->flush();
+        $em->flush();
 
         return $etudiant;
     }

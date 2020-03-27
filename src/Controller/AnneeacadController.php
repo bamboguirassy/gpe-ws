@@ -30,6 +30,19 @@ class AnneeacadController extends AbstractController
 
         return count($anneeacads)?$anneeacads:[];
     }
+    
+    /**
+     * @Rest\Get(path="/public/encours/", name="anneeacad_encours_index")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findAnneeEnCours(): array
+    {
+        $anneeacads = $this->getDoctrine()
+            ->getRepository(Anneeacad::class)
+            ->findByEncours(true,['id'=>'desc']);
+
+        return count($anneeacads)?$anneeacads:[];
+    }
 
     /**
      * @Rest\Post(Path="/create", name="anneeacad_new")

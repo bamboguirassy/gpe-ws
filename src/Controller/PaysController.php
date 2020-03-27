@@ -18,7 +18,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class PaysController extends AbstractController
 {
     /**
-     * @Rest\Get(path="/", name="pays_index")
+     * @Rest\Get(path="/public/", name="pays_index")
      * @Rest\View(StatusCode = 200)
      */
     public function index(): array
