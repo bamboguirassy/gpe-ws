@@ -29,16 +29,18 @@ class AnneeacadController extends AbstractController
 
         return count($anneeacads)?$anneeacads:[];
     }
-
+    
     /**
-     * Permet de recupérer les années académiques en cours
-     *
-     * @Rest\Get(path="/encours", name="anneeacad_encours")
+     * @Rest\Get(path="/public/encours/", name="anneeacad_encours_index")
      * @Rest\View(StatusCode = 200)
      */
-    public function findAnneeAcadEnCours() {
-        $manager = $this->getDoctrine()->getManager();
-        return $manager->createQuery('SELECT a FROM App\Entity\Anneeacad a WHERE a.encours = ?1')->setParameter(1, true)->getResult();
+    public function findAnneeEnCours(): array
+    {
+        $anneeacads = $this->getDoctrine()
+            ->getRepository(Anneeacad::class)
+            ->findByEncours(true,['id'=>'desc']);
+
+        return count($anneeacads)?$anneeacads:[];
     }
 
     /**

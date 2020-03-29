@@ -195,12 +195,12 @@ class EtudiantController extends AbstractController
 
     public static function getEtudiantConnecte($controller)
     {
-        $etudiants = $controller->getDoctrine()->getManager()->createQuery('select et from App\Entity\Etudiant et '
-            . 'where et.email=?1 or et.emailUniv=?1')
-            ->setParameter(1, $controller->getUser()->getEmail())
+        $etudiants = $controller->getDoctrine()->getManager()->createQuery('select et from App\Entity\Etudiant et'
+            . 'where et.email=?1')->setParameter(1, $controller->getUser()->getEmail())
             ->getResult();
+
         if (count($etudiants) < 1) {
-            throw $controller->createAccessDeniedException("Votre compte n'est rataché à aucun étudiant.");
+            throw $controller->createAccessDeniedException("Votre compte n'est rattaché à aucun étudiant.");
         }
         return $etudiants[0];
     }
@@ -211,17 +211,20 @@ class EtudiantController extends AbstractController
      */
     public function edit(Request $request, Etudiant $etudiant): Etudiant
     {
+        $em = $this->getDoctrine()->getManager();
         $form = $this->createForm(EtudiantType::class, $etudiant);
         $form->submit(Utils::serializeRequestContent($request));
+        //find
         if ($etudiant->getAdPays()->getAlpha2() != 'SN') {
-            throw $this->createNotFoundException("Le pays d'adresse doit être Sénégal");
+            $senegal = $em->getRepository(\App\Entity\Pays::class)->findOneByAlpha2('SN');
+            $etudiant->setAdpays($senegal);
         }
         if ($etudiant->getHandicap() == 'Non') {
             $etudiant->setTypeHandicap(null);
             $etudiant->setDescriptionHandicap(null);
         }
 
-        $this->getDoctrine()->getManager()->flush();
+        $em->flush();
 
         return $etudiant;
     }
@@ -295,6 +298,8 @@ class EtudiantController extends AbstractController
     }
 
     /**
+     * Permet de recupérer tous les étudiants d'une filière donnée pour une annéé académique
+     *
      * @Rest\Post("/filiere", name="etudiants_by_filiere")
      * @Rest\View(statusCode=200)
      * @param Request $request
@@ -303,18 +308,19 @@ class EtudiantController extends AbstractController
     public function findAllEtudiantByFiliere(Request $request)
     {
         /** @var Inscriptionacad[] $inscriptions */
-
-
         $inscriptions = [];
 
         $data = Utils::serializeRequestContent($request);
         $manager = $this->getDoctrine()->getManager();
         $annee = $manager->getRepository(Anneeacad::class)->find($data['annee']);
 
-        $inscriptions = $manager->createQuery('SELECT i.idclasse FROM App\Entity\Inscriptionacad i')->getResult();
+        // Pour test
+        $inscriptions = $manager->getRepository(Inscriptionacad::class)->findAll();
 
-//        if (isset($annee)) $inscriptions = $manager->createQuery('SELECT c FROM App\Entity\Classe c, App\Entity\Filiere f WHERE c.idanneeacad = ?1 AND c.idfiliere = f AND f.libellefiliere = ?2')
-//            ->setParameter(1, $annee)->setParameter(2, $data['libelleFiliere'])->getResult();
+//        if (isset($annee))
+//            $inscriptions = $manager
+//                ->createQuery('SELECT e FROM App\Entity\Etudiant e, App\Entity\Inscriptionacad i, App\Entity\Classe c, App\Entity\Filiere f WHERE f.libellefiliere = ?1 AND c.idanneeacad = ?2 AND c.idfiliere = f AND i.idclasse = c AND i.idetudiant = e')
+//                ->setParameter(1, $data['libelleFiliere'])->setParameter(2, $annee)->getResult();
 
         return $inscriptions;
     }
