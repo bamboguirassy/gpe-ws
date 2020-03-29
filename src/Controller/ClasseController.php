@@ -2,8 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Anneeacad;
 use App\Entity\Classe;
+use App\Entity\Filiere;
+use App\Entity\Niveau;
 use App\Form\ClasseType;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +34,7 @@ class ClasseController extends AbstractController
             ->getRepository(Classe::class)
             ->findAll();
 
-        return count($classes)?$classes:[];
+        return count($classes) ? $classes : [];
     }
 
     /**
@@ -36,7 +42,8 @@ class ClasseController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_CLASSE_NOUVEAU")
      */
-    public function create(Request $request): Classe    {
+    public function create(Request $request): Classe
+    {
         $classe = new Classe();
         $form = $this->createForm(ClasseType::class, $classe);
         $form->submit(Utils::serializeRequestContent($request));
@@ -53,17 +60,19 @@ class ClasseController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_CLASSE_AFFICHAGE")
      */
-    public function show(Classe $classe): Classe    {
+    public function show(Classe $classe): Classe
+    {
         return $classe;
     }
 
-    
+
     /**
      * @Rest\Put(path="/{id}/edit", name="classe_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_CLASSE_EDITION")
      */
-    public function edit(Request $request, Classe $classe): Classe    {
+    public function edit(Request $request, Classe $classe): Classe
+    {
         $form = $this->createForm(ClasseType::class, $classe);
         $form->submit(Utils::serializeRequestContent($request));
 
@@ -71,15 +80,16 @@ class ClasseController extends AbstractController
 
         return $classe;
     }
-    
+
     /**
      * @Rest\Put(path="/{id}/clone", name="classe_clone",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_CLASSE_CLONE")
      */
-    public function cloner(Request $request, Classe $classe):  Classe {
-        $em=$this->getDoctrine()->getManager();
-        $classeNew=new Classe();
+    public function cloner(Request $request, Classe $classe): Classe
+    {
+        $em = $this->getDoctrine()->getManager();
+        $classeNew = new Classe();
         $form = $this->createForm(ClasseType::class, $classeNew);
         $form->submit(Utils::serializeRequestContent($request));
         $em->persist($classeNew);
@@ -94,20 +104,22 @@ class ClasseController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_CLASSE_SUPPRESSION")
      */
-    public function delete(Classe $classe): Classe    {
+    public function delete(Classe $classe): Classe
+    {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($classe);
         $entityManager->flush();
 
         return $classe;
     }
-    
+
     /**
      * @Rest\Post("/delete-selection/", name="classe_selection_delete")
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_CLASSE_SUPPRESSION")
      */
-    public function deleteMultiple(Request $request): array {
+    public function deleteMultiple(Request $request): array
+    {
         $entityManager = $this->getDoctrine()->getManager();
         $classes = Utils::getObjectFromRequest($request);
         if (!count($classes)) {
@@ -118,6 +130,30 @@ class ClasseController extends AbstractController
             $entityManager->remove($classe);
         }
         $entityManager->flush();
+
+        return $classes;
+    }
+
+    /**
+     *Permet de recupérer une liste de classes en spécifiant le libelleFiliere et l'année académique
+     *
+     * @Rest\Post("/annee/filiere", name="by_anneeacad_filiere")
+     * @Rest\View(statusCode=200)
+     * @param Request $request
+     * @return array
+     */
+    public function findClasseByFiliereAndAnneeAcad(Request $request): array
+    {
+        /** @var Classe[] $classes */
+        /** @var EntityManagerInterface $manager */
+
+        $classes = [];
+        $data = Utils::serializeRequestContent($request);
+        $manager = $this->getDoctrine()->getManager();
+        $annee = $manager->getRepository(Anneeacad::class)->find($data['annee']);
+
+        if (isset($annee)) $classes = $manager->createQuery('SELECT c FROM App\Entity\Classe c, App\Entity\Filiere f WHERE c.idanneeacad = ?1 AND f.libellefiliere = ?2 AND c.idfiliere = f')
+            ->setParameter(1, $annee)->setParameter(2, $data['libelleFiliere'])->getResult();
 
         return $classes;
     }

@@ -20,7 +20,6 @@ class AnneeacadController extends AbstractController
     /**
      * @Rest\Get(path="/", name="anneeacad_index")
      * @Rest\View(StatusCode = 200)
-     * @IsGranted("ROLE_ANNEEACAD_LISTE")
      */
     public function index(): array
     {
@@ -29,6 +28,17 @@ class AnneeacadController extends AbstractController
             ->findAll();
 
         return count($anneeacads)?$anneeacads:[];
+    }
+
+    /**
+     * Permet de recupérer les années académiques en cours
+     *
+     * @Rest\Get(path="/encours", name="anneeacad_encours")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findAnneeAcadEnCours() {
+        $manager = $this->getDoctrine()->getManager();
+        return $manager->createQuery('SELECT a FROM App\Entity\Anneeacad a WHERE a.encours = ?1')->setParameter(1, true)->getResult();
     }
 
     /**
@@ -51,9 +61,8 @@ class AnneeacadController extends AbstractController
     /**
      * @Rest\Get(path="/{id}", name="anneeacad_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_ANNEEACAD_AFFICHAGE")
      */
-    public function show(Anneeacad $anneeacad): Anneeacad    {
+    public function show(Anneeacad $anneeacad): Anneeacad {
         return $anneeacad;
     }
 

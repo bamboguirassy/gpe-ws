@@ -24,7 +24,6 @@ class InscriptionacadController extends AbstractController {
     /**
      * @Rest\Get(path="/", name="inscriptionacad_index")
      * @Rest\View(StatusCode = 200)
-     * @IsGranted("ROLE_INSCRIPTIONACAD_LISTE")
      */
     public function index(): array {
         $inscriptionacads = $this->getDoctrine()
