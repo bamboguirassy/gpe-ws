@@ -25,12 +25,12 @@ class InscriptionacadController extends AbstractController {
      * @Rest\Get(path="/", name="inscriptionacad_index")
      * @Rest\View(StatusCode = 200)
      */
-    public function index(): array {
+    public function index() {
         $inscriptionacads = $this->getDoctrine()
                 ->getRepository(Inscriptionacad::class)
                 ->findAll();
 
-        return count($inscriptionacads) ? $inscriptionacads : [];
+        return $inscriptionacads;
     }
 
     /**

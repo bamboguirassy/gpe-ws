@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Anneeacad;
+use App\Entity\Classe;
 use App\Entity\Etudiant;
 use App\Entity\Inscriptionacad;
 use App\Form\EtudiantType;
@@ -305,24 +306,34 @@ class EtudiantController extends AbstractController
      * @param Request $request
      * @return array
      */
-    public function findAllEtudiantByFiliere(Request $request)
+    public function findAllEtudiantByFiliere(Request $request): array
     {
-        /** @var Inscriptionacad[] $inscriptions */
-        $inscriptions = [];
+        /** @var Etudiant[] $etudiants */
 
         $data = Utils::serializeRequestContent($request);
         $manager = $this->getDoctrine()->getManager();
         $annee = $manager->getRepository(Anneeacad::class)->find($data['annee']);
+        if (isset($annee))
+            $etudiants = $manager
+                ->createQuery('SELECT e FROM App\Entity\Etudiant e, App\Entity\Inscriptionacad i, App\Entity\Classe c, App\Entity\Filiere f WHERE f.libellefiliere = ?1 AND c.idfiliere = f AND c.idanneeacad = ?2 AND i.idclasse = c and i.idetudiant = e')
+                ->setParameter(1, $data['libelleFiliere'])->setParameter(2, $annee)->getResult();
 
-        // Pour test
-        $inscriptions = $manager->getRepository(Inscriptionacad::class)->findAll();
+        return $etudiants;
+    }
 
-//        if (isset($annee))
-//            $inscriptions = $manager
-//                ->createQuery('SELECT e FROM App\Entity\Etudiant e, App\Entity\Inscriptionacad i, App\Entity\Classe c, App\Entity\Filiere f WHERE f.libellefiliere = ?1 AND c.idanneeacad = ?2 AND c.idfiliere = f AND i.idclasse = c AND i.idetudiant = e')
-//                ->setParameter(1, $data['libelleFiliere'])->setParameter(2, $annee)->getResult();
+    /**
+     * @Rest\Get("/classe/{id}", name="etudiants_by_classe")
+     * @Rest\View(statusCode=200)
+     * @param Classe $classe
+     * @return array
+     */
+    public function findEtudiantByClasse(Classe $classe): array
+    {
+        /** @var Etudiant[] $etudiants */
 
-        return $inscriptions;
+        $manager = $this->getDoctrine()->getManager();
+        $etudiants = $manager->createQuery('SELECT e FROM App\Entity\Etudiant e, App\Entity\Inscriptionacad i WHERE i.idclasse = ?1 AND i.idetudiant = e')->setParameter(1, $classe)->getResult();
+        return $etudiants;
     }
 
 }
