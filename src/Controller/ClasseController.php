@@ -137,7 +137,7 @@ class ClasseController extends AbstractController
     /**
      *Permet de recupérer une liste de classes en spécifiant le libelleFiliere et l'année académique
      *
-     * @Rest\Post("/annee/filiere", name="by_anneeacad_filiere")
+     * @Rest\Post("/annee", name="by_anneeacad_filiere")
      * @Rest\View(statusCode=200)
      * @param Request $request
      * @return array
@@ -147,14 +147,31 @@ class ClasseController extends AbstractController
         /** @var Classe[] $classes */
         /** @var EntityManagerInterface $manager */
 
-        $classes = [];
         $data = Utils::serializeRequestContent($request);
         $manager = $this->getDoctrine()->getManager();
-        $annee = $manager->getRepository(Anneeacad::class)->find($data['annee']);
 
-        if (isset($annee)) $classes = $manager->createQuery('SELECT c FROM App\Entity\Classe c, App\Entity\Filiere f WHERE c.idanneeacad = ?1 AND f.libellefiliere = ?2 AND c.idfiliere = f')
-            ->setParameter(1, $annee)->setParameter(2, $data['libelleFiliere'])->getResult();
+        $classes = $manager->createQuery(
+            'SELECT c FROM App\Entity\Classe c, App\Entity\Filiere f WHERE c.idanneeacad = ?1 AND f.libellefiliere = ?2 AND c.idfiliere = f')
+            ->setParameter(1, $data['annee'])->setParameter(2, $data['libelleFiliere'])->getResult();
 
         return $classes;
     }
+
+
+    /**
+     *
+     * @Rest\Post("/niveau/{id}", name="classe_by_niveau")
+     * @Rest\View(statusCode=200)
+     * @param Request $request
+     * @param Niveau $niveau
+     * @return Classe
+     */
+    public function findClasseByNiveau(Request $request, Niveau $niveau): Classe
+    {
+        $manager = $this->getDoctrine()->getManager();
+        $data = Utils::serializeRequestContent($request);
+        return $manager->createQuery("SELECT c FROM App\Entity\Classe c, App\Entity\Filiere f WHERE f.libellefiliere = ?1 AND  c.idanneeacad = ?2 AND c.idniveau = ?3 AND c.idfiliere = f")
+            ->setParameter(1, $data["libelleFiliere"])->setParameter(2, $data["annee"])->setParameter(3, $niveau)->getSingleResult();
+    }
+
 }

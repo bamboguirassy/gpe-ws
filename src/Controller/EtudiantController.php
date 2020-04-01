@@ -6,6 +6,7 @@ use App\Entity\Anneeacad;
 use App\Entity\Classe;
 use App\Entity\Etudiant;
 use App\Entity\Inscriptionacad;
+use App\Entity\Niveau;
 use App\Form\EtudiantType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -299,41 +300,44 @@ class EtudiantController extends AbstractController
     }
 
     /**
-     * Permet de recupérer tous les étudiants d'une filière donnée pour une annéé académique
+     * Permet de recupérer tous les étudiants ayant validés l'inscription acad pour une filière donnée pour une année académique
      *
      * @Rest\Post("/filiere", name="etudiants_by_filiere")
      * @Rest\View(statusCode=200)
      * @param Request $request
      * @return array
      */
-    public function findAllEtudiantByFiliere(Request $request): array
+    public function findEtudiant(Request $request): array
     {
         /** @var Etudiant[] $etudiants */
 
         $data = Utils::serializeRequestContent($request);
         $manager = $this->getDoctrine()->getManager();
-        $annee = $manager->getRepository(Anneeacad::class)->find($data['annee']);
-        if (isset($annee))
-            $etudiants = $manager
-                ->createQuery('SELECT e FROM App\Entity\Etudiant e, App\Entity\Inscriptionacad i, App\Entity\Classe c, App\Entity\Filiere f WHERE f.libellefiliere = ?1 AND c.idfiliere = f AND c.idanneeacad = ?2 AND i.idclasse = c and i.idetudiant = e')
-                ->setParameter(1, $data['libelleFiliere'])->setParameter(2, $annee)->getResult();
+
+        $etudiants = $manager->createQuery(
+            'SELECT e FROM App\Entity\Etudiant e, App\Entity\Inscriptionacad ia, App\Entity\Classe c, App\Entity\Filiere f' .
+            ' WHERE f.libellefiliere = ?1 AND c.idfiliere = f AND c.idanneeacad = ?2 AND ia.idclasse = c and ia.idetudiant = e'
+        )->setParameter(1, $data['libelleFiliere'])->setParameter(2, $data['annee'])->getResult();
 
         return $etudiants;
     }
 
     /**
+     * Permet de recupérer tous les étudiants ayant validés l'inscription acad pour une classe donnée
+     *
      * @Rest\Get("/classe/{id}", name="etudiants_by_classe")
      * @Rest\View(statusCode=200)
      * @param Classe $classe
-     * @return array
+     * @return mixed
      */
-    public function findEtudiantByClasse(Classe $classe): array
+    public function findEtudiantByClasse(Classe $classe)
     {
         /** @var Etudiant[] $etudiants */
 
         $manager = $this->getDoctrine()->getManager();
-        $etudiants = $manager->createQuery('SELECT e FROM App\Entity\Etudiant e, App\Entity\Inscriptionacad i WHERE i.idclasse = ?1 AND i.idetudiant = e')->setParameter(1, $classe)->getResult();
+        $etudiants = $manager->createQuery(
+            'SELECT e FROM App\Entity\Etudiant e, App\Entity\Inscriptionacad ia' .
+            ' WHERE ia.idclasse = ?1 AND e = ia.idetudiant')->setParameter(1, $classe)->getResult();
         return $etudiants;
     }
-
 }
