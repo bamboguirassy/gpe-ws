@@ -300,26 +300,26 @@ class EtudiantController extends AbstractController
     }
 
     /**
-     * Permet de recupérer tous les étudiants ayant validés l'inscription acad pour une filière donnée pour une année académique
+     * Permet de recupérer un étudiant d'une filière donnée par son email universitaire pour l'année courante
      *
-     * @Rest\Post("/filiere", name="etudiants_by_filiere")
+     * @Rest\Post("/etu", name="etudiant_by_email")
      * @Rest\View(statusCode=200)
      * @param Request $request
-     * @return array
+     * @return Etudiant
      */
-    public function findEtudiant(Request $request): array
+    public function findEtudiantByEmail(Request $request): Etudiant
     {
-        /** @var Etudiant[] $etudiants */
-
+        /** @var Etudiant $etudiant */
         $data = Utils::serializeRequestContent($request);
         $manager = $this->getDoctrine()->getManager();
 
-        $etudiants = $manager->createQuery(
-            'SELECT e FROM App\Entity\Etudiant e, App\Entity\Inscriptionacad ia, App\Entity\Classe c, App\Entity\Filiere f' .
-            ' WHERE f.libellefiliere = ?1 AND c.idfiliere = f AND c.idanneeacad = ?2 AND ia.idclasse = c and ia.idetudiant = e'
-        )->setParameter(1, $data['libelleFiliere'])->setParameter(2, $data['annee'])->getResult();
+        $annee = $manager->getRepository(Anneeacad::class)->findByEncours(true, ["id" => "desc"])[1]; // l'année courante [0]
+        $etudiant = $manager->createQuery(
+            'SELECT e FROM App\Entity\Etudiant e, App\Entity\Filiere f, App\Entity\Classe c, App\Entity\Inscriptionacad ia ' .
+            ' WHERE f.libellefiliere = ?1 AND c.idfiliere = f AND c.idanneeacad = ?2 AND ia.idclasse = c AND e = ia.idetudiant AND e.emailUniv = ?3')
+            ->setParameter(1, $data["libelleFiliere"])->setParameter(2, $annee)->setParameter(3, $data["email"])->getSingleResult();
 
-        return $etudiants;
+        return $etudiant;
     }
 
     /**
