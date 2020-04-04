@@ -330,7 +330,7 @@ class EtudiantController extends AbstractController
      * @param Classe $classe
      * @return mixed
      */
-    public function findEtudiantByClasse(Classe $classe)
+    public function findEtudiantsByClasse(Classe $classe)
     {
         /** @var Etudiant[] $etudiants */
 
