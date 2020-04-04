@@ -322,6 +322,30 @@ class EtudiantController extends AbstractController
         return $etudiant;
     }
 
+
+    /**
+     * Permet de recupérer tous les étudiants d'une filière donnée pour une année donnée
+     *
+     * @Rest\Post("/all-etudiants", name="all_etudiants")
+     * @Rest\View(statusCode=200)
+     * @param Request $request
+     * @return Etudiant[]
+     */
+    public function findEtudiant(Request $request): array
+    {
+        /** @var Etudiant[] $etudiants */
+
+        $data = Utils::serializeRequestContent($request);
+        $manager = $this->getDoctrine()->getManager();
+
+        $etudiants = $manager->createQuery(
+            'SELECT e FROM App\Entity\Etudiant e, App\Entity\Filiere f, App\Entity\Classe c, App\Entity\Inscriptionacad ia ' .
+            ' WHERE f.libellefiliere = ?1 AND c.idfiliere = f AND c.idanneeacad = ?2 AND ia.idclasse = c AND e = ia.idetudiant')
+            ->setParameter(1, $data["libelleFiliere"])->setParameter(2, $data['annee'])->getResult();
+
+        return $etudiants;
+    }
+
     /**
      * Permet de recupérer tous les étudiants ayant validés l'inscription acad pour une classe donnée
      *
