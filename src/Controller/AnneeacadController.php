@@ -20,7 +20,10 @@ class AnneeacadController extends AbstractController
     /**
      * @Rest\Get(path="/", name="anneeacad_index")
      * @Rest\View(StatusCode = 200)
+<<<<<<< HEAD
      * @IsGranted("ROLE_ANNEE ACADEMIQUE_LISTE")
+=======
+>>>>>>> a6b34a05ab6936dbc2491eeaba2a9cb66569e685
      */
     public function index(): array
     {
@@ -64,9 +67,12 @@ class AnneeacadController extends AbstractController
     /**
      * @Rest\Get(path="/{id}", name="anneeacad_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
+<<<<<<< HEAD
      * @IsGranted("ROLE_ANNEE ACADEMIQUE_AFFICHAGE")
+=======
+>>>>>>> a6b34a05ab6936dbc2491eeaba2a9cb66569e685
      */
-    public function show(Anneeacad $anneeacad): Anneeacad    {
+    public function show(Anneeacad $anneeacad): Anneeacad {
         return $anneeacad;
     }
 
