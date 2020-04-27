@@ -31,6 +31,103 @@ class FosUserController extends AbstractController {
     }
 
     /**
+     * @Rest\Post(path="/public/reset-password/", name="user_password_reset")
+     * @Rest\View(StatusCode=200)
+     */
+    public function resetPassword(Request $request, \Swift_Mailer $mailer): bool {
+        $email = $request->getContent();
+        if (!$email) {
+            throw $this->createNotFoundException("Adresse email introuvable");
+        }
+        $em = $this->getDoctrine()->getManager();
+        $linkedUser = $em->getRepository(FosUser::class)
+                ->findOneByEmail($email);
+        if (!$linkedUser) {
+            throw $this->createAccessDeniedException("Cette adresse email n'est asssocié à aucun utilisateur, merci de vérifier.");
+        }
+        $linkedUser->setConfirmationToken(time());
+        $linkedUser->setPasswordRequestedAt(new \DateTime());
+        $em->flush();
+        $message = (new \Swift_Message('Lien de réinitialisation du mot de passe.'))
+                ->setFrom(\App\Utils\Utils::$senderEmail)
+                ->setTo($linkedUser->getEmail())
+                ->setBody(
+                $this->renderView(
+                        'emails/forgot-password/etudiant.html.twig', ['user' => $linkedUser,
+                    'link' => \App\Utils\Utils::$lienResetEtudiantPassword . $linkedUser->getConfirmationToken()]
+                ), 'text/html'
+        );
+        $mailer->send($message);
+
+        return true;
+    }
+
+    /**
+     * @Rest\Post(path="/public/check-token/", name="user_token_check")
+     * @Rest\View(StatusCode=200)
+     */
+    public function checkToken(Request $request): FosUser {
+        $token = $request->getContent();
+        if (!$token) {
+            throw $this->createNotFoundException("Lien invalide !");
+        }
+        $em = $this->getDoctrine()->getManager();
+        $linkedUser = $em->getRepository(FosUser::class)
+                ->findOneByConfirmationToken($token);
+        if (!$linkedUser) {
+            throw $this->createAccessDeniedException("Ce lien n'est plus valable.");
+        }
+        // verifier si le token n'a pas expiré
+        /* $tokenLife = Utils::getDateDifferenceInHours(new \DateTime(), $linkedUser->getPasswordRequestedAt());
+          if ($tokenLife > 48) {
+          $linkedUser->setConfirmationToken(null);
+          $linkedUser->setPasswordRequestedAt(null);
+          throw $this->createAccessDeniedException("Ce lien a déja expiré, merci de faire une nouvelle demande.");
+          } */
+
+        $em->flush();
+
+        return $linkedUser;
+    }
+
+    /**
+     * @Rest\Post(path="/public/update-password/", name="user_update_password")
+     * @Rest\View(StatusCode=200)
+     */
+    public function updatePassword(Request $request, \Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface $passwordEncoder): FosUser {
+        $updateData = json_decode($request->getContent());
+        if (!isset($updateData->password)) {
+            throw $this->createNotFoundException("Mot de passe introuvable");
+        }
+        $password = $updateData->password;
+        if (!isset($updateData->email)) {
+            throw $this->createNotFoundException("Utilisateur introuvable, identifiant incorrect.");
+        }
+        $email = $updateData->email;
+
+        $em = $this->getDoctrine()->getManager();
+        $linkedUser = $em->getRepository(FosUser::class)
+                ->findOneByEmail($email);
+        if (!$linkedUser) {
+            throw $this->createAccessDeniedException("Information incorrecte...");
+        }
+        // verifier si le token n'a pas expiré
+        /* $tokenLife = Utils::getDateDifferenceInHours(new \DateTime(), $linkedUser->getPasswordRequestedAt());
+          if ($tokenLife > 48) {
+          $linkedUser->setConfirmationToken(null);
+          $linkedUser->setPasswordRequestedAt(null);
+          throw $this->createAccessDeniedException("Ce lien a déja expiré, merci de faire une nouvelle demande.");
+          } */
+        $linkedUser->setConfirmationToken(null);
+        $linkedUser->setPasswordRequestedAt(null);
+        $linkedUser->setPassword($passwordEncoder->encodePassword($linkedUser, $password));
+
+        $em->flush();
+
+        return $linkedUser;
+    }
+
+    /**
      * @Rest\Post(Path="/create", name="fos_user_new")
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FOSUSER_NOUVEAU")

@@ -30,7 +30,7 @@ security:
             security: false
             
         open_access:
-            pattern:   ^/api/[a-z]+/public
+            pattern:   ^/api/[A-Za-z0-9_]+/public
             security: false
         
         api:

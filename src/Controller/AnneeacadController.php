@@ -20,7 +20,7 @@ class AnneeacadController extends AbstractController
     /**
      * @Rest\Get(path="/", name="anneeacad_index")
      * @Rest\View(StatusCode = 200)
-     * @IsGranted("ROLE_ANNEEACAD_LISTE")
+     * @IsGranted("ROLE_ANNEE ACADEMIQUE_LISTE")
      */
     public function index(): array
     {
@@ -39,7 +39,7 @@ class AnneeacadController extends AbstractController
     {
         $anneeacads = $this->getDoctrine()
             ->getRepository(Anneeacad::class)
-            ->findByEncours(true,['id'=>'desc']);
+            ->findByEncours(true,['id'=>'desc'],3);
 
         return count($anneeacads)?$anneeacads:[];
     }
@@ -47,7 +47,7 @@ class AnneeacadController extends AbstractController
     /**
      * @Rest\Post(Path="/create", name="anneeacad_new")
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_ANNEEACAD_NOUVEAU")
+     * @IsGranted("ROLE_ANNEE ACADEMIQUE_NOUVEAU")
      */
     public function create(Request $request): Anneeacad    {
         $anneeacad = new Anneeacad();
@@ -64,7 +64,7 @@ class AnneeacadController extends AbstractController
     /**
      * @Rest\Get(path="/{id}", name="anneeacad_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_ANNEEACAD_AFFICHAGE")
+     * @IsGranted("ROLE_ANNEE ACADEMIQUE_AFFICHAGE")
      */
     public function show(Anneeacad $anneeacad): Anneeacad    {
         return $anneeacad;
@@ -74,7 +74,7 @@ class AnneeacadController extends AbstractController
     /**
      * @Rest\Put(path="/{id}/edit", name="anneeacad_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_ANNEEACAD_EDITION")
+     * @IsGranted("ROLE_ANNEE ACADEMIQUE_EDITION")
      */
     public function edit(Request $request, Anneeacad $anneeacad): Anneeacad    {
         $form = $this->createForm(AnneeacadType::class, $anneeacad);
@@ -88,7 +88,7 @@ class AnneeacadController extends AbstractController
     /**
      * @Rest\Put(path="/{id}/clone", name="anneeacad_clone",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_ANNEEACAD_CLONE")
+     * @IsGranted("ROLE_ANNEE ACADEMIQUE_CLONE")
      */
     public function cloner(Request $request, Anneeacad $anneeacad):  Anneeacad {
         $em=$this->getDoctrine()->getManager();
@@ -105,7 +105,7 @@ class AnneeacadController extends AbstractController
     /**
      * @Rest\Delete("/{id}", name="anneeacad_delete",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_ANNEEACAD_SUPPRESSION")
+     * @IsGranted("ROLE_ANNEE ACADEMIQUE_SUPPRESSION")
      */
     public function delete(Anneeacad $anneeacad): Anneeacad    {
         $entityManager = $this->getDoctrine()->getManager();
@@ -118,7 +118,7 @@ class AnneeacadController extends AbstractController
     /**
      * @Rest\Post("/delete-selection/", name="anneeacad_selection_delete")
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_ANNEEACAD_SUPPRESSION")
+     * @IsGranted("ROLE_ANNEE ACADEMIQUE_SUPPRESSION")
      */
     public function deleteMultiple(Request $request): array {
         $entityManager = $this->getDoctrine()->getManager();

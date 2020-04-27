@@ -9,6 +9,7 @@
 namespace App\Controller;
 
 use App\Entity\FosUser;
+use App\Entity\Etudiant;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -27,7 +28,7 @@ class PublicController extends AbstractController {
      * @Rest\Post(Path="/register-etudiant", name="fos_user_register_etudiant")
      * @Rest\View(StatusCode=200)
      */
-    public function createEtudiantAccount(\Symfony\Component\HttpFoundation\Request $request, \Swift_Mailer $mailer, \Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface $passwordEncoder): FosUser {
+    public function createEtudiantAccount(\Symfony\Component\HttpFoundation\Request $request, \Swift_Mailer $mailer, \Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface $passwordEncoder): Etudiant {
         $em = $this->getDoctrine()->getManager();
         $reqData = \App\Utils\Utils::getObjectFromRequest($request);
         if (!isset($reqData->identifiant)) {
@@ -45,7 +46,7 @@ class PublicController extends AbstractController {
         $etudiant = $etudiants[0];
 
         //check if the email is already associated to an account
-        $linkedEmailAccount = $em->getRepository(FosUser::class)->findByEmail($etudiant->getEmail());
+        $linkedEmailAccount = $em->getRepository(FosUser::class)->findByEmail($etudiant->getEmailUniv());
         if ($linkedEmailAccount) {
             throw $this->createAccessDeniedException("Vous avez déja un compte, merci de vous connecter.");
         }
@@ -60,9 +61,9 @@ class PublicController extends AbstractController {
         $user->setPassword($password);
         $user->setPrenom($etudiant->getPrenometudiant());
         $user->setNom($etudiant->getNometudiant());
-        $user->setEmail($etudiant->getEmail());
+        $user->setEmail($etudiant->getEmailUniv());
         $user->setEnabled(false);
-        $user->setUsername($etudiant->getEmail());
+        $user->setUsername($etudiant->getEmailUniv());
         $user->setSexe($etudiant->getGenre());
         $user->setTitre('Etudiant');
         $groupEtudiant = $em->getRepository(\App\Entity\FosGroup::class)->findOneByCodegroupe('ETU');
@@ -77,19 +78,30 @@ class PublicController extends AbstractController {
         $user->setProfession($profilEtudiant);
 
         $em->persist($user);
-       // $em->flush();
+        $em->flush();
         //send confirmation mail
         $message = (new \Swift_Message('Confirmation de compte'))
                 ->setFrom(\App\Utils\Utils::$senderEmail)
                 ->setTo($etudiant->getEmail())
                 ->setBody(
                 $this->renderView(
-                        'emails/registrations/etudiant.html.twig', ['user' => $user, 'link' => \App\Utils\Utils::$lienValidationCompteEtudiant . $user->getId()]
+                        'emails/registrations/etudiant.html.twig', ['user' => $user,
+                    'link' => \App\Utils\Utils::$lienValidationCompteEtudiant . $user->getId(),
+                    'password' => $reqData->password,
+                    'etudiant' => $etudiant]
                 ), 'text/html'
         );
-      //  $mailer->send($message);
+        $i=0;
+        $isMailSent = $mailer->send($message);
+        while (!$isMailSent) {
+            $isMailSent = $mailer->send($message);
+            $i++;
+            if($i==5 && !$isMailSent) {
+                throw $this->createAccessDeniedException("Impossible d'envoyer le mail de confirmation, des erreurs sont survenue après 5 tentatives au mail ".$etudiant->getEmail());
+            }
+        }
 
-        return $user;
+        return $etudiant;
     }
 
     /**
@@ -140,43 +152,53 @@ class PublicController extends AbstractController {
             throw $this->createAccessDeniedException("Numero inscription et/ou année invalide");
         }
         // verfieir si un compte n'est pas rattaché au mail donnée
-        $linkedEmailAccount = $em->getRepository(FosUser::class)->findByEmail($email);
-        if ($linkedEmailAccount) {
-            throw $this->createAccessDeniedException("Ce mail est déja associé à un autre compte,"
-                    . " merci de vous connecter ou de proposer une autre adresse email.");
-        }
+        /* $linkedEmailAccount = $em->getRepository(FosUser::class)->findByEmail($email);
+          if ($linkedEmailAccount) {
+          throw $this->createAccessDeniedException("Ce mail est déja associé à un autre compte,"
+          . " merci de vous connecter ou de proposer une autre adresse email.");
+          } */
         //trouver l'étudiant
         $etudiant = $inscriptionacad->getIdetudiant();
+        $oldEmail = $etudiant->getEmail();
+        if ($oldEmail != $email) {
+            $etudiant->setEmailPersoUpdated(true);
+        }
+//        else {
+//            throw $this->createAccessDeniedException("Le mail indiqué est le meme que celui auquel les informations du compte sont envoyées, "
+//                    . "si vous êtes sûrs que vous n'avez pas accès à ce mail, merci d'indiquer une autre");
+//        }
+        $etudiant->setEmail($email);
         //check if the email is already associated to an account
-        $etudiantAccount = $em->getRepository(FosUser::class)->findByEmail($etudiant->getEmail());
-        if ($etudiantAccount) {
-            if ($etudiantAccount[0]->isEnabled()) {
-                throw $this->createAccessDeniedException("Vous avez déja un compte, merci de vous connecter.");
+        $etudiantAccounts = $em->getRepository(FosUser::class)->findByEmail($etudiant->getEmailUniv());
+        if ($etudiantAccounts) {
+            $etudiantAccount = $etudiantAccounts[0];
+            if ($etudiantAccount->isEnabled()) {
+                throw $this->createAccessDeniedException("Vous avez déja un compte actif, merci de vous connecter.");
             }
         } else {
             throw $this->createAccessDeniedException("Vous devriez d'abord créer un compte pour pouvoir accèder à cette interface...");
         }
-
-        //create User
-        $user = $em->getRepository(FosUser::class)->findOneByEmail($etudiant->getEmail());
-        $user->setEmail($email);
-        $user->setUsername($email);
-        $user->setEmailCanonical($email);
-        $user->setUsernameCanonical($email);
-        $inscriptionacad->getIdetudiant()->setEmail($email);
         $em->flush();
+
         //send confirmation mail
         $message = (new \Swift_Message('Confirmation de compte'))
                 ->setFrom(\App\Utils\Utils::$senderEmail)
                 ->setTo($etudiant->getEmail())
                 ->setBody(
                 $this->renderView(
-                        'emails/registrations/etudiant.html.twig', ['user' => $user, 'link' => \App\Utils\Utils::$lienValidationCompteEtudiant . $user->getId()]
+                        'emails/registrations/etudiant.html.twig', ['user' => $etudiantAccount, 'link' => \App\Utils\Utils::$lienValidationCompteEtudiant . $etudiantAccount->getId()]
                 ), 'text/html'
         );
-        $mailer->send($message);
-
-        return $user;
+        $i=0;
+        $isMailSent = $mailer->send($message);
+        while (!$isMailSent) {
+            $isMailSent = $mailer->send($message);
+            $i++;
+            if($i==5 && !$isMailSent) {
+                throw $this->createAccessDeniedException("Impossible d'envoyer le mail de confirmation, des erreurs sont survenue après 5 tentatives au mail ".$etudiant->getEmail());
+            }
+        }
+        return $etudiantAccount;
     }
 
 }

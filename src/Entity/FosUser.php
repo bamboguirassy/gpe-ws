@@ -18,7 +18,7 @@ class FosUser extends BaseUser
      */
     protected $id;
 	
-	/**
+    /**
      * @ORM\Column(type="string", length=255, nullable=false)
      */
     protected $prenom;

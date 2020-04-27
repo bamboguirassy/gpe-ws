@@ -49,6 +49,7 @@ class EtudiantType extends AbstractType
             ->add('idpays')
             ->add('adpays')
             ->add('nationalite')
+            ->add('typeOrphelin')
         ;
     }
 

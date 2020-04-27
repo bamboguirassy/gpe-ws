@@ -289,6 +289,16 @@ class Etudiant
      */
     private $nationalite;
 
+    /**
+     * @ORM\Column(name="type_orphelin",type="string", length=255, nullable=true)
+     */
+    private $typeOrphelin;
+
+    /**
+     * @ORM\Column(name="email_perso_updated",type="boolean", nullable=true)
+     */
+    private $emailPersoUpdated;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -734,6 +744,30 @@ class Etudiant
     public function setNationalite(?Pays $nationalite): self
     {
         $this->nationalite = $nationalite;
+
+        return $this;
+    }
+
+    public function getTypeOrphelin(): ?string
+    {
+        return $this->typeOrphelin;
+    }
+
+    public function setTypeOrphelin(?string $typeOrphelin): self
+    {
+        $this->typeOrphelin = $typeOrphelin;
+
+        return $this;
+    }
+
+    public function getEmailPersoUpdated(): ?bool
+    {
+        return $this->emailPersoUpdated;
+    }
+
+    public function setEmailPersoUpdated(?bool $emailPersoUpdated): self
+    {
+        $this->emailPersoUpdated = $emailPersoUpdated;
 
         return $this;
     }

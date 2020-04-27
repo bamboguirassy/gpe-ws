@@ -1,8 +1,27 @@
-{# empty Twig template #}
-Bonjour <b>{{user.prenom}} {{user.nom}}</b> <br>
-<span>Bienvenue sur <b>GPE</b>, la première plateforme de gestion du parcours de l'étudiant.</span><br>
-<span>Vous avez demandé la creation d'un compte étudiant, merci de confirmer votre mail en cliquant 
-    <a href="{{link}}">ici</a>
-</span>.<br>
+{%extends "emails/email-template.html.twig"%}
+{% block title %}  Bonjour <b>{{user.prenom}} {{user.nom}}</b> {% endblock %}
+{% block paragraphe1 %}
+    <span>Bienvenue sur <b>GPE</b>, la première plateforme de gestion du parcours de l'étudiant.</span><br>
+{% endblock %}
+{% block paragraphe2 %}
 
-<span>Nous vous souhaitons une excellente experience avec GPE et comptons sur vous pour que la plateforme soit votre meilleure compagnonne.</span>
+    <span>Vous avez demandé la creation d'un compte étudiant, 
+        
+        
+    <span>
+        Vos identifiants de connexion sont:<br>
+        <u>Adresse email de connexion </u>: {{user.email}}<br>
+        {% if password is defined %}
+        <u>Mot de passe</u>: {{password}}
+        {% else %}
+        Le <u>mot de passe</u> est celui que vous avez indiqué lors de la création du compte.
+        {% endif %}
+    </span><br>
+        
+        Merci de cliquer sur le lien pour activer votre compte de connexion à l'espace étudiant :  
+        <a href="{{link}}">lien d'activation du compte</a>
+    </span>.
+{% endblock %}
+{% block paragraphe3 %}
+    Nous vous souhaitons une excellente experience avec GPE et comptons sur vous pour que la plateforme soit votre meilleure compagnonne.
+{% endblock %}
