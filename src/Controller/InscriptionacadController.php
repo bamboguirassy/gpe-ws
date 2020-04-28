@@ -60,9 +60,13 @@ class InscriptionacadController extends AbstractController {
      */
     public function getInscriptionEtudiantConnecte(): array {
         $em = $this->getDoctrine()->getManager();
-        $inscriptionacads = $em->getRepository(Inscriptionacad::class)
-                ->findBy(['idetudiant' => EtudiantController::getEtudiantConnecte($this),
-            'etat' => 'V'], ['id' => 'DESC']);
+        $inscriptionacads = $em->createQuery('select ia from App\Entity\Inscriptionacad ia, '
+                . 'App\Entity\Classe c, App\Entity\Anneeacad aa where '
+                . 'ia.idclasse=c and c.idanneeacad=aa and ia.idetudiant=?1 and ia.etat=?2 '
+                . 'order by aa.id DESC')
+                ->setParameter(1,EtudiantController::getEtudiantConnecte($this))
+                ->setParameter(2,'V')
+                ->getResult();
         return count($inscriptionacads) ? $inscriptionacads : [];
     }
 

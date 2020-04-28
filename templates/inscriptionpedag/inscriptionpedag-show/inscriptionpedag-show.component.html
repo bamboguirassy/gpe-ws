@@ -1,0 +1,59 @@
+<p-toast></p-toast>
+<p-fieldset *ngIf="'Inscriptionpedag'|showable" legend="Affichage des informations - Utilisateur" [toggleable]="true">
+  <p-toolbar>
+    <button *ngIf="'Inscriptionpedag'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+      [routerLink]="['/'+inscriptionpedagSrv.getRoutePrefix(),inscriptionpedag.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+      Modifier</button>
+    <button *ngIf="'Inscriptionpedag'|clonable" [routerLink]="['/'+inscriptionpedagSrv.getRoutePrefix(),inscriptionpedag.id,'clone']" type="button"
+      class="btn btn-outline-secondary pull-right ml-1">
+      <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+    </button>
+    <button *ngIf="'Inscriptionpedag'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeInscriptionpedag()"><i
+        class="fa fa-trash-o"></i> Supprimer</button>
+    <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+        class="fa fa-reply"></i> Retour</button>
+  </p-toolbar>
+  <p-tabView>
+    <p-tabPanel header="Détails">
+      <p-fieldset [legend]="inscriptionpedag.id">
+        <table class="table">
+                                    <tr>
+                <th>Dateinscriptionpedag</th>
+                <td>{{ inscriptionpedag.dateinscriptionpedag ? inscriptionpedag.dateinscriptionpedag|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+                                    <tr>
+                <th>Passage</th>
+                <td>{{ inscriptionpedag.passage ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>Valide</th>
+                <td>{{ inscriptionpedag.valide ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>Moyenneobtenue</th>
+                <td>{{ inscriptionpedag.moyenneobtenue }}</td>
+            </tr>
+                    </table>
+        <p-toolbar>
+          <button *ngIf="'Inscriptionpedag'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+            [routerLink]="['/'+inscriptionpedagSrv.getRoutePrefix(),inscriptionpedag.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+            Modifier</button>
+          <button *ngIf="'Inscriptionpedag'|clonable" [routerLink]="['/'+inscriptionpedagSrv.getRoutePrefix(),inscriptionpedag.id,'clone']" type="button"
+            class="btn btn-outline-secondary pull-right ml-1">
+            <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+          </button>
+          <button *ngIf="'Inscriptionpedag'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeInscriptionpedag()"><i
+              class="fa fa-trash-o"></i> Supprimer</button>
+          <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+              class="fa fa-reply"></i> Retour</button>
+          <button *ngIf="'Inscriptionpedag'|showable" type="button" class="btn btn-secondary ml-1" (click)="refresh()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+          </button>
+        </p-toolbar>
+      </p-fieldset>
+    </p-tabPanel>
+    <p-tabPanel header="Liste associée">
+      
+    </p-tabPanel>
+  </p-tabView>
+</p-fieldset>

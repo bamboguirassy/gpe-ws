@@ -22,25 +22,34 @@ class Ue
     private $id;
 
     /**
-     * @var int
+     * @var \Specialite
      *
-     * @ORM\Column(name="idTypeUe", type="integer", nullable=false)
+     * @ORM\ManyToOne(targetEntity="Specialite")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idSpecialite", referencedColumnName="id")
+     * })
      */
-    private $idtypeue;
+    private $idspecialite;
 
     /**
-     * @var int
+     * @var \Semestre
      *
-     * @ORM\Column(name="idSemestre", type="integer", nullable=false)
+     * @ORM\ManyToOne(targetEntity="Semestre")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idSemestre", referencedColumnName="id")
+     * })
      */
     private $idsemestre;
 
     /**
-     * @var int|null
+     * @var \Typeue
      *
-     * @ORM\Column(name="idSpecialite", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="Typeue")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idTypeUe", referencedColumnName="id")
+     * })
      */
-    private $idspecialite;
+    private $idtypeue;
 
     /**
      * @var string|null
