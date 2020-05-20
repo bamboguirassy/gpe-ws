@@ -42,7 +42,7 @@ class AnneeacadController extends AbstractController
     {
         $anneeacads = $this->getDoctrine()
             ->getRepository(Anneeacad::class)
-            ->findByEncours(true,['id'=>'desc'],3);
+            ->findByEncours(true,['id'=>'desc'],4);
 
         return count($anneeacads)?$anneeacads:[];
     }

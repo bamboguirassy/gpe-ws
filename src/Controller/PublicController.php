@@ -110,9 +110,6 @@ class PublicController extends AbstractController {
      */
     public function confirmAccount(FosUser $user): FosUser {
         $em = $this->getDoctrine()->getManager();
-        if ($user->isEnabled()) {
-            throw $this->createAccessDeniedException("Ce compte est déja actif");
-        }
         $user->setEnabled(true);
         $em->flush();
 
