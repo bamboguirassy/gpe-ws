@@ -1,0 +1,48 @@
+
+<p-toast></p-toast>
+<!-- form reclamation_bourse info -->
+<form *ngIf="'ReclamationBourse'|editable" class="form" role="form" #reclamation_bourseForm="ngForm" autocomplete="off" (ngSubmit)="updateReclamationBourse()">
+  <p-fieldset legend="Modification utilisateur" [toggleable]="true">
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="reclamation_bourseForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+    <!-- debut body -->
+    <div class="row">
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="date">Date</label>
+                    <input [(ngModel)]="reclamation_bourse.date" class="form-control" type="text" name="date" id="date">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="objet">Objet</label>
+                    <input [(ngModel)]="reclamation_bourse.objet" class="form-control" type="text" name="objet" id="objet">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="message">Message</label>
+                    <input [(ngModel)]="reclamation_bourse.message" class="form-control" type="text" name="message" id="message">
+                </div>
+            </div>
+                
+      
+    </div>
+    <!-- fin body -->
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="reclamation_bourseForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+  </p-fieldset>
+</form>
+<!-- /form reclamation_bourse info -->
