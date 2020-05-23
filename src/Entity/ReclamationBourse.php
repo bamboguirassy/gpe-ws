@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * ReclamationBourse
  *
- * @ORM\Table(name="reclamation_bourse", indexes={@ORM\Index(name="fk_reclamation_bourse_bourse_etudiant1_idx", columns={"bourse_etudiant"}), @ORM\Index(name="fk_reclamation_bourse_etat_reclamation_bourse1_idx", columns={"etat_actuel"})})
+ * @ORM\Table(name="reclamation_bourse", indexes={@ORM\Index(name="etudiant", columns={"etudiant"}), @ORM\Index(name="fk_reclamation_bourse_bourse_etudiant1_idx", columns={"bourse_etudiant"}), @ORM\Index(name="fk_reclamation_bourse_etat_reclamation_bourse1_idx", columns={"etat_actuel"})})
  * @ORM\Entity
  */
 class ReclamationBourse
@@ -62,24 +62,34 @@ class ReclamationBourse
      */
     private $etatActuel;
 
-    public function getId(): ?int
+    /**
+     * @var \Etudiant
+     *
+     * @ORM\ManyToOne(targetEntity="Etudiant")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="etudiant", referencedColumnName="id")
+     * })
+     */
+    private $etudiant;
+
+    public function getId()
     {
         return $this->id;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate()
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): self
+    public function setDate($date): self
     {
         $this->date = $date;
 
         return $this;
     }
 
-    public function getObjet(): ?string
+    public function getObjet()
     {
         return $this->objet;
     }
@@ -91,7 +101,7 @@ class ReclamationBourse
         return $this;
     }
 
-    public function getMessage(): ?string
+    public function getMessage()
     {
         return $this->message;
     }
@@ -103,26 +113,38 @@ class ReclamationBourse
         return $this;
     }
 
-    public function getBourseEtudiant(): ?BourseEtudiant
+    public function getBourseEtudiant()
     {
         return $this->bourseEtudiant;
     }
 
-    public function setBourseEtudiant(?BourseEtudiant $bourseEtudiant): self
+    public function setBourseEtudiant($bourseEtudiant): self
     {
         $this->bourseEtudiant = $bourseEtudiant;
 
         return $this;
     }
 
-    public function getEtatActuel(): ?EtatReclamationBourse
+    public function getEtatActuel()
     {
         return $this->etatActuel;
     }
 
-    public function setEtatActuel(?EtatReclamationBourse $etatActuel): self
+    public function setEtatActuel($etatActuel): self
     {
         $this->etatActuel = $etatActuel;
+
+        return $this;
+    }
+
+    public function getEtudiant()
+    {
+        return $this->etudiant;
+    }
+
+    public function setEtudiant($etudiant): self
+    {
+        $this->etudiant = $etudiant;
 
         return $this;
     }

@@ -299,12 +299,12 @@ class Etudiant
      */
     private $emailPersoUpdated;
 
-    public function getId(): ?int
+    public function getId()
     {
         return $this->id;
     }
 
-    public function getCni(): ?string
+    public function getCni()
     {
         return $this->cni;
     }
@@ -316,7 +316,7 @@ class Etudiant
         return $this;
     }
 
-    public function getIne(): ?string
+    public function getIne()
     {
         return $this->ine;
     }
@@ -328,7 +328,7 @@ class Etudiant
         return $this;
     }
 
-    public function getNuminterne(): ?string
+    public function getNuminterne()
     {
         return $this->numinterne;
     }
@@ -340,7 +340,7 @@ class Etudiant
         return $this;
     }
 
-    public function getNometudiant(): ?string
+    public function getNometudiant()
     {
         return $this->nometudiant;
     }
@@ -352,7 +352,7 @@ class Etudiant
         return $this;
     }
 
-    public function getPrenometudiant(): ?string
+    public function getPrenometudiant()
     {
         return $this->prenometudiant;
     }
@@ -364,7 +364,7 @@ class Etudiant
         return $this;
     }
 
-    public function getGenre(): ?string
+    public function getGenre()
     {
         return $this->genre;
     }
@@ -376,19 +376,19 @@ class Etudiant
         return $this;
     }
 
-    public function getDatenaiss(): ?\DateTimeInterface
+    public function getDatenaiss()
     {
         return $this->datenaiss;
     }
 
-    public function setDatenaiss(\DateTimeInterface $datenaiss): self
+    public function setDatenaiss($datenaiss): self
     {
         $this->datenaiss = $datenaiss;
 
         return $this;
     }
 
-    public function getLieunaiss(): ?string
+    public function getLieunaiss()
     {
         return $this->lieunaiss;
     }
@@ -400,31 +400,31 @@ class Etudiant
         return $this;
     }
 
-    public function getRegionnaiss(): ?string
+    public function getRegionnaiss()
     {
         return $this->regionnaiss;
     }
 
-    public function setRegionnaiss(?string $regionnaiss): self
+    public function setRegionnaiss($regionnaiss): self
     {
         $this->regionnaiss = $regionnaiss;
 
         return $this;
     }
 
-    public function getAdville(): ?string
+    public function getAdville()
     {
         return $this->adville;
     }
 
-    public function setAdville(?string $adville): self
+    public function setAdville($adville): self
     {
         $this->adville = $adville;
 
         return $this;
     }
 
-    public function getAdquartier(): ?string
+    public function getAdquartier()
     {
         return $this->adquartier;
     }
@@ -436,19 +436,19 @@ class Etudiant
         return $this;
     }
 
-    public function getAdruevilla(): ?string
+    public function getAdruevilla()
     {
         return $this->adruevilla;
     }
 
-    public function setAdruevilla(?string $adruevilla): self
+    public function setAdruevilla($adruevilla): self
     {
         $this->adruevilla = $adruevilla;
 
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getEmail()
     {
         return $this->email;
     }
@@ -460,139 +460,139 @@ class Etudiant
         return $this;
     }
 
-    public function getEmailUniv(): ?string
+    public function getEmailUniv()
     {
         return $this->emailUniv;
     }
 
-    public function setEmailUniv(?string $emailUniv): self
+    public function setEmailUniv($emailUniv): self
     {
         $this->emailUniv = $emailUniv;
 
         return $this;
     }
 
-    public function getNotifmail(): ?bool
+    public function getNotifmail()
     {
         return $this->notifmail;
     }
 
-    public function setNotifmail(?bool $notifmail): self
+    public function setNotifmail($notifmail): self
     {
         $this->notifmail = $notifmail;
 
         return $this;
     }
 
-    public function getPhoto(): ?string
+    public function getPhoto()
     {
         return $this->photo;
     }
 
-    public function setPhoto(?string $photo): self
+    public function setPhoto($photo): self
     {
         $this->photo = $photo;
 
         return $this;
     }
 
-    public function getLyceedeprovenance(): ?string
+    public function getLyceedeprovenance()
     {
         return $this->lyceedeprovenance;
     }
 
-    public function setLyceedeprovenance(?string $lyceedeprovenance): self
+    public function setLyceedeprovenance($lyceedeprovenance): self
     {
         $this->lyceedeprovenance = $lyceedeprovenance;
 
         return $this;
     }
 
-    public function getTeletudiant(): ?string
+    public function getTeletudiant()
     {
         return $this->teletudiant;
     }
 
-    public function setTeletudiant(?string $teletudiant): self
+    public function setTeletudiant($teletudiant): self
     {
         $this->teletudiant = $teletudiant;
 
         return $this;
     }
 
-    public function getTeletudiant2(): ?string
+    public function getTeletudiant2()
     {
         return $this->teletudiant2;
     }
 
-    public function setTeletudiant2(?string $teletudiant2): self
+    public function setTeletudiant2($teletudiant2): self
     {
         $this->teletudiant2 = $teletudiant2;
 
         return $this;
     }
 
-    public function getSeriebac(): ?string
+    public function getSeriebac()
     {
         return $this->seriebac;
     }
 
-    public function setSeriebac(?string $seriebac): self
+    public function setSeriebac($seriebac): self
     {
         $this->seriebac = $seriebac;
 
         return $this;
     }
 
-    public function getDiplomeentree(): ?string
+    public function getDiplomeentree()
     {
         return $this->diplomeentree;
     }
 
-    public function setDiplomeentree(?string $diplomeentree): self
+    public function setDiplomeentree($diplomeentree): self
     {
         $this->diplomeentree = $diplomeentree;
 
         return $this;
     }
 
-    public function getMoyennebac(): ?float
+    public function getMoyennebac()
     {
         return $this->moyennebac;
     }
 
-    public function setMoyennebac(?float $moyennebac): self
+    public function setMoyennebac($moyennebac): self
     {
         $this->moyennebac = $moyennebac;
 
         return $this;
     }
 
-    public function getMentionbac(): ?string
+    public function getMentionbac()
     {
         return $this->mentionbac;
     }
 
-    public function setMentionbac(?string $mentionbac): self
+    public function setMentionbac($mentionbac): self
     {
         $this->mentionbac = $mentionbac;
 
         return $this;
     }
 
-    public function getGroupepassage(): ?string
+    public function getGroupepassage()
     {
         return $this->groupepassage;
     }
 
-    public function setGroupepassage(?string $groupepassage): self
+    public function setGroupepassage($groupepassage): self
     {
         $this->groupepassage = $groupepassage;
 
         return $this;
     }
 
-    public function getAnneeBac(): ?int
+    public function getAnneeBac()
     {
         return $this->anneeBac;
     }
@@ -604,7 +604,7 @@ class Etudiant
         return $this;
     }
 
-    public function getHandicap(): ?string
+    public function getHandicap()
     {
         return $this->handicap;
     }
@@ -616,31 +616,31 @@ class Etudiant
         return $this;
     }
 
-    public function getTypeHandicap(): ?string
+    public function getTypeHandicap()
     {
         return $this->typeHandicap;
     }
 
-    public function setTypeHandicap(?string $typeHandicap): self
+    public function setTypeHandicap($typeHandicap): self
     {
         $this->typeHandicap = $typeHandicap;
 
         return $this;
     }
 
-    public function getDescriptionHandicap(): ?string
+    public function getDescriptionHandicap()
     {
         return $this->descriptionHandicap;
     }
 
-    public function setDescriptionHandicap(?string $descriptionHandicap): self
+    public function setDescriptionHandicap($descriptionHandicap): self
     {
         $this->descriptionHandicap = $descriptionHandicap;
 
         return $this;
     }
 
-    public function getOrphelin(): ?string
+    public function getOrphelin()
     {
         return $this->orphelin;
     }
@@ -652,7 +652,7 @@ class Etudiant
         return $this;
     }
 
-    public function getSituationMatrimoniale(): ?string
+    public function getSituationMatrimoniale()
     {
         return $this->situationMatrimoniale;
     }
@@ -664,108 +664,108 @@ class Etudiant
         return $this;
     }
 
-    public function getNomconjoint(): ?string
+    public function getNomconjoint()
     {
         return $this->nomconjoint;
     }
 
-    public function setNomconjoint(?string $nomconjoint): self
+    public function setNomconjoint($nomconjoint): self
     {
         $this->nomconjoint = $nomconjoint;
 
         return $this;
     }
 
-    public function getNbreenfant(): ?int
+    public function getNbreenfant()
     {
         return $this->nbreenfant;
     }
 
-    public function setNbreenfant(?int $nbreenfant): self
+    public function setNbreenfant($nbreenfant): self
     {
         $this->nbreenfant = $nbreenfant;
 
         return $this;
     }
 
-    public function getNomcontact(): ?string
+    public function getNomcontact()
     {
         return $this->nomcontact;
     }
 
-    public function setNomcontact(?string $nomcontact): self
+    public function setNomcontact($nomcontact): self
     {
         $this->nomcontact = $nomcontact;
 
         return $this;
     }
 
-    public function getTelcontact(): ?string
+    public function getTelcontact()
     {
         return $this->telcontact;
     }
 
-    public function setTelcontact(?string $telcontact): self
+    public function setTelcontact($telcontact): self
     {
         $this->telcontact = $telcontact;
 
         return $this;
     }
 
-    public function getIdpays(): ?Pays
+    public function getIdpays()
     {
         return $this->idpays;
     }
 
-    public function setIdpays(?Pays $idpays): self
+    public function setIdpays($idpays): self
     {
         $this->idpays = $idpays;
 
         return $this;
     }
 
-    public function getAdpays(): ?Pays
+    public function getAdpays()
     {
         return $this->adpays;
     }
 
-    public function setAdpays(?Pays $adpays): self
+    public function setAdpays($adpays): self
     {
         $this->adpays = $adpays;
 
         return $this;
     }
 
-    public function getNationalite(): ?Pays
+    public function getNationalite()
     {
         return $this->nationalite;
     }
 
-    public function setNationalite(?Pays $nationalite): self
+    public function setNationalite($nationalite): self
     {
         $this->nationalite = $nationalite;
 
         return $this;
     }
 
-    public function getTypeOrphelin(): ?string
+    public function getTypeOrphelin()
     {
         return $this->typeOrphelin;
     }
 
-    public function setTypeOrphelin(?string $typeOrphelin): self
+    public function setTypeOrphelin($typeOrphelin): self
     {
         $this->typeOrphelin = $typeOrphelin;
 
         return $this;
     }
 
-    public function getEmailPersoUpdated(): ?bool
+    public function getEmailPersoUpdated()
     {
         return $this->emailPersoUpdated;
     }
 
-    public function setEmailPersoUpdated(?bool $emailPersoUpdated): self
+    public function setEmailPersoUpdated($emailPersoUpdated): self
     {
         $this->emailPersoUpdated = $emailPersoUpdated;
 

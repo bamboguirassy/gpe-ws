@@ -12,10 +12,11 @@ class DemandeDocumentType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('type')
+            ->add('typedocument')
             ->add('intitule')
             ->add('etatActuel')
             ->add('inscriptionacad')
+            ->add('nature')
         ;
     }
 

@@ -55,24 +55,24 @@ class HistoriqueEtatReclamation
      */
     private $reclamation;
 
-    public function getId(): ?int
+    public function getId()
     {
         return $this->id;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate()
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): self
+    public function setDate($date): self
     {
         $this->date = $date;
 
         return $this;
     }
 
-    public function getUserEmail(): ?string
+    public function getUserEmail()
     {
         return $this->userEmail;
     }
@@ -84,24 +84,24 @@ class HistoriqueEtatReclamation
         return $this;
     }
 
-    public function getEtat(): ?EtatReclamationBourse
+    public function getEtat()
     {
         return $this->etat;
     }
 
-    public function setEtat(?EtatReclamationBourse $etat): self
+    public function setEtat($etat): self
     {
         $this->etat = $etat;
 
         return $this;
     }
 
-    public function getReclamation(): ?ReclamationBourse
+    public function getReclamation()
     {
         return $this->reclamation;
     }
 
-    public function setReclamation(?ReclamationBourse $reclamation): self
+    public function setReclamation($reclamation): self
     {
         $this->reclamation = $reclamation;
 

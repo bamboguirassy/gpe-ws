@@ -30,6 +30,16 @@ class EtatReclamationBourseController extends AbstractController
 
         return count($etatReclamationBourses)?$etatReclamationBourses:[];
     }
+    
+    public static function getEtatInitial($cntrl) {
+        $em = $cntrl->getDoctrine()->getManager();
+        $etatInitial = $em->getRepository(EtatReclamationBourse::class)
+                ->findOneByCode('INITIEE');
+        if(!$etatInitial) {
+            throw new Exception("L'état initié est introuvale...");
+        }
+        return $etatInitial;
+    }
 
     /**
      * @Rest\Post(Path="/create", name="etat_reclamation_bourse_new")

@@ -30,6 +30,16 @@ class EtatDemandeDocumentController extends AbstractController
 
         return count($etatDemandeDocuments)?$etatDemandeDocuments:[];
     }
+    
+    public static function getEtatInitial($cntrl) {
+        $em = $cntrl->getDoctrine()->getManager();
+        $etatInitial = $em->getRepository(EtatDemandeDocument::class)
+                ->findOneByCode('EEA');
+        if(!$etatInitial) {
+            throw new Exception("L'état en attente d'approbation est introuvale...");
+        }
+        return $etatInitial;
+    }
 
     /**
      * @Rest\Post(Path="/create", name="etat_demande_document_new")

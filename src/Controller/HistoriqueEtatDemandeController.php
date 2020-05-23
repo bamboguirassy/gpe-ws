@@ -30,6 +30,29 @@ class HistoriqueEtatDemandeController extends AbstractController
 
         return count($historiqueEtatDemandes)?$historiqueEtatDemandes:[];
     }
+    
+    /**
+     * @Rest\Get(path="/demande/{id}", name="historique_etat_by_demande")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findByDemande(\App\Entity\DemandeDocument $demande): array
+    {
+        $historiqueEtatDemandes = $this->getDoctrine()
+            ->getRepository(HistoriqueEtatDemande::class)
+            ->findByDemande($demande);
+
+        return count($historiqueEtatDemandes)?$historiqueEtatDemandes:[];
+    }
+    
+    public static function createHistoriqueFromDemande(\App\Entity\DemandeDocument $demande, $cntrl): HistoriqueEtatDemande {
+        $historique = new HistoriqueEtatDemande();
+        $historique->setDate(new \DateTime());
+        $historique->setEtat($demande->getEtatActuel());
+        $historique->setDemande($demande);
+        $historique->setUserMail($cntrl->getUser()->getEmail());
+        
+        return $historique;
+    }
 
     /**
      * @Rest\Post(Path="/create", name="historique_etat_demande_new")

@@ -13,6 +13,7 @@ class EtatReclamationBourseType extends AbstractType
     {
         $builder
             ->add('libelle')
+            ->add('code')
             ->add('codeCouleur')
             ->add('description')
             ->add('etatSuivant')

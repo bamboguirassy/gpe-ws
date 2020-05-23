@@ -30,6 +30,29 @@ class HistoriqueEtatReclamationController extends AbstractController
 
         return count($historiqueEtatReclamations)?$historiqueEtatReclamations:[];
     }
+    
+    /**
+     * @Rest\Get(path="/reclamation/{id}", name="historique_etat_by_reclamation")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findByReclamation(\App\Entity\ReclamationBourse $reclamation): array
+    {
+        $historiqueEtatReclamations = $this->getDoctrine()
+            ->getRepository(HistoriqueEtatReclamation::class)
+            ->findByReclamation($reclamation);
+
+        return count($historiqueEtatReclamations)?$historiqueEtatReclamations:[];
+    }
+    
+    public static function createHistoriqueFromReclamation(\App\Entity\ReclamationBourse $reclamation, $cntrl): HistoriqueEtatReclamation {
+        $historique = new HistoriqueEtatReclamation();
+        $historique->setDate(new \DateTime());
+        $historique->setEtat($reclamation->getEtatActuel());
+        $historique->setReclamation($reclamation);
+        $historique->setUserEmail($cntrl->getUser()->getEmail());
+        
+        return $historique;
+    }
 
     /**
      * @Rest\Post(Path="/create", name="historique_etat_reclamation_new")

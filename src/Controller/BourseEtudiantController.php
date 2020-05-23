@@ -51,6 +51,48 @@ class BourseEtudiantController extends AbstractController {
 
         return count($tab_annee) ? $tab_annee : [];
     }
+    
+    
+    /**
+     * @Rest\Get(path="/mois/{mois}/annee/{annee}", name="bourse_etudiant_with_no_matching")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findEtatBourseWithNoMatching($mois, $annee): array {
+        $em = $this->getDoctrine()->getManager();
+        $bourseWithNoMatchings = $em->createQuery('select be from '
+                . 'App\Entity\BourseEtudiant be where be.mois=?1 '
+                . 'and be.annee=?2 and be.cni not in'
+                . ' (select e.cni from App\Entity\Etudiant e) ')
+                ->setParameter(1,$mois)
+                ->setParameter(2,$annee)
+                ->getResult();
+       return $bourseWithNoMatchings;
+    }
+    
+    /**
+     * @Rest\Get(path="/available-states/", name="bourse_etudiant_available_states")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findAvalaibleStatesBourse(): array {
+        $em = $this->getDoctrine()->getManager();
+        // reccuperer les années des bourses
+        $anneeObjects = $em->createQuery('select distinct be.annee from '
+                        . 'App\Entity\BourseEtudiant be order by be.annee desc')
+                ->getResult();
+        // pour chaque année, reccuperer les mois de bourse disponibles
+        $tab_annee = [];
+        foreach ($anneeObjects as $anneeObject) {
+            $listeMois = $em->createQuery('select distinct be.mois from '
+                            . 'App\Entity\BourseEtudiant be where be.annee=?1 order by be.id desc')
+                    ->setParameter(1, $anneeObject['annee'])
+                    ->getResult();
+            $tab_annee[] = ['annee' => $anneeObject['annee'], 'listeMois' => $listeMois];
+        }
+
+        return count($tab_annee) ? $tab_annee : [];
+    }
+    
+    
 
     /**
      * @Rest\Post(Path="/create", name="bourse_etudiant_new")

@@ -17,6 +17,7 @@ class ReclamationBourseType extends AbstractType
             ->add('message')
             ->add('bourseEtudiant')
             ->add('etatActuel')
+            ->add('etudiant')
         ;
     }
 

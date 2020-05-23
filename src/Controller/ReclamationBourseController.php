@@ -20,7 +20,6 @@ class ReclamationBourseController extends AbstractController
     /**
      * @Rest\Get(path="/", name="reclamation_bourse_index")
      * @Rest\View(StatusCode = 200)
-     * @IsGranted("ROLE_RECLAMATIONBOURSE_LISTE")
      */
     public function index(): array
     {
@@ -30,20 +29,41 @@ class ReclamationBourseController extends AbstractController
 
         return count($reclamationBourses)?$reclamationBourses:[];
     }
+    
+    
+    /**
+     * @Rest\Get(path="/mes-reclamations/", name="reclamation_bourse_by_etudiant_connecte")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findMesReclamations(): array
+    {
+        $reclamationBourses = $this->getDoctrine()
+            ->getRepository(ReclamationBourse::class)
+            ->findByEtudiant(EtudiantController::getEtudiantConnecte($this));
+
+        return count($reclamationBourses)?$reclamationBourses:[];
+    }
 
     /**
      * @Rest\Post(Path="/create", name="reclamation_bourse_new")
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_RECLAMATIONBOURSE_NOUVEAU")
      */
     public function create(Request $request): ReclamationBourse    {
         $reclamationBourse = new ReclamationBourse();
         $form = $this->createForm(ReclamationBourseType::class, $reclamationBourse);
         $form->submit(Utils::serializeRequestContent($request));
-
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($reclamationBourse);
-        $entityManager->flush();
+        $reclamationBourse->setEtudiant(EtudiantController::getEtudiantConnecte($this));
+        $reclamationBourse->setDate(new \DateTime());
+        // definir premiere étape des reclamations bourses
+        $reclamationBourse->setEtatActuel(EtatReclamationBourseController::getEtatInitial($this));
+        // créer l'historique
+        $historiqueInitiale = HistoriqueEtatReclamationController::createHistoriqueFromReclamation($reclamationBourse, $this);
+        
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($reclamationBourse);
+        $em->persist($historiqueInitiale);
+        
+        $em->flush();
 
         return $reclamationBourse;
     }
@@ -51,7 +71,6 @@ class ReclamationBourseController extends AbstractController
     /**
      * @Rest\Get(path="/{id}", name="reclamation_bourse_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_RECLAMATIONBOURSE_AFFICHAGE")
      */
     public function show(ReclamationBourse $reclamationBourse): ReclamationBourse    {
         return $reclamationBourse;
@@ -61,13 +80,18 @@ class ReclamationBourseController extends AbstractController
     /**
      * @Rest\Put(path="/{id}/edit", name="reclamation_bourse_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_RECLAMATIONBOURSE_EDITION")
      */
     public function edit(Request $request, ReclamationBourse $reclamationBourse): ReclamationBourse    {
+        $em = $this->getDoctrine()->getManager();
+        $oldEtat = $reclamationBourse->getEtatActuel();
         $form = $this->createForm(ReclamationBourseType::class, $reclamationBourse);
         $form->submit(Utils::serializeRequestContent($request));
+        if($reclamationBourse->getEtatActuel()->getCode()!=$oldEtat->getCode()) {
+            $historique = HistoriqueEtatReclamationController::createHistoriqueFromReclamation($reclamationBourse, $this);
+            $em->persist($historique);
+        }
 
-        $this->getDoctrine()->getManager()->flush();
+        $em->flush();
 
         return $reclamationBourse;
     }

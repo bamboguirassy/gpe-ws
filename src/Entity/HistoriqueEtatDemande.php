@@ -55,24 +55,24 @@ class HistoriqueEtatDemande
      */
     private $etat;
 
-    public function getId(): ?int
+    public function getId()
     {
         return $this->id;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate()
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): self
+    public function setDate($date): self
     {
         $this->date = $date;
 
         return $this;
     }
 
-    public function getUserMail(): ?string
+    public function getUserMail()
     {
         return $this->userMail;
     }
@@ -84,24 +84,24 @@ class HistoriqueEtatDemande
         return $this;
     }
 
-    public function getDemande(): ?DemandeDocument
+    public function getDemande()
     {
         return $this->demande;
     }
 
-    public function setDemande(?DemandeDocument $demande): self
+    public function setDemande($demande): self
     {
         $this->demande = $demande;
 
         return $this;
     }
 
-    public function getEtat(): ?EtatDemandeDocument
+    public function getEtat()
     {
         return $this->etat;
     }
 
-    public function setEtat(?EtatDemandeDocument $etat): self
+    public function setEtat($etat): self
     {
         $this->etat = $etat;
 

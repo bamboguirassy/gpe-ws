@@ -197,5 +197,21 @@ class PublicController extends AbstractController {
         }
         return $etudiantAccount;
     }
+    
+    /**
+     * @Rest\Post(Path="/message-assistance", name="message_assistance")
+     * @Rest\View(StatusCode=200)
+     */
+    public function sendAssistanceMessage(\Symfony\Component\HttpFoundation\Request $request, \Swift_Mailer $mailer) {
+        //send confirmation mail
+        /*$message = (new \Swift_Message('Confirmation de compte'))
+                ->setFrom(\App\Utils\Utils::$senderEmail)
+                ->setTo($etudiant->getEmail())
+                ->setBody(
+                $this->renderView(
+                        'emails/registrations/etudiant.html.twig', ['user' => $etudiantAccount, 'link' => \App\Utils\Utils::$lienValidationCompteEtudiant . $etudiantAccount->getId()]
+                ), 'text/html'
+        );*/
+    }
 
 }

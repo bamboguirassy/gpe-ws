@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * DemandeDocument
  *
- * @ORM\Table(name="demande_document", indexes={@ORM\Index(name="fk_demande_document_etat_demande_document1_idx", columns={"etat_actuel"}), @ORM\Index(name="fk_demande_document_inscriptionacad1_idx", columns={"inscriptionacad"})})
+ * @ORM\Table(name="demande_document", indexes={@ORM\Index(name="fk_demande_document_etat_demande_document1_idx", columns={"etat_actuel"}), @ORM\Index(name="fk_demande_document_inscriptionacad1_idx", columns={"inscriptionacad"}), @ORM\Index(name="typedocument", columns={"typedocument"})})
  * @ORM\Entity
  */
 class DemandeDocument
@@ -24,16 +24,33 @@ class DemandeDocument
     /**
      * @var string
      *
-     * @ORM\Column(name="type", type="string", length=45, nullable=false)
-     */
-    private $type;
-
-    /**
-     * @var string
-     *
      * @ORM\Column(name="intitule", type="string", length=145, nullable=false)
      */
     private $intitule;
+    
+        /**
+     * @var string
+     *
+     * @ORM\Column(name="nature", type="string", length=45, nullable=false)
+     */
+    private $nature;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="date", type="date", nullable=false)
+     */
+    private $date;
+
+    /**
+     * @var \Typedocument
+     *
+     * @ORM\ManyToOne(targetEntity="Typedocument")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="typedocument", referencedColumnName="id")
+     * })
+     */
+    private $typedocument;
 
     /**
      * @var \EtatDemandeDocument
@@ -55,24 +72,12 @@ class DemandeDocument
      */
     private $inscriptionacad;
 
-    public function getId(): ?int
+    public function getId()
     {
         return $this->id;
     }
 
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): self
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    public function getIntitule(): ?string
+    public function getIntitule()
     {
         return $this->intitule;
     }
@@ -84,26 +89,62 @@ class DemandeDocument
         return $this;
     }
 
-    public function getEtatActuel(): ?EtatDemandeDocument
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    public function setDate($date): self
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    public function getTypedocument()
+    {
+        return $this->typedocument;
+    }
+
+    public function setTypedocument($typedocument): self
+    {
+        $this->typedocument = $typedocument;
+
+        return $this;
+    }
+
+    public function getEtatActuel()
     {
         return $this->etatActuel;
     }
 
-    public function setEtatActuel(?EtatDemandeDocument $etatActuel): self
+    public function setEtatActuel($etatActuel): self
     {
         $this->etatActuel = $etatActuel;
 
         return $this;
     }
 
-    public function getInscriptionacad(): ?Inscriptionacad
+    public function getInscriptionacad()
     {
         return $this->inscriptionacad;
     }
 
-    public function setInscriptionacad(?Inscriptionacad $inscriptionacad): self
+    public function setInscriptionacad($inscriptionacad): self
     {
         $this->inscriptionacad = $inscriptionacad;
+
+        return $this;
+    }
+
+    public function getNature()
+    {
+        return $this->nature;
+    }
+
+    public function setNature(string $nature): self
+    {
+        $this->nature = $nature;
 
         return $this;
     }

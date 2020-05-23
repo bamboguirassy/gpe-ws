@@ -27,6 +27,13 @@ class EtatDemandeDocument
      * @ORM\Column(name="libelle", type="string", length=45, nullable=false)
      */
     private $libelle;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="code", type="string", length=20, nullable=false)
+     */
+    private $code;
 
     /**
      * @var string|null
@@ -52,12 +59,12 @@ class EtatDemandeDocument
      */
     private $etatSuivant;
 
-    public function getId(): ?int
+    public function getId()
     {
         return $this->id;
     }
 
-    public function getLibelle(): ?string
+    public function getLibelle()
     {
         return $this->libelle;
     }
@@ -69,19 +76,19 @@ class EtatDemandeDocument
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getDescription()
     {
         return $this->description;
     }
 
-    public function setDescription(?string $description): self
+    public function setDescription($description): self
     {
         $this->description = $description;
 
         return $this;
     }
 
-    public function getCodeCouleur(): ?string
+    public function getCodeCouleur()
     {
         return $this->codeCouleur;
     }
@@ -92,13 +99,25 @@ class EtatDemandeDocument
 
         return $this;
     }
+    
+    public function getCode()
+    {
+        return $this->code;
+    }
 
-    public function getEtatSuivant(): ?self
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getEtatSuivant()
     {
         return $this->etatSuivant;
     }
 
-    public function setEtatSuivant(?self $etatSuivant): self
+    public function setEtatSuivant($etatSuivant): self
     {
         $this->etatSuivant = $etatSuivant;
 
