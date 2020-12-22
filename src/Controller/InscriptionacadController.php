@@ -61,11 +61,11 @@ class InscriptionacadController extends AbstractController {
     public function getInscriptionEtudiantConnecte(): array {
         $em = $this->getDoctrine()->getManager();
         $inscriptionacads = $em->createQuery('select ia from App\Entity\Inscriptionacad ia, '
-                . 'App\Entity\Classe c, App\Entity\Anneeacad aa where '
-                . 'ia.idclasse=c and c.idanneeacad=aa and ia.idetudiant=?1 and ia.etat=?2 '
-                . 'order by aa.id DESC')
-                ->setParameter(1,EtudiantController::getEtudiantConnecte($this))
-                ->setParameter(2,'V')
+                        . 'App\Entity\Classe c, App\Entity\Anneeacad aa where '
+                        . 'ia.idclasse=c and c.idanneeacad=aa and ia.idetudiant=?1 and ia.etat=?2 '
+                        . 'order by aa.id DESC')
+                ->setParameter(1, EtudiantController::getEtudiantConnecte($this))
+                ->setParameter(2, 'V')
                 ->getResult();
         return count($inscriptionacads) ? $inscriptionacads : [];
     }
@@ -119,17 +119,24 @@ class InscriptionacadController extends AbstractController {
             throw $this->createNotFoundException("Modalité enseignement presentiel introuvable...");
         }
         $inscriptionacad->setIdmodaliteenseignement($modaliteEnseignementPresentiel);
-        //find moyen paiement orange money
-        $modepaiement = $entityManager->getRepository("App\Entity\Modepaiement")
-                ->findOneByCodemodepaiement("OM");
-        if (!$modepaiement) {
-            throw $this->createNotFoundException("Mode de paiement orange money introuvable...");
+        // si paiement déja effectué, prendre le paiement selectioné
+        // si paiement non effectué, selectionner touch comme moyen de paiement
+        if ($preinscription->getPaiementConfirme()) {
+            $inscriptionacad->setMontantinscriptionacad($preinscription->getMontant());
+        } else {
+            //find moyen paiement TouchPay
+            $modepaiement = $entityManager->getRepository("App\Entity\Modepaiement")
+                    ->findOneByCodemodepaiement("TP");
+            if (!$modepaiement) {
+                throw $this->createNotFoundException("Mode de paiement TouchPay introuvable...");
+            }
+            $inscriptionacad->setIdmodepaiement($modepaiement);
         }
-        $inscriptionacad->setIdmodepaiement($modepaiement);
+
         //find non boursier et le definir
-        $typeBourseNonBoursier=$entityManager->getRepository("App\Entity\Bourse")
+        $typeBourseNonBoursier = $entityManager->getRepository("App\Entity\Bourse")
                 ->findOneByCodebourse("NB");
-        if(!$typeBourseNonBoursier){
+        if (!$typeBourseNonBoursier) {
             throw $this->createNotFoundException("Type de bourse introuvable pour Non Boursier");
         }
         $inscriptionacad->setIdbourse($typeBourseNonBoursier);

@@ -54,7 +54,7 @@ class BourseEtudiantController extends AbstractController {
     
     
     /**
-     * @Rest\Get(path="/mois/{mois}/annee/{annee}", name="bourse_etudiant_with_no_matching")
+     * @Rest\Get(path="/nomatching/mois/{mois}/annee/{annee}", name="bourse_etudiant_with_no_matching_per_month_year")
      * @Rest\View(StatusCode = 200)
      */
     public function findEtatBourseWithNoMatching($mois, $annee): array {
@@ -65,6 +65,19 @@ class BourseEtudiantController extends AbstractController {
                 . ' (select e.cni from App\Entity\Etudiant e) ')
                 ->setParameter(1,$mois)
                 ->setParameter(2,$annee)
+                ->getResult();
+       return $bourseWithNoMatchings;
+    }
+    
+    /**
+     * @Rest\Get(path="/nomatching/global/", name="bourse_etudiant_with_no_matching_global")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findGlobalEtatBourseWithNoMatching(): array {
+        $em = $this->getDoctrine()->getManager();
+        $bourseWithNoMatchings = $em->createQuery('select be from '
+                . 'App\Entity\BourseEtudiant be where be.cni not in'
+                . ' (select e.cni from App\Entity\Etudiant e) ')
                 ->getResult();
        return $bourseWithNoMatchings;
     }
@@ -123,7 +136,6 @@ class BourseEtudiantController extends AbstractController {
     /**
      * @Rest\Put(path="/{id}/edit", name="bourse_etudiant_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_BOURSEETUDIANT_EDITION")
      */
     public function edit(Request $request, BourseEtudiant $bourseEtudiant): BourseEtudiant {
         $form = $this->createForm(BourseEtudiantType::class, $bourseEtudiant);

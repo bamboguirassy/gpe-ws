@@ -20,7 +20,6 @@ class EtatDemandeDocumentController extends AbstractController
     /**
      * @Rest\Get(path="/", name="etat_demande_document_index")
      * @Rest\View(StatusCode = 200)
-     * @IsGranted("ROLE_ETATDEMANDEDOCUMENT_LISTE")
      */
     public function index(): array
     {

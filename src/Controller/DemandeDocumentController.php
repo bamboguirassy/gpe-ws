@@ -25,25 +25,41 @@ class DemandeDocumentController extends AbstractController {
     public function index(): array {
         $demandeDocuments = $this->getDoctrine()
                 ->getRepository(DemandeDocument::class)
-                ->findAll();
+                ->findAll(['date'=>'DESC']);
 
         return count($demandeDocuments) ? $demandeDocuments : [];
     }
-    
+
+    /**
+     * @Rest\Get(path="/type/{type}", name="demande_document_index_by_type")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findByType($type): array {
+        if (!in_array($type, ['pedagogique', 'administrative'])) {
+            throw $this->createNotFoundException('Type inconnu, doit être pedagogique ou administratif');
+        }
+        $demandeDocuments = $this->getDoctrine()->getManager()
+                ->createQuery('select dd from App\Entity\DemandeDocument dd, '
+                        . 'App\Entity\Typedocument td where dd.typedocument=td and '
+                        . 'td.source=?1')
+                ->setParameter(1, $type)
+                ->getResult();
+
+        return count($demandeDocuments) ? $demandeDocuments : [];
+    }
+
     /**
      * @Rest\Get(path="/mes-demandes/", name="demande_document_by_etudiant_connecte")
      * @Rest\View(StatusCode = 200)
      */
-    public function findMesDemandes(): array
-    {
+    public function findMesDemandes(): array {
         $em = $this->getDoctrine()->getManager();
-        $demandeDocuments = 
-            $em->createQuery('select dd from App\Entity\DemandeDocument dd, App\Entity\Inscriptionacad ia '
-                    . 'where dd.inscriptionacad=ia and ia.idetudiant=?1 ')
+        $demandeDocuments = $em->createQuery('select dd from App\Entity\DemandeDocument dd, App\Entity\Inscriptionacad ia '
+                        . 'where dd.inscriptionacad=ia and ia.idetudiant=?1 ')
                 ->setParameter(1, EtudiantController::getEtudiantConnecte($this))
                 ->getResult();
 
-        return count($demandeDocuments)?$demandeDocuments:[];
+        return count($demandeDocuments) ? $demandeDocuments : [];
     }
 
     /**
@@ -72,7 +88,6 @@ class DemandeDocumentController extends AbstractController {
     /**
      * @Rest\Get(path="/{id}", name="demande_document_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_DEMANDEDOCUMENT_AFFICHAGE")
      */
     public function show(DemandeDocument $demandeDocument): DemandeDocument {
         return $demandeDocument;

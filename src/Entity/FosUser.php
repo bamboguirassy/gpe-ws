@@ -60,6 +60,15 @@ class FosUser extends BaseUser
      * @ORM\Column(name="statut", type="boolean", nullable=true)
      */
     private $statut;
+    
+    
+    
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="admission", type="boolean", nullable=true)
+     */
+    protected $admission;
 	
 	/**
      * @ORM\ManyToMany(targetEntity="App\Entity\FosGroup")
@@ -355,6 +364,30 @@ class FosUser extends BaseUser
     public function getStatut()
     {
         return $this->statut;
+    }
+    
+    /**
+     * Set admission
+     *
+     * @param boolean $admission
+     *
+     * @return FosUser
+     */
+    public function setAdmission($admission)
+    {
+        $this->admission = $admission;
+
+        return $this;
+    }
+
+    /**
+     * Get admission
+     *
+     * @return boolean
+     */
+    public function getAdmission()
+    {
+        return $this->admission;
     }
 	
 }

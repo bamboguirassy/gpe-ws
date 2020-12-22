@@ -25,7 +25,7 @@ class ReclamationBourseController extends AbstractController
     {
         $reclamationBourses = $this->getDoctrine()
             ->getRepository(ReclamationBourse::class)
-            ->findAll();
+            ->findAll(['date'=>'DESC']);
 
         return count($reclamationBourses)?$reclamationBourses:[];
     }
@@ -39,7 +39,7 @@ class ReclamationBourseController extends AbstractController
     {
         $reclamationBourses = $this->getDoctrine()
             ->getRepository(ReclamationBourse::class)
-            ->findByEtudiant(EtudiantController::getEtudiantConnecte($this));
+            ->findByEtudiant(EtudiantController::getEtudiantConnecte($this),['date'=>'DESC']);
 
         return count($reclamationBourses)?$reclamationBourses:[];
     }

@@ -321,7 +321,7 @@ class Etudiant
         return $this->ine;
     }
 
-    public function setIne(string $ine): self
+    public function setIne($ine): self
     {
         $this->ine = $ine;
 

@@ -1,0 +1,48 @@
+
+<p-toast></p-toast>
+<!-- form modepaiement info -->
+<form *ngIf="'Modepaiement'|editable" class="form" role="form" #modepaiementForm="ngForm" autocomplete="off" (ngSubmit)="updateModepaiement()">
+  <p-fieldset legend="Modification utilisateur" [toggleable]="true">
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="modepaiementForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+    <!-- debut body -->
+    <div class="row">
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="codemodepaiement">Codemodepaiement</label>
+                    <input [(ngModel)]="modepaiement.codemodepaiement" class="form-control" type="text" name="codemodepaiement" id="codemodepaiement">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="libellemodepaiement">Libellemodepaiement</label>
+                    <input [(ngModel)]="modepaiement.libellemodepaiement" class="form-control" type="text" name="libellemodepaiement" id="libellemodepaiement">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="description">Description</label>
+                    <input [(ngModel)]="modepaiement.description" class="form-control" type="text" name="description" id="description">
+                </div>
+            </div>
+                
+      
+    </div>
+    <!-- fin body -->
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="modepaiementForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+  </p-fieldset>
+</form>
+<!-- /form modepaiement info -->

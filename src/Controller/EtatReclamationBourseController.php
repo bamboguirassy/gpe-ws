@@ -20,7 +20,6 @@ class EtatReclamationBourseController extends AbstractController
     /**
      * @Rest\Get(path="/", name="etat_reclamation_bourse_index")
      * @Rest\View(StatusCode = 200)
-     * @IsGranted("ROLE_ETATRECLAMATIONBOURSE_LISTE")
      */
     public function index(): array
     {

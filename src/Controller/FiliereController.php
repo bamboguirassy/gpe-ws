@@ -15,21 +15,22 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 /**
  * @Route("/api/filiere")
  */
-class FiliereController extends AbstractController
-{
+class FiliereController extends AbstractController {
+
     /**
      * @Rest\Get(path="/", name="filiere_index")
      * @Rest\View(StatusCode = 200)
      * @IsGranted("ROLE_FILIERE_LISTE")
      * @return array
      */
-    public function index(): array
-    {
+    public function index(): array {
         $em = $this->getDoctrine()->getManager();
-        $filieres = $em->getRepository(Filiere::class)
-            ->findAll(['nomfiliere'=>'asc']);
+         $filieres = $em->createQuery('select f from App\Entity\Filiere f, App\Entity\UserFiliere uf '
+                        . 'where uf.idfiliere=f and uf.iduser=?1 order by f.libellefiliere asc')
+                ->setParameter(1, $this->getUser())
+                ->getResult();
 
-        return count($filieres)?$filieres:[];
+        return count($filieres) ? $filieres : [];
     }
 
     /**
@@ -48,10 +49,10 @@ class FiliereController extends AbstractController
         $data = Utils::serializeRequestContent($request);
         if ($this->getUser()->getIdgroup()->getCodegroupe() == $data['codeGroupe']) {
             $filieres = $em->createQuery('select f from App\Entity\Filiere f,'
-                . 'App\Entity\UserFiliere uf where uf.idfiliere=f and f.libellefiliere=?1 and uf.iduser=?2')
-                ->setParameter(1, $data['libelleFiliere'])
-                ->setParameter(2, $this->getUser())
-                ->getResult();
+                            . 'App\Entity\UserFiliere uf where uf.idfiliere=f and f.libellefiliere=?1 and uf.iduser=?2')
+                    ->setParameter(1, $data['libelleFiliere'])
+                    ->setParameter(2, $this->getUser())
+                    ->getResult();
         }
 
         return $filieres;
@@ -62,7 +63,7 @@ class FiliereController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERE_NOUVEAU")
      */
-    public function create(Request $request): Filiere    {
+    public function create(Request $request): Filiere {
         $filiere = new Filiere();
         $form = $this->createForm(FiliereType::class, $filiere);
         $form->submit(Utils::serializeRequestContent($request));
@@ -78,17 +79,16 @@ class FiliereController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERE_AFFICHAGE")
      */
-    public function show(Filiere $filiere): Filiere    {
+    public function show(Filiere $filiere): Filiere {
         return $filiere;
     }
-
 
     /**
      * @Rest\Put(path="/{id}/edit", name="filiere_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERE_EDITION")
      */
-    public function edit(Request $request, Filiere $filiere): Filiere    {
+    public function edit(Request $request, Filiere $filiere): Filiere {
         $form = $this->createForm(FiliereType::class, $filiere);
         $form->submit(Utils::serializeRequestContent($request));
 
@@ -102,9 +102,9 @@ class FiliereController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERE_CLONE")
      */
-    public function cloner(Request $request, Filiere $filiere):  Filiere {
-        $em=$this->getDoctrine()->getManager();
-        $filiereNew=new Filiere();
+    public function cloner(Request $request, Filiere $filiere): Filiere {
+        $em = $this->getDoctrine()->getManager();
+        $filiereNew = new Filiere();
         $form = $this->createForm(FiliereType::class, $filiereNew);
         $form->submit(Utils::serializeRequestContent($request));
         $em->persist($filiereNew);
@@ -119,7 +119,7 @@ class FiliereController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERE_SUPPRESSION")
      */
-    public function delete(Filiere $filiere): Filiere    {
+    public function delete(Filiere $filiere): Filiere {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($filiere);
         $entityManager->flush();
@@ -146,4 +146,5 @@ class FiliereController extends AbstractController
 
         return $filieres;
     }
+
 }

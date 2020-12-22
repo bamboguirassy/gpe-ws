@@ -104,6 +104,13 @@ class Preinscription
      * @ORM\Column(name="estInscrit", type="boolean", nullable=false)
      */
     private $estinscrit = '0';
+    
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="paiement_confirme", type="boolean", nullable=true)
+     */
+    private $paiementConfirme;
 
     /**
      * @var string|null
@@ -172,13 +179,23 @@ class Preinscription
      * })
      */
     private $idtypeadmission;
+    
+    /**
+     * @var \Pays
+     *
+     * @ORM\ManyToOne(targetEntity="Pays")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="nationalite", referencedColumnName="id")
+     * })
+     */
+    private $nationalite;
 
-    public function getId(): ?int
+    public function getId()
     {
         return $this->id;
     }
 
-    public function getCni(): ?string
+    public function getCni()
     {
         return $this->cni;
     }
@@ -190,19 +207,19 @@ class Preinscription
         return $this;
     }
 
-    public function getIne(): ?string
+    public function getIne()
     {
         return $this->ine;
     }
 
-    public function setIne(?string $ine): self
+    public function setIne($ine): self
     {
         $this->ine = $ine;
 
         return $this;
     }
 
-    public function getPassage(): ?string
+    public function getPassage()
     {
         return $this->passage;
     }
@@ -214,103 +231,103 @@ class Preinscription
         return $this;
     }
 
-    public function getPrenometudiant(): ?string
+    public function getPrenometudiant()
     {
         return $this->prenometudiant;
     }
 
-    public function setPrenometudiant(?string $prenometudiant): self
+    public function setPrenometudiant($prenometudiant): self
     {
         $this->prenometudiant = $prenometudiant;
 
         return $this;
     }
 
-    public function getNometudiant(): ?string
+    public function getNometudiant()
     {
         return $this->nometudiant;
     }
 
-    public function setNometudiant(?string $nometudiant): self
+    public function setNometudiant($nometudiant): self
     {
         $this->nometudiant = $nometudiant;
 
         return $this;
     }
 
-    public function getDatenaiss(): ?\DateTimeInterface
+    public function getDatenaiss()
     {
         return $this->datenaiss;
     }
 
-    public function setDatenaiss(?\DateTimeInterface $datenaiss): self
+    public function setDatenaiss($datenaiss): self
     {
         $this->datenaiss = $datenaiss;
 
         return $this;
     }
 
-    public function getLieunaiss(): ?string
+    public function getLieunaiss()
     {
         return $this->lieunaiss;
     }
 
-    public function setLieunaiss(?string $lieunaiss): self
+    public function setLieunaiss($lieunaiss): self
     {
         $this->lieunaiss = $lieunaiss;
 
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getEmail()
     {
         return $this->email;
     }
 
-    public function setEmail(?string $email): self
+    public function setEmail($email): self
     {
         $this->email = $email;
 
         return $this;
     }
 
-    public function getTel(): ?string
+    public function getTel()
     {
         return $this->tel;
     }
 
-    public function setTel(?string $tel): self
+    public function setTel($tel): self
     {
         $this->tel = $tel;
 
         return $this;
     }
 
-    public function getDatenotif(): ?\DateTimeInterface
+    public function getDatenotif()
     {
         return $this->datenotif;
     }
 
-    public function setDatenotif(?\DateTimeInterface $datenotif): self
+    public function setDatenotif($datenotif): self
     {
         $this->datenotif = $datenotif;
 
         return $this;
     }
 
-    public function getDatedelai(): ?\DateTimeInterface
+    public function getDatedelai()
     {
         return $this->datedelai;
     }
 
-    public function setDatedelai(?\DateTimeInterface $datedelai): self
+    public function setDatedelai($datedelai): self
     {
         $this->datedelai = $datedelai;
 
         return $this;
     }
 
-    public function getEstinscrit(): ?bool
+    public function getEstinscrit()
     {
         return $this->estinscrit;
     }
@@ -322,98 +339,122 @@ class Preinscription
         return $this;
     }
 
-    public function getCodeOperateur(): ?string
+    public function getCodeOperateur()
     {
         return $this->codeOperateur;
     }
 
-    public function setCodeOperateur(?string $codeOperateur): self
+    public function setCodeOperateur($codeOperateur): self
     {
         $this->codeOperateur = $codeOperateur;
 
         return $this;
     }
 
-    public function getDatePaiement(): ?string
+    public function getDatePaiement()
     {
         return $this->datePaiement;
     }
 
-    public function setDatePaiement(?string $datePaiement): self
+    public function setDatePaiement($datePaiement): self
     {
         $this->datePaiement = $datePaiement;
 
         return $this;
     }
 
-    public function getNumeroTransaction(): ?string
+    public function getNumeroTransaction()
     {
         return $this->numeroTransaction;
     }
 
-    public function setNumeroTransaction(?string $numeroTransaction): self
+    public function setNumeroTransaction($numeroTransaction): self
     {
         $this->numeroTransaction = $numeroTransaction;
 
         return $this;
     }
 
-    public function getMontant(): ?int
+    public function getMontant()
     {
         return $this->montant;
     }
 
-    public function setMontant(?int $montant): self
+    public function setMontant($montant): self
     {
         $this->montant = $montant;
 
         return $this;
     }
 
-    public function getIdanneeacad(): ?Anneeacad
+    public function getIdanneeacad()
     {
         return $this->idanneeacad;
     }
 
-    public function setIdanneeacad(?Anneeacad $idanneeacad): self
+    public function setIdanneeacad($idanneeacad): self
     {
         $this->idanneeacad = $idanneeacad;
 
         return $this;
     }
 
-    public function getIdfiliere(): ?Filiere
+    public function getIdfiliere()
     {
         return $this->idfiliere;
     }
 
-    public function setIdfiliere(?Filiere $idfiliere): self
+    public function setIdfiliere($idfiliere): self
     {
         $this->idfiliere = $idfiliere;
 
         return $this;
     }
 
-    public function getIdniveau(): ?Niveau
+    public function getIdniveau()
     {
         return $this->idniveau;
     }
 
-    public function setIdniveau(?Niveau $idniveau): self
+    public function setIdniveau($idniveau): self
     {
         $this->idniveau = $idniveau;
 
         return $this;
     }
 
-    public function getIdtypeadmission(): ?Typeadmission
+    public function getIdtypeadmission()
     {
         return $this->idtypeadmission;
     }
 
-    public function setIdtypeadmission(?Typeadmission $idtypeadmission): self
+    public function setIdtypeadmission($idtypeadmission): self
     {
         $this->idtypeadmission = $idtypeadmission;
+
+        return $this;
+    }
+
+    public function getNationalite()
+    {
+        return $this->nationalite;
+    }
+
+    public function setNationalite($nationalite): self
+    {
+        $this->nationalite = $nationalite;
+
+        return $this;
+    }
+
+    public function getPaiementConfirme()
+    {
+        return $this->paiementConfirme;
+    }
+
+    public function setPaiementConfirme($paiementConfirme): self
+    {
+        $this->paiementConfirme = $paiementConfirme;
 
         return $this;
     }

@@ -1,0 +1,48 @@
+
+<p-toast></p-toast>
+<!-- form typedocument info -->
+<form *ngIf="'Typedocument'|editable" class="form" role="form" #typedocumentForm="ngForm" autocomplete="off" (ngSubmit)="updateTypedocument()">
+  <p-fieldset legend="Modification utilisateur" [toggleable]="true">
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="typedocumentForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+    <!-- debut body -->
+    <div class="row">
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="codetypedocument">Codetypedocument</label>
+                    <input [(ngModel)]="typedocument.codetypedocument" class="form-control" type="text" name="codetypedocument" id="codetypedocument">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="libelletypedocument">Libelletypedocument</label>
+                    <input [(ngModel)]="typedocument.libelletypedocument" class="form-control" type="text" name="libelletypedocument" id="libelletypedocument">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="source">Source</label>
+                    <input [(ngModel)]="typedocument.source" class="form-control" type="text" name="source" id="source">
+                </div>
+            </div>
+                
+      
+    </div>
+    <!-- fin body -->
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="typedocumentForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+  </p-fieldset>
+</form>
+<!-- /form typedocument info -->

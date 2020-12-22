@@ -2,14 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/wamp64/www/gpe/gpe-ws/src/Controller/AuthController.php</file>
-            <file>file:/C:/wamp64/www/gpe/gpe-ws/src/Controller/PublicController.php</file>
-            <file>file:/C:/wamp64/www/gpe/gpe-ws/src/Controller/BourseEtudiantController.php</file>
-            <file>file:/C:/wamp64/www/gpe/gpe-ws/.env</file>
-            <file>file:/C:/wamp64/www/gpe/gpe-ws/src/Utils/Utils.php</file>
-            <file>file:/C:/wamp64/www/gpe/gpe-ws/src/Controller/EtudiantController.php</file>
-            <file>file:/C:/wamp64/www/gpe/gpe-ws/templates/emails/registrations/etudiant.html.twig</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

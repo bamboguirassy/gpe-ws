@@ -29,6 +29,24 @@ class FosUserController extends AbstractController {
 
         return count($fosUsers) ? $fosUsers : [];
     }
+    
+    /**
+     * @Rest\Get(path="/public/check-user-existence-admission/{email}", name="fos_user_check_existence_admission")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function checkUserExistenceForAdmission($email) {
+        $fosUser = $this->getDoctrine()
+                ->getRepository(FosUser::class)
+                ->findOneByEmail($email);
+        if(!$fosUser) {
+            throw $this->createNotFoundException("Le mail indiqué ne correspond à aucun utilisateur.");
+        }
+        if(!$fosUser->getAdmission()) {
+            throw $this->createNotFoundException("Cet utilisateur n'est pas habilité à acceder à la plateforme admission, merci de contacter votre administrateur.");
+        }
+
+        return $fosUser;
+    }
 
     /**
      * @Rest\Post(path="/public/reset-password/", name="user_password_reset")

@@ -38,9 +38,15 @@ class PreinscriptionController extends AbstractController {
      */
     public function findActivePreinscriptionByEtudiant(): array {
         $etudiant= EtudiantController::getEtudiantConnecte($this);
-        $preinscriptions = $this->getDoctrine()
-                ->getRepository(Preinscription::class)
-                ->findBy(array('cni'=>$etudiant->getCni(),'estinscrit'=>0));
+        $preinscriptions = $this->getDoctrine()->getManager()
+                ->createQuery('select p from App\Entity\Preinscription p '
+                        . 'where p.datenotif<=?1 and p.datedelai>=?2 '
+                        . 'and p.cni=?3 and p.estinscrit=?4')
+                ->setParameter(1,new \DateTime())
+                ->setParameter(2,new \DateTime())
+                ->setParameter(3,$etudiant->getCni())
+                ->setParameter(4,false)
+                ->getResult();
 
         return count($preinscriptions) ? $preinscriptions : [];
     }

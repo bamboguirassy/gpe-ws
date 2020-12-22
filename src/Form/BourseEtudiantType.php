@@ -20,6 +20,7 @@ class BourseEtudiantType extends AbstractType
             ->add('montantBourse')
             ->add('mois')
             ->add('annee')
+            ->add('cni')
         ;
     }
 
