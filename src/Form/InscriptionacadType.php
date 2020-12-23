@@ -44,6 +44,8 @@ class InscriptionacadType extends AbstractType
             ->add('idetudiant')
             ->add('encadreur')
             ->add('idfosuser')
+            ->add('source')
+            ->add('croust')
         ;
     }
 

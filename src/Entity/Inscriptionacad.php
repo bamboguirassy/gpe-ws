@@ -272,6 +272,16 @@ class Inscriptionacad
      */
     private $idfosuser;
 
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $source;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $croust;
+
     public function getId()
     {
         return $this->id;
@@ -657,6 +667,30 @@ class Inscriptionacad
     public function setIdfosuser($idfosuser): self
     {
         $this->idfosuser = $idfosuser;
+
+        return $this;
+    }
+
+    public function getSource(): ?string
+    {
+        return $this->source;
+    }
+
+    public function setSource(?string $source): self
+    {
+        $this->source = $source;
+
+        return $this;
+    }
+
+    public function getCroust(): ?bool
+    {
+        return $this->croust;
+    }
+
+    public function setCroust(?bool $croust): self
+    {
+        $this->croust = $croust;
 
         return $this;
     }

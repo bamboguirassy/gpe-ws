@@ -32,6 +32,7 @@ class PreinscriptionType extends AbstractType
             ->add('datePaiement')
             ->add('numeroTransaction')
             ->add('montant')
+            ->add('nationalite')
         ;
     }
 

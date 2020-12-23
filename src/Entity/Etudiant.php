@@ -299,6 +299,26 @@ class Etudiant
      */
     private $emailPersoUpdated;
 
+    /**
+     * @ORM\Column(type="string", length=115, nullable=true)
+     */
+    private $typeHabitation;
+
+    /**
+     * @ORM\Column(type="string", length=115, nullable=true)
+     */
+    private $campusSocial;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $numeroChambre;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $quartierEtudiant;
+
     public function getId()
     {
         return $this->id;
@@ -768,6 +788,54 @@ class Etudiant
     public function setEmailPersoUpdated($emailPersoUpdated): self
     {
         $this->emailPersoUpdated = $emailPersoUpdated;
+
+        return $this;
+    }
+
+    public function getTypeHabitation(): ?string
+    {
+        return $this->typeHabitation;
+    }
+
+    public function setTypeHabitation(?string $typeHabitation): self
+    {
+        $this->typeHabitation = $typeHabitation;
+
+        return $this;
+    }
+
+    public function getCampusSocial(): ?string
+    {
+        return $this->campusSocial;
+    }
+
+    public function setCampusSocial(?string $campusSocial): self
+    {
+        $this->campusSocial = $campusSocial;
+
+        return $this;
+    }
+
+    public function getNumeroChambre(): ?int
+    {
+        return $this->numeroChambre;
+    }
+
+    public function setNumeroChambre(?int $numeroChambre): self
+    {
+        $this->numeroChambre = $numeroChambre;
+
+        return $this;
+    }
+
+    public function getQuartierEtudiant(): ?string
+    {
+        return $this->quartierEtudiant;
+    }
+
+    public function setQuartierEtudiant(?string $quartierEtudiant): self
+    {
+        $this->quartierEtudiant = $quartierEtudiant;
 
         return $this;
     }

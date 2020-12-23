@@ -141,6 +141,11 @@ class InscriptionacadController extends AbstractController {
         }
         $inscriptionacad->setIdbourse($typeBourseNonBoursier);
 
+        // if etudiant sénégalais mettre croust à true
+        if ($inscriptionacad->getIdetudiant()->getNationalite()->getAlpha2() == 'SN') {
+            $inscriptionacad->setCroust(true);
+        }
+
         $entityManager->persist($inscriptionacad);
         $entityManager->flush();
 
@@ -164,6 +169,11 @@ class InscriptionacadController extends AbstractController {
         $form = $this->createForm(InscriptionacadType::class, $inscriptionacad);
         $form->submit(Utils::serializeRequestContent($request));
 
+        // if etudiant sénégalais mettre croust à true
+        if ($inscriptionacad->getIdetudiant()->getNationalite()->getAlpha2() == 'SN') {
+            $inscriptionacad->setCroust(true);
+        }
+
         $this->getDoctrine()->getManager()->flush();
 
         return $inscriptionacad;
@@ -184,6 +194,32 @@ class InscriptionacadController extends AbstractController {
         $em->flush();
 
         return $inscriptionacadNew;
+    }
+
+    /**
+     * @Rest\Put(path="/{id}/confirm-prepaid-inscription", name="prepaid_inscription_confirm",requirements = {"id"="\d+"})
+     * @Rest\View(StatusCode=200)
+     */
+    public function confirmPrepaidInscription(Inscriptionacad $inscriptionacad) {
+        $em = $this->getDoctrine()->getManager();
+        $preinscriptions = $em->getRepository(Preinscription::class)
+                ->findBy([
+            'idfiliere' => $inscriptionacad->getIdClasse()->getIdfiliere(),
+            'idniveau' => $inscriptionacad->getIdClasse()->getIdniveau(),
+            'idanneeacad' => $inscriptionacad->getIdClasse()->getIdanneeacad(),
+        ]);
+
+        if (count($preinscriptions)) {
+            $preinscription = $preinscriptions[0];
+            $preinscription->setEstinscrit(true);
+        } else {
+            throw $this->createNotFoundException("La préinscription est introuvable pour termine le processus d'inscription");
+        }
+
+
+        $em->flush();
+
+        return $preinscription;
     }
 
     /**
