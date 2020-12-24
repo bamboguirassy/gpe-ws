@@ -30,25 +30,65 @@ class PreinscriptionController extends AbstractController {
 
         return count($preinscriptions) ? $preinscriptions : [];
     }
-    
-    
+
     /**
      * @Rest\Get(path="/active/", name="preinscription_active_etudiant")
      * @Rest\View(StatusCode = 200)
      */
     public function findActivePreinscriptionByEtudiant(): array {
-        $etudiant= EtudiantController::getEtudiantConnecte($this);
+        $etudiant = EtudiantController::getEtudiantConnecte($this);
         $preinscriptions = $this->getDoctrine()->getManager()
                 ->createQuery('select p from App\Entity\Preinscription p '
                         . 'where p.datenotif<=?1 and p.datedelai>=?2 '
                         . 'and p.cni=?3 and p.estinscrit=?4')
-                ->setParameter(1,new \DateTime())
-                ->setParameter(2,new \DateTime())
-                ->setParameter(3,$etudiant->getCni())
-                ->setParameter(4,false)
+                ->setParameter(1, new \DateTime())
+                ->setParameter(2, new \DateTime())
+                ->setParameter(3, $etudiant->getCni())
+                ->setParameter(4, false)
                 ->getResult();
 
         return count($preinscriptions) ? $preinscriptions : [];
+    }
+
+    /**
+     * @Rest\Get(path="/public/request-etudiant-creation/{cni}", name="request_etudiant_creation")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function requestNewEtudiantCreation($cni) {
+        $em = $this->getDoctrine()->getManager();
+        $etudiants = $em->getRepository('App\Entity\Etudiant')
+                ->findByCni($cni);
+        if (count($etudiants)) {
+            throw $this->createAccessDeniedException("Vous êtes déja étudiant à l'université de Thiès,"
+                    . " cette interface est réservée aux étudiants qui viennent juste d'être admis"
+                    . " à l'université de Thiès, merci de vous rapprocher de la DSOS si vous pensez"
+                    . " qu'il s'agit d'une erreur.");
+        }
+        $preinscriptionActifs = $em
+                ->createQuery('select p from App\Entity\Preinscription p '
+                        . 'where p.datenotif<=?1 and p.datedelai>=?2 '
+                        . 'and p.cni=?3 and p.estinscrit=?4')
+                ->setParameter(1, new \DateTime())
+                ->setParameter(2, new \DateTime())
+                ->setParameter(3, $cni)
+                ->setParameter(4, false)
+                ->getResult();
+        if (!count($preinscriptionActifs)) {
+            // si aucune préinscription actif, vérifier si l'étudiant a une préinscription en suspens
+            $preinscriptionInactifs = $em
+                    ->createQuery('select p from App\Entity\Preinscription p '
+                            . 'where p.cni=?3 and p.estinscrit=?4')
+                    ->setParameter(3, $cni)
+                    ->setParameter(4, false)
+                    ->getResult();
+            if (count($preinscriptionInactifs)) {
+                throw $this->createAccessDeniedException("Votre campagne d'inscription n'est pas encore ouverte, merci de patienter !");
+            }
+            throw $this->createNotFoundException("Nous n'avons pas pu vous authentifier, si vous pensez qu'il s'agit d'une erreur,"
+                    . " merci de vous rapprocher de la DSOS de l'université de Thiès.");
+        }
+
+        return $preinscriptionActifs[0];
     }
 
     /**
