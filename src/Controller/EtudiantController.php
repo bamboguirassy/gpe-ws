@@ -95,12 +95,71 @@ class EtudiantController extends AbstractController {
     }
 
     /**
+     * @Rest\Post(Path="/public/create-primoentrant/", name="etudiant_primoentrant_new")
+     * @Rest\View(StatusCode=200)
+     */
+    public function createPrimoEntrant(Request $request): Etudiant {
+        $etudiant = new Etudiant();
+        $em = $this->getDoctrine()->getManager();
+        $form = $this->createForm(EtudiantType::class, $etudiant);
+        $form->submit(Utils::serializeRequestContent($request));
+        $reqData = Utils::getObjectFromRequest($request);
+        if(isset($reqData->datenaiss)) {
+            $etudiant->setDatenaiss(new \DateTime($reqData->datenaiss));
+        }
+        $preinscriptionActifs = $em
+                ->createQuery('select p from App\Entity\Preinscription p '
+                        . 'where p.datenotif<=?1 and p.datedelai>=?2 '
+                        . 'and p.cni=?3 and p.estinscrit=?4')
+                ->setParameter(1, new \DateTime())
+                ->setParameter(2, new \DateTime())
+                ->setParameter(3, $etudiant->getCni())
+                ->setParameter(4, false)
+                ->getResult();
+        if (!count($preinscriptionActifs)) {
+            // si aucune préinscription actif, vérifier si l'étudiant a une préinscription en suspens
+            $preinscriptionInactifs = $em
+                    ->createQuery('select p from App\Entity\Preinscription p '
+                            . 'where p.cni=?3 and p.estinscrit=?4')
+                    ->setParameter(3, $etudiant->getCni())
+                    ->setParameter(4, false)
+                    ->getResult();
+            if (count($preinscriptionInactifs)) {
+                throw $this->createAccessDeniedException("Votre campagne d'inscription n'est pas encore ouverte, merci de patienter !");
+            }
+            throw $this->createNotFoundException("Nous n'avons pas pu vous authentifier, si vous pensez qu'il s'agit d'une erreur,"
+                    . " merci de vous rapprocher de la DSOS de l'université de Thiès.");
+        }
+        $preinscription = $preinscriptionActifs[0];
+        $etudiant->setNuminterne($this->genererNumInterne($preinscription));
+
+        //generer mail univ    si ça n'existe pas
+
+        $mail = \App\Ldap\LdapManager::getInstance()->addPrimoEntrant($etudiant, $preinscription, $this);
+        $etudiant->setEmailUniv($mail);
+        $etudiant->setNotifmail(0);
+
+        $em->persist($etudiant);
+        $em->flush();
+
+        return $etudiant;
+    }
+
+    /**
      * @Rest\Get(path="/{id}", name="etudiant_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_ETUDIANT_AFFICHAGE")
      */
     public function show(Etudiant $etudiant): Etudiant {
         return $etudiant;
+    }
+    
+    /**
+     * @Rest\Get(path="/public/{id}/show-generated-fields", name="etudiant_display_generated_fields",requirements = {"id"="\d+"})
+     * @Rest\View(StatusCode=200)
+     */
+    public function showGeneratedFields(Etudiant $etudiant): array {
+        return ['numinterne'=>$etudiant->getNuminterne(),'emailUniv'=>$etudiant->getEmailUniv(),'email'=>$etudiant->getEmail()];
     }
 
     /**
@@ -185,7 +244,7 @@ class EtudiantController extends AbstractController {
                 ->setParameter(1, $controller->getUser()->getEmail())
                 ->getResult();
         if (count($etudiants) < 1) {
-            throw new \Exception("Votre compte n'est rattaché à aucun étudiant.",401,null);
+            throw new \Exception("Votre compte n'est rattaché à aucun étudiant.", 401, null);
         }
         return $etudiants[0];
     }
@@ -201,18 +260,18 @@ class EtudiantController extends AbstractController {
         $form->submit(Utils::serializeRequestContent($request));
         //find
         if ($etudiant->getAdPays()->getAlpha2() != 'SN') {
-            $senegal= $em->getRepository(\App\Entity\Pays::class)->findOneByAlpha2('SN');
+            $senegal = $em->getRepository(\App\Entity\Pays::class)->findOneByAlpha2('SN');
             $etudiant->setAdpays($senegal);
         }
-        if($etudiant->getHandicap()=='Non'){
+        if ($etudiant->getHandicap() == 'Non') {
             $etudiant->setTypeHandicap(null);
             $etudiant->setDescriptionHandicap(null);
         }
-        
-        if($etudiant->getOrphelin()=='Non'){
+
+        if ($etudiant->getOrphelin() == 'Non') {
             $etudiant->setTypeOrphelin(null);
         }
-        if($oldEmail!=$etudiant->getEmail()) {
+        if ($oldEmail != $etudiant->getEmail()) {
             $etudiant->setEmailPersoUpdated(true);
         }
 
@@ -230,8 +289,8 @@ class EtudiantController extends AbstractController {
         $oldMail = $etudiant->getEmail();
         $form = $this->createForm(EtudiantType::class, $etudiant);
         $form->submit(Utils::serializeRequestContent($request));
-        
-        if($oldEmail!=$etudiant->getEmail()) {
+
+        if ($oldEmail != $etudiant->getEmail()) {
             $etudiant->setEmailPersoUpdated(true);
         }
 
@@ -288,6 +347,36 @@ class EtudiantController extends AbstractController {
         $entityManager->flush();
 
         return $etudiants;
+    }
+
+    /**
+     * fonction qui permet de recuperer le dernier numero d'inscription academique
+     * et le met à 5 chiffres si non existe
+     */
+    public static function genererNumInterne(\App\Entity\Preinscription $preinscription) {
+        $numeroOrdreInscription = $preinscription->getIdanneeacad()->getNbreInscrits();
+
+
+        $numeroOrdreInscription++;
+        switch (strlen('' . $numeroOrdreInscription)) {
+            case 1:
+                $numeroOrdreInscription = '0000' . $numeroOrdreInscription;
+                break;
+            case 2:
+                $numeroOrdreInscription = '000' . $numeroOrdreInscription;
+                break;
+            case 3:
+                $numeroOrdreInscription = '00' . $numeroOrdreInscription;
+                break;
+            case 4:
+                $numeroOrdreInscription = '0' . $numeroOrdreInscription;
+                break;
+        }
+
+
+        $annee = $preinscription->getIdanneeacad()->getCodeanneeacad();
+        $numInterne = substr($annee, -2) . '' . $preinscription->getIdfiliere()->getCodenum() . '' . $numeroOrdreInscription;
+        return $numInterne;
     }
 
 }

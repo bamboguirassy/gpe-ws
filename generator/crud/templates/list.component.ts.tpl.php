@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { <?= $entity_class_name ?> } from '../user';
+import { <?= $entity_class_name ?> } from '../<?= strtolower($entity_class_name) ?>';
 import { ActivatedRoute, Router } from '@angular/router';
-import { <?= $entity_class_name ?>Service } from '../user.service';
-import { <?= $entity_twig_var_singular ?>Columns, allowed<?= $entity_class_name ?>FieldsForFilter } from '../user.columns';
+import { <?= $entity_class_name ?>Service } from '../<?= strtolower($entity_class_name) ?>.service';
+import { <?= $entity_var_singular ?>Columns, allowed<?= $entity_class_name ?>FieldsForFilter } from '../<?= strtolower($entity_class_name) ?>.columns';
 import { ExportService } from 'src/app/shared/services/export.service';
 import { MenuItem } from 'primeng/api';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -10,26 +10,26 @@ import { NotificationService } from 'src/app/shared/services/notification.servic
 
 
 @Component({
-  selector: 'app-user-list',
-  templateUrl: './user-list.component.html',
-  styleUrls: ['./user-list.component.scss']
+  selector: 'app-<?= strtolower($entity_class_name) ?>-list',
+  templateUrl: './<?= strtolower($entity_class_name) ?>-list.component.html',
+  styleUrls: ['./<?= strtolower($entity_class_name) ?>-list.component.scss']
 })
 export class <?= $entity_class_name ?>ListComponent implements OnInit {
 
-  <?= $entity_twig_var_singular ?>s: <?= $entity_class_name ?>[] = [];
+  <?= $entity_var_singular ?>s: <?= $entity_class_name ?>[] = [];
   selected<?= $entity_class_name ?>s: <?= $entity_class_name ?>[];
   selected<?= $entity_class_name ?>: <?= $entity_class_name ?>;
   cloned<?= $entity_class_name ?>s: <?= $entity_class_name ?>[];
 
   cMenuItems: MenuItem[]=[];
 
-  tableColumns = <?= $entity_twig_var_singular ?>Columns;
+  tableColumns = <?= $entity_var_singular ?>Columns;
   //allowed fields for filter
   globalFilterFields = allowed<?= $entity_class_name ?>FieldsForFilter;
 
 
   constructor(private activatedRoute: ActivatedRoute,
-    public <?= $entity_twig_var_singular ?>Srv: <?= $entity_class_name ?>Service, public exportSrv: ExportService,
+    public <?= $entity_var_singular ?>Srv: <?= $entity_class_name ?>Service, public exportSrv: ExportService,
     private router: Router, public authSrv: AuthService,
     public notificationSrv: NotificationService) { }
 
@@ -47,43 +47,43 @@ export class <?= $entity_class_name ?>ListComponent implements OnInit {
       this.cMenuItems.push({ label: 'Supprimer', icon: 'pi pi-times', command: (event) => this.delete<?= $entity_class_name ?>(this.selected<?= $entity_class_name ?>) })
     }
 
-    this.<?= $entity_twig_var_singular ?>s = this.activatedRoute.snapshot.data['<?= $entity_twig_var_singular ?>s'];
+    this.<?= $entity_var_singular ?>s = this.activatedRoute.snapshot.data['<?= $entity_var_singular ?>s'];
   }
 
-  view<?= $entity_class_name ?>(<?= $entity_twig_var_singular ?>: <?= $entity_class_name ?>) {
-      this.router.navigate([this.<?= $entity_twig_var_singular ?>Srv.getRoutePrefix(), <?= $entity_twig_var_singular ?>.id]);
+  view<?= $entity_class_name ?>(<?= $entity_var_singular ?>: <?= $entity_class_name ?>) {
+      this.router.navigate([this.<?= $entity_var_singular ?>Srv.getRoutePrefix(), <?= $entity_var_singular ?>.id]);
 
   }
 
-  edit<?= $entity_class_name ?>(<?= $entity_twig_var_singular ?>: <?= $entity_class_name ?>) {
-      this.router.navigate([this.<?= $entity_twig_var_singular ?>Srv.getRoutePrefix(), <?= $entity_twig_var_singular ?>.id, 'edit']);
+  edit<?= $entity_class_name ?>(<?= $entity_var_singular ?>: <?= $entity_class_name ?>) {
+      this.router.navigate([this.<?= $entity_var_singular ?>Srv.getRoutePrefix(), <?= $entity_var_singular ?>.id, 'edit']);
   }
 
-  clone<?= $entity_class_name ?>(<?= $entity_twig_var_singular ?>: <?= $entity_class_name ?>) {
-      this.router.navigate([this.<?= $entity_twig_var_singular ?>Srv.getRoutePrefix(), <?= $entity_twig_var_singular ?>.id, 'clone']);
+  clone<?= $entity_class_name ?>(<?= $entity_var_singular ?>: <?= $entity_class_name ?>) {
+      this.router.navigate([this.<?= $entity_var_singular ?>Srv.getRoutePrefix(), <?= $entity_var_singular ?>.id, 'clone']);
   }
 
-  delete<?= $entity_class_name ?>(<?= $entity_twig_var_singular ?>: <?= $entity_class_name ?>) {
-      this.<?= $entity_twig_var_singular ?>Srv.remove(<?= $entity_twig_var_singular ?>)
-        .subscribe(data => this.refreshList(), error => this.<?= $entity_twig_var_singular ?>Srv.httpSrv.handleError(error));
+  delete<?= $entity_class_name ?>(<?= $entity_var_singular ?>: <?= $entity_class_name ?>) {
+      this.<?= $entity_var_singular ?>Srv.remove(<?= $entity_var_singular ?>)
+        .subscribe(data => this.refreshList(), error => this.<?= $entity_var_singular ?>Srv.httpSrv.handleError(error));
   }
 
-  deleteSelected<?= $entity_class_name ?>s(<?= $entity_twig_var_singular ?>: <?= $entity_class_name ?>) {
-    this.<?= $entity_twig_var_singular ?>Srv.removeSelection(this.selected<?= $entity_class_name ?>s)
-      .subscribe(data => this.refreshList(), error => this.<?= $entity_twig_var_singular ?>Srv.httpSrv.handleError(error));
+  deleteSelected<?= $entity_class_name ?>s(<?= $entity_var_singular ?>: <?= $entity_class_name ?>) {
+    this.<?= $entity_var_singular ?>Srv.removeSelection(this.selected<?= $entity_class_name ?>s)
+      .subscribe(data => this.refreshList(), error => this.<?= $entity_var_singular ?>Srv.httpSrv.handleError(error));
   }
 
   refreshList() {
-    this.<?= $entity_twig_var_singular ?>Srv.findAll()
-      .subscribe((data: any) => this.<?= $entity_twig_var_singular ?>s = data, error => this.<?= $entity_twig_var_singular ?>Srv.httpSrv.handleError(error));
+    this.<?= $entity_var_singular ?>Srv.findAll()
+      .subscribe((data: any) => this.<?= $entity_var_singular ?>s = data, error => this.<?= $entity_var_singular ?>Srv.httpSrv.handleError(error));
   }
 
   exportPdf() {
-    this.exportSrv.exportPdf(this.tableColumns, this.<?= $entity_twig_var_singular ?>s, '<?= $entity_twig_var_singular ?>s');
+    this.exportSrv.exportPdf(this.tableColumns, this.<?= $entity_var_singular ?>s, '<?= $entity_var_singular ?>s');
   }
 
   exportExcel() {
-    this.exportSrv.exportExcel(this.<?= $entity_twig_var_singular ?>s);
+    this.exportSrv.exportExcel(this.<?= $entity_var_singular ?>s);
   }
 
   saveAsExcelFile(buffer: any, fileName: string): void {

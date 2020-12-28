@@ -124,7 +124,7 @@ class Etudiant
      *
      * @ORM\Column(name="notifMail", type="boolean", nullable=true)
      */
-    private $notifmail = '0';
+    private $notifmail;
 
     /**
      * @var string|null

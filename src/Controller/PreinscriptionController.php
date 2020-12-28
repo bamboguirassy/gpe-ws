@@ -109,7 +109,7 @@ class PreinscriptionController extends AbstractController {
     }
 
     /**
-     * @Rest\Get(path="/{id}", name="preinscription_show",requirements = {"id"="\d+"})
+     * @Rest\Get(path="/public/{id}", name="preinscription_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      */
     public function show(Preinscription $preinscription): Preinscription {
