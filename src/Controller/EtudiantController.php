@@ -104,7 +104,7 @@ class EtudiantController extends AbstractController {
         $form = $this->createForm(EtudiantType::class, $etudiant);
         $form->submit(Utils::serializeRequestContent($request));
         $reqData = Utils::getObjectFromRequest($request);
-        if(isset($reqData->datenaiss)) {
+        if (isset($reqData->datenaiss)) {
             $etudiant->setDatenaiss(new \DateTime($reqData->datenaiss));
         }
         $preinscriptionActifs = $em
@@ -146,6 +146,30 @@ class EtudiantController extends AbstractController {
     }
 
     /**
+     * @Rest\Post(Path="/upload-photo/{id}", name="etudiant_photo_upload")
+     * @Rest\View(StatusCode=200)
+     */
+    public function uploadPhoto(Request $request, Etudiant $etudiant, \App\Utils\FileUploader $uploader): Etudiant {
+        $host = $request->getHttpHost();
+        $scheme = $request->getScheme();
+        $data = Utils::getObjectFromRequest($request);
+        $fileName = $data->filename;
+        file_put_contents($fileName, base64_decode($data->photo));
+        $file = new \Symfony\Component\HttpFoundation\File\File($fileName);
+        $authorizedExtensions = ['jpeg', 'jpg', 'png'];
+        if (!in_array($file->guessExtension(), $authorizedExtensions)) {
+            throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Fichier non pris en charge');
+        }
+        $newFileName = $uploader->setTargetDirectory('etudiant_photo_directory')->upload($file,$etudiant->getNuminterne(), $etudiant->getPhoto()); // old fileName
+        $etudiant->setPhotoLink("$scheme://$host/" . $uploader->getTargetDirectory() . $newFileName);
+        $etudiant->setPhoto($newFileName);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->flush();
+
+        return $etudiant;
+    }
+
+    /**
      * @Rest\Get(path="/{id}", name="etudiant_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_ETUDIANT_AFFICHAGE")
@@ -153,13 +177,13 @@ class EtudiantController extends AbstractController {
     public function show(Etudiant $etudiant): Etudiant {
         return $etudiant;
     }
-    
+
     /**
      * @Rest\Get(path="/public/{id}/show-generated-fields", name="etudiant_display_generated_fields",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      */
     public function showGeneratedFields(Etudiant $etudiant): array {
-        return ['numinterne'=>$etudiant->getNuminterne(),'emailUniv'=>$etudiant->getEmailUniv(),'email'=>$etudiant->getEmail()];
+        return ['numinterne' => $etudiant->getNuminterne(), 'emailUniv' => $etudiant->getEmailUniv(), 'email' => $etudiant->getEmail()];
     }
 
     /**

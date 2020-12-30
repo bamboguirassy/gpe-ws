@@ -189,6 +189,16 @@ class Preinscription
      * })
      */
     private $nationalite;
+    
+     /**
+     * @var \Regimeinscription
+     *
+     * @ORM\ManyToOne(targetEntity="Regimeinscription")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idregimeinscription", referencedColumnName="id")
+     * })
+     */
+    private $idregimeinscription;
 
     public function getId()
     {
@@ -450,6 +460,28 @@ class Preinscription
     public function getPaiementConfirme()
     {
         return $this->paiementConfirme;
+    }
+
+    /**
+     * Set idregimeinscription
+     *
+     * @param \LmdproBundle\Entity\Regimeinscription $idregimeinscription
+     *
+     * @return Inscriptionacad
+     */
+    public function setIdregimeinscription($idregimeinscription) {
+        $this->idregimeinscription = $idregimeinscription;
+
+        return $this;
+    }
+
+    /**
+     * Get idregimeinscription
+     *
+     * @return \LmdproBundle\Entity\Regimeinscription
+     */
+    public function getIdregimeinscription() {
+        return $this->idregimeinscription;
     }
 
     public function setPaiementConfirme($paiementConfirme): self
