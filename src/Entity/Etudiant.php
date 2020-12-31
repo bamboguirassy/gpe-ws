@@ -124,7 +124,7 @@ class Etudiant
      *
      * @ORM\Column(name="notifMail", type="boolean", nullable=true)
      */
-    private $notifmail = '0';
+    private $notifmail;
 
     /**
      * @var string|null
@@ -318,6 +318,11 @@ class Etudiant
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $quartierEtudiant;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $photoLink;
 
     public function getId()
     {
@@ -792,50 +797,62 @@ class Etudiant
         return $this;
     }
 
-    public function getTypeHabitation(): ?string
+    public function getTypeHabitation()
     {
         return $this->typeHabitation;
     }
 
-    public function setTypeHabitation(?string $typeHabitation): self
+    public function setTypeHabitation($typeHabitation): self
     {
         $this->typeHabitation = $typeHabitation;
 
         return $this;
     }
 
-    public function getCampusSocial(): ?string
+    public function getCampusSocial()
     {
         return $this->campusSocial;
     }
 
-    public function setCampusSocial(?string $campusSocial): self
+    public function setCampusSocial($campusSocial): self
     {
         $this->campusSocial = $campusSocial;
 
         return $this;
     }
 
-    public function getNumeroChambre(): ?int
+    public function getNumeroChambre()
     {
         return $this->numeroChambre;
     }
 
-    public function setNumeroChambre(?int $numeroChambre): self
+    public function setNumeroChambre($numeroChambre): self
     {
         $this->numeroChambre = $numeroChambre;
 
         return $this;
     }
 
-    public function getQuartierEtudiant(): ?string
+    public function getQuartierEtudiant()
     {
         return $this->quartierEtudiant;
     }
 
-    public function setQuartierEtudiant(?string $quartierEtudiant): self
+    public function setQuartierEtudiant($quartierEtudiant): self
     {
         $this->quartierEtudiant = $quartierEtudiant;
+
+        return $this;
+    }
+
+    public function getPhotoLink()
+    {
+        return $this->photoLink;
+    }
+
+    public function setPhotoLink($photoLink): self
+    {
+        $this->photoLink = $photoLink;
 
         return $this;
     }

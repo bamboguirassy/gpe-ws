@@ -56,14 +56,6 @@ class PreinscriptionController extends AbstractController {
      */
     public function requestNewEtudiantCreation($cni) {
         $em = $this->getDoctrine()->getManager();
-        $etudiants = $em->getRepository('App\Entity\Etudiant')
-                ->findByCni($cni);
-        if (count($etudiants)) {
-            throw $this->createAccessDeniedException("Vous êtes déja étudiant à l'université de Thiès,"
-                    . " cette interface est réservée aux étudiants qui viennent juste d'être admis"
-                    . " à l'université de Thiès, merci de vous rapprocher de la DSOS si vous pensez"
-                    . " qu'il s'agit d'une erreur.");
-        }
         $preinscriptionActifs = $em
                 ->createQuery('select p from App\Entity\Preinscription p '
                         . 'where p.datenotif<=?1 and p.datedelai>=?2 '
@@ -87,8 +79,24 @@ class PreinscriptionController extends AbstractController {
             throw $this->createNotFoundException("Nous n'avons pas pu vous authentifier, si vous pensez qu'il s'agit d'une erreur,"
                     . " merci de vous rapprocher de la DSOS de l'université de Thiès.");
         }
+        $etudiants = $em->getRepository('App\Entity\Etudiant')
+                ->findByCni($cni);
 
-        return $preinscriptionActifs[0];
+        if (count($etudiants)) {
+            // verifier si l'étudiant a une inscription acad active
+            $inscriptionacads = $em->getRepository("App\Entity\Inscriptionacad")
+                    ->findByIdetudiant($etudiants[0]);
+            if (count($inscriptionacads)) {
+                throw $this->createAccessDeniedException("Vous êtes déja étudiant à l'université de Thiès,"
+                        . " cette interface est réservée aux étudiants qui viennent juste d'être admis"
+                        . " à l'université de Thiès, merci de vous rapprocher de la DSOS si vous pensez"
+                        . " qu'il s'agit d'une erreur.");
+            }
+            return ['code' => 'etudiant', 'etudiant' => $etudiants[0]];
+        }
+
+
+        return ['code' => 'preinscription', 'preinscription' => $preinscriptionActifs[0]];
     }
 
     /**
@@ -109,7 +117,7 @@ class PreinscriptionController extends AbstractController {
     }
 
     /**
-     * @Rest\Get(path="/{id}", name="preinscription_show",requirements = {"id"="\d+"})
+     * @Rest\Get(path="/public/{id}", name="preinscription_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      */
     public function show(Preinscription $preinscription): Preinscription {

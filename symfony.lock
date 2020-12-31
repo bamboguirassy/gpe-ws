@@ -164,6 +164,9 @@
     "ocramius/proxy-manager": {
         "version": "2.1.1"
     },
+    "php": {
+        "version": "7.3"
+    },
     "phpcollection/phpcollection": {
         "version": "0.5.0"
     },
@@ -291,6 +294,9 @@
     },
     "symfony/intl": {
         "version": "v4.3.5"
+    },
+    "symfony/ldap": {
+        "version": "v4.3.11"
     },
     "symfony/maker-bundle": {
         "version": "1.0",
