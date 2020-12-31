@@ -263,7 +263,7 @@ class EtudiantController extends AbstractController {
         return EtudiantController::getEtudiantConnecte($this);
     }
      /**
-     * @Rest\Get(path="/find-by-email/{emailUniv}", name="etudiant_last_connection")
+     * @Rest\Get(path="/find-by-email/{emailUniv}", name="find_user_email")
      * @Rest\View(StatusCode=200)
      */
     public function findUserByEmail($emailUniv){
