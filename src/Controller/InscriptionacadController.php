@@ -200,7 +200,7 @@ class InscriptionacadController extends AbstractController {
      * @Rest\Put(path="/{id}/confirm-prepaid-inscription", name="prepaid_inscription_confirm",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      */
-    public function confirmPrepaidInscription(Inscriptionacad $inscriptionacad) {
+    public function confirmPrepaidInscription(Inscriptionacad $inscriptionacad,\Swift_Mailer $mailer) {
         $em = $this->getDoctrine()->getManager();
         $preinscriptions = $em->getRepository(Preinscription::class)
                 ->findBy([
@@ -215,12 +215,32 @@ class InscriptionacadController extends AbstractController {
         } else {
             throw $this->createNotFoundException("La préinscription est introuvable pour termine le processus d'inscription");
         }
+             $em->flush();
+             // Envoyer un email de confirmation
+        
+        $message = (new \Swift_Message('Confirmation Préinscription'))
+            ->setFrom(Utils::$senderEmail)
+            ->setTo($preinscription->getEmail())
+            ->setBody(
+                $this->renderView(
+                        'emails/preinscription/confirmation-notification.html.twig', ['preinscription' => $preinscription,
+                    ]
+                ), 'text/html'
+        );
+       $i=0;
+        $isMailSent = $mailer->send($message);
+        while (!$isMailSent) {
+            $isMailSent = $mailer->send($message);
+            $i++;
+            if($i==5 && !$isMailSent) {
+                throw $this->createAccessDeniedException("Impossible d'envoyer le mail de confirmation, des erreurs sont survenue après 5 tentatives au mail ".$preinscription->getEmail());
+            }
+        }
 
-
-        $em->flush();
-
-        return $preinscription;
-    }
+       
+         return $preinscription;
+              
+     }
 
     /**
      * @Rest\Delete("/{id}", name="inscriptionacad_delete",requirements = {"id"="\d+"})

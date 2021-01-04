@@ -1,0 +1,15 @@
+{%extends "emails/email-template.html.twig"%}
+{% block title %}  Bonjour <b>{{preinscription.prenometudiant}} {{preinscription.nometudiant}}</b> {% endblock %}
+
+{% block paragraphe2 %}
+
+    <span>
+        Votre inscription a été crée avec succés,
+        elle est en cours de traitement à la scolarité
+        Nous vous contacterons dans les jours à venir pour plus d'informations
+  
+    </span>
+{% endblock %}
+{% block paragraphe3 %}
+    Nous vous souhaitons une excellente experience avec espace Etudiant et comptons sur vous pour que la plateforme soit votre meilleure compagnonne.
+{% endblock %}
