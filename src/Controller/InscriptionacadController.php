@@ -223,7 +223,7 @@ class InscriptionacadController extends AbstractController {
             ->setTo($preinscription->getEmail())
             ->setBody(
                 $this->renderView(
-                        'emails/preinscription/confirmation-notification.html.twig', ['preinscription' => $preinscription,
+                        'emails/preinscription/confirmation-notification.html.twig', ['preinscription' => $preinscription
                     ]
                 ), 'text/html'
         );
