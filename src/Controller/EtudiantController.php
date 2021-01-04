@@ -160,7 +160,7 @@ class EtudiantController extends AbstractController {
         if (!in_array($file->guessExtension(), $authorizedExtensions)) {
             throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Fichier non pris en charge');
         }
-        $newFileName = $uploader->setTargetDirectory('etudiant_photo_directory')->upload($file,$etudiant->getNuminterne(), $etudiant->getPhoto()); // old fileName
+        $newFileName = $uploader->setTargetDirectory('etudiant_photo_directory')->upload($file, $etudiant->getNuminterne(), $etudiant->getPhoto()); // old fileName
         $etudiant->setPhotoLink("$scheme://$host/" . $uploader->getTargetDirectory() . $newFileName);
         $etudiant->setPhoto($newFileName);
         $entityManager = $this->getDoctrine()->getManager();
@@ -198,7 +198,6 @@ class EtudiantController extends AbstractController {
             ["value" => 'V', "label" => 'Veuf (ve)']
         ];
     }
-    
 
     /**
      * @Rest\Get(path="/handicap/", name="handicap_list")
@@ -262,28 +261,28 @@ class EtudiantController extends AbstractController {
     public function getMonCompteEtudiant(): Etudiant {
         return EtudiantController::getEtudiantConnecte($this);
     }
-     /**
+
+    /**
      * @Rest\Get(path="/find-by-email/{emailUniv}", name="find_user_email")
      * @Rest\View(StatusCode=200)
      */
-    public function findUserByEmail($emailUniv){
-       $em = $this->getDoctrine()->getManager();
-       $etudiant= $em->createQuery('select fs from App\Entity\FosUser fs '
-               . 'where fs.username =?1')
-               ->setParameter(1,$emailUniv)
-               ->getSingleResult()
-               ;
-               return $etudiant;
-               
-               
+    public function findUserByEmail($emailUniv) {
+        $em = $this->getDoctrine()->getManager();
+        $etudiant = $em->createQuery('select fs from App\Entity\FosUser fs '
+                        . 'where fs.username =?1')
+                ->setParameter(1, $emailUniv)
+                ->getSingleResult()
+        ;
+
+        return $etudiant;
     }
-    
-    /* 
+
+    /*
      * $em->createQuery("select ia from App\Entity\Inscriptionacad ia, "
-                        . "App\Entity\Etudiant et where ia.idclasse=?1 and ia.idetudiant=et and et.cni=?2 ")
-                ->setParameter(1, $classe)
-                ->setParameter(2, $preinscription->getCni())
-                ->getResult();
+      . "App\Entity\Etudiant et where ia.idclasse=?1 and ia.idetudiant=et and et.cni=?2 ")
+      ->setParameter(1, $classe)
+      ->setParameter(2, $preinscription->getCni())
+      ->getResult();
      */
 
     public static function getEtudiantConnecte($controller) {
