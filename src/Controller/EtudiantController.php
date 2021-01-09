@@ -276,6 +276,25 @@ class EtudiantController extends AbstractController {
 
         return $etudiant;
     }
+    /**
+     * @Rest\Get(path="/send-by-email/{id}", name="send_email")
+     * @Rest\View(StatusCode=200)
+     */
+    public function SendEmail(Etudiant $etudiant,  \Swift_Mailer $mailer) {
+        $message = (new \Swift_Message('Message'))
+                ->setFrom($etudiant->getEmailUniv())
+                ->setTo(Utils::$senderEmail)
+                ->setCc($etudiant->getEmail())
+                 ->setBody(
+                         '',
+                         'text/htlm'
+                
+        );
+       $mailer->send($message);
+       return $etudiant;
+       
+    }
+
 
     /*
      * $em->createQuery("select ia from App\Entity\Inscriptionacad ia, "
