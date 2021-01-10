@@ -15,6 +15,7 @@ class TypedocumentType extends AbstractType
             ->add('codetypedocument')
             ->add('libelletypedocument')
             ->add('source')
+            ->add('type')
         ;
     }
 

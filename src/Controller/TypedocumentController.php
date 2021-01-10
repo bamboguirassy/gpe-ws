@@ -27,7 +27,22 @@ class TypedocumentController extends AbstractController
             ->getRepository(Typedocument::class)
             ->findAll();
 
-        return count($typedocuments)?$typedocuments:[];
+        return count($typedocuments) ? $typedocuments : [];
+    }
+
+    /**
+     * @return array
+     * @Rest\Get(path="/input-documents", name="input_document_type")
+     * @Rest\View(statusCode = 200)
+     */
+    public function findInputDocuments(): array
+    {
+        return $this->getDoctrine()
+            ->getRepository(Typedocument::class)
+            ->findBy(
+                ['type' => 'input'],
+                ['libelletypedocument' => 'ASC']
+            );
     }
 
     /**
@@ -35,7 +50,8 @@ class TypedocumentController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_TYPEDOCUMENT_NOUVEAU")
      */
-    public function create(Request $request): Typedocument    {
+    public function create(Request $request): Typedocument
+    {
         $typedocument = new Typedocument();
         $form = $this->createForm(TypedocumentType::class, $typedocument);
         $form->submit(Utils::serializeRequestContent($request));
@@ -52,17 +68,19 @@ class TypedocumentController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_TYPEDOCUMENT_AFFICHAGE")
      */
-    public function show(Typedocument $typedocument): Typedocument    {
+    public function show(Typedocument $typedocument): Typedocument
+    {
         return $typedocument;
     }
 
-    
+
     /**
      * @Rest\Put(path="/{id}/edit", name="typedocument_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_TYPEDOCUMENT_EDITION")
      */
-    public function edit(Request $request, Typedocument $typedocument): Typedocument    {
+    public function edit(Request $request, Typedocument $typedocument): Typedocument
+    {
         $form = $this->createForm(TypedocumentType::class, $typedocument);
         $form->submit(Utils::serializeRequestContent($request));
 
@@ -70,15 +88,16 @@ class TypedocumentController extends AbstractController
 
         return $typedocument;
     }
-    
+
     /**
      * @Rest\Put(path="/{id}/clone", name="typedocument_clone",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_TYPEDOCUMENT_CLONE")
      */
-    public function cloner(Request $request, Typedocument $typedocument):  Typedocument {
-        $em=$this->getDoctrine()->getManager();
-        $typedocumentNew=new Typedocument();
+    public function cloner(Request $request, Typedocument $typedocument): Typedocument
+    {
+        $em = $this->getDoctrine()->getManager();
+        $typedocumentNew = new Typedocument();
         $form = $this->createForm(TypedocumentType::class, $typedocumentNew);
         $form->submit(Utils::serializeRequestContent($request));
         $em->persist($typedocumentNew);
@@ -93,20 +112,22 @@ class TypedocumentController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_TYPEDOCUMENT_SUPPRESSION")
      */
-    public function delete(Typedocument $typedocument): Typedocument    {
+    public function delete(Typedocument $typedocument): Typedocument
+    {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($typedocument);
         $entityManager->flush();
 
         return $typedocument;
     }
-    
+
     /**
      * @Rest\Post("/delete-selection/", name="typedocument_selection_delete")
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_TYPEDOCUMENT_SUPPRESSION")
      */
-    public function deleteMultiple(Request $request): array {
+    public function deleteMultiple(Request $request): array
+    {
         $entityManager = $this->getDoctrine()->getManager();
         $typedocuments = Utils::getObjectFromRequest($request);
         if (!count($typedocuments)) {
