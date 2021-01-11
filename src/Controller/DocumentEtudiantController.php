@@ -33,7 +33,7 @@ class DocumentEtudiantController extends AbstractController
      * @Rest\Post(path="/create", name="document_etudiant_new")
      * @Rest\View(statusCode=201)
      */
-    public function new(Request $request, EntityManagerInterface $entityManager, FileUploader $uploader)
+    public function create(Request $request, EntityManagerInterface $entityManager, FileUploader $uploader)
     {
         $documentEtudiant = new DocumentEtudiant();
         $httpHost = $request->getHttpHost();
