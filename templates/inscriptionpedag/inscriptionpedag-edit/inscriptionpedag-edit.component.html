@@ -1,0 +1,54 @@
+
+<p-toast></p-toast>
+<!-- form inscriptionpedag info -->
+<form *ngIf="'Inscriptionpedag'|editable" class="form" role="form" #inscriptionpedagForm="ngForm" autocomplete="off" (ngSubmit)="updateInscriptionpedag()">
+  <p-fieldset legend="Modification utilisateur" [toggleable]="true">
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="inscriptionpedagForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+    <!-- debut body -->
+    <div class="row">
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="dateinscriptionpedag">Dateinscriptionpedag</label>
+                    <input [(ngModel)]="inscriptionpedag.dateinscriptionpedag" class="form-control" type="text" name="dateinscriptionpedag" id="dateinscriptionpedag">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="passage">Passage</label>
+                    <input [(ngModel)]="inscriptionpedag.passage" class="form-control" type="text" name="passage" id="passage">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="valide">Valide</label>
+                    <input [(ngModel)]="inscriptionpedag.valide" class="form-control" type="text" name="valide" id="valide">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="moyenneobtenue">Moyenneobtenue</label>
+                    <input [(ngModel)]="inscriptionpedag.moyenneobtenue" class="form-control" type="text" name="moyenneobtenue" id="moyenneobtenue">
+                </div>
+            </div>
+                
+      
+    </div>
+    <!-- fin body -->
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="inscriptionpedagForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+  </p-fieldset>
+</form>
+<!-- /form inscriptionpedag info -->

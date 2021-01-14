@@ -1,0 +1,101 @@
+<p-toast></p-toast>
+<div class="row" *ngIf="'Typedocument'|listable">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <p-fieldset legend="Liste des typedocuments" [toggleable]="true">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+          <p-toolbar>
+            <button *ngIf="'Typedocument'|listable" type="button" class="btn btn-outline-secondary" (click)="refreshList()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+            </button>
+            <button *ngIf="'Typedocument'|deletable" (click)="deleteSelectedTypedocuments()" type="button"
+              class="btn btn-outline-danger pull-right ml-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'Typedocument'|creable" [routerLink]="['/'+typedocumentSrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary pull-right ml-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+          <p-table #tt [value]="typedocuments" [paginator]="true" [rows]="50" sortMode="multiple" selectionMode="multiple"
+            [(selection)]="selectedTypedocuments" [resizableColumns]="true" [responsive]="true"
+            [contextMenu]="contextMenu" [(contextMenuSelection)]="selectedTypedocument" [scrollable]="true"
+            scrollHeight="400px" [globalFilterFields]="globalFilterFields" dataKey="id">
+            <ng-template pTemplate="caption">
+              Liste des typedocuments<br>
+              <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+              <input type="text" pInputText size="50" placeholder="Rechercher dans le tableau"
+                (input)="tt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+              <div class="ui-helper-clearfix" style="text-align: left">
+                <button *ngIf="'Typedocument'|listable" type="button" pButton icon="pi pi-file-pdf" iconPos="left" label="PDF"
+                  (click)="exportPdf()" class="ui-button-warning pull-right ml-1"></button>
+                <button *ngIf="'Typedocument'|listable" type="button" pButton icon="pi pi-file-excel" iconPos="left"
+                  label="EXCEL" (click)="exportExcel()" style="margin-right: 0.5em;" class="ui-button-success pull-right"></button>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="colgroup">
+              <colgroup>
+                                  <col>
+                            <col>
+                            <col>
+                    </colgroup>
+            </ng-template>
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                                <th [pSortableColumn]="'codetypedocument'" pResizableColumn>
+                  Codetypedocument <p-sortIcon [field]="'codetypedocument'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'libelletypedocument'" pResizableColumn>
+                  Libelletypedocument <p-sortIcon [field]="'libelletypedocument'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'source'" pResizableColumn>
+                  Source <p-sortIcon [field]="'source'"></p-sortIcon>
+              </th>
+                    </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-typedocument let-editing="editing">
+              <tr [pEditableRow]="typedocument" [pSelectableRow]="typedocument" [pContextMenuRow]="typedocument">
+                <td style="width: 3em">
+                  <p-tableCheckbox [value]="typedocument"></p-tableCheckbox>
+                </td>
+                                                  <td class="ui-resizable-column">
+                  {{ typedocument.codetypedocument }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ typedocument.libelletypedocument }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ typedocument.source }}
+                </td>
+                          </tr>
+            </ng-template>
+            <ng-template pTemplate="footer" let-columns>
+              <tr>
+                <td style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </td>
+                                   <td>Codetypedocument</td>
+                             <td>Libelletypedocument</td>
+                             <td>Source</td>
+                    </tr>
+            </ng-template>
+          </p-table>
+          <p-contextMenu #contextMenu [model]="cMenuItems"></p-contextMenu>
+          <p-toolbar>
+            <button *ngIf="'Typedocument'|deletable" (click)="deleteSelectedTypedocuments()" type="button"
+              class="btn btn-outline-danger mr-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'Typedocument'|creable" [routerLink]="['/'+typedocumentSrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary mr-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+        </div>
+      </div>
+    </p-fieldset>
+  </div>
+</div>

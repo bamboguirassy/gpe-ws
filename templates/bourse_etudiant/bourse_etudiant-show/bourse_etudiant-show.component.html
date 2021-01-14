@@ -1,0 +1,75 @@
+<p-toast></p-toast>
+<p-fieldset *ngIf="'BourseEtudiant'|showable" legend="Affichage des informations - Utilisateur" [toggleable]="true">
+  <p-toolbar>
+    <button *ngIf="'BourseEtudiant'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+      [routerLink]="['/'+bourse_etudiantSrv.getRoutePrefix(),bourse_etudiant.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+      Modifier</button>
+    <button *ngIf="'BourseEtudiant'|clonable" [routerLink]="['/'+bourse_etudiantSrv.getRoutePrefix(),bourse_etudiant.id,'clone']" type="button"
+      class="btn btn-outline-secondary pull-right ml-1">
+      <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+    </button>
+    <button *ngIf="'BourseEtudiant'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeBourseEtudiant()"><i
+        class="fa fa-trash-o"></i> Supprimer</button>
+    <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+        class="fa fa-reply"></i> Retour</button>
+  </p-toolbar>
+  <p-tabView>
+    <p-tabPanel header="Détails">
+      <p-fieldset [legend]="bourse_etudiant.id">
+        <table class="table">
+                                    <tr>
+                <th>Prenoms</th>
+                <td>{{ bourse_etudiant.prenoms }}</td>
+            </tr>
+                                    <tr>
+                <th>Nom</th>
+                <td>{{ bourse_etudiant.nom }}</td>
+            </tr>
+                                    <tr>
+                <th>DateNaissance</th>
+                <td>{{ bourse_etudiant.dateNaissance }}</td>
+            </tr>
+                                    <tr>
+                <th>LieuNaissance</th>
+                <td>{{ bourse_etudiant.lieuNaissance }}</td>
+            </tr>
+                                    <tr>
+                <th>TauxBourse</th>
+                <td>{{ bourse_etudiant.tauxBourse }}</td>
+            </tr>
+                                    <tr>
+                <th>MontantBourse</th>
+                <td>{{ bourse_etudiant.montantBourse }}</td>
+            </tr>
+                                    <tr>
+                <th>Mois</th>
+                <td>{{ bourse_etudiant.mois }}</td>
+            </tr>
+                                    <tr>
+                <th>Annee</th>
+                <td>{{ bourse_etudiant.annee }}</td>
+            </tr>
+                    </table>
+        <p-toolbar>
+          <button *ngIf="'BourseEtudiant'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+            [routerLink]="['/'+bourse_etudiantSrv.getRoutePrefix(),bourse_etudiant.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+            Modifier</button>
+          <button *ngIf="'BourseEtudiant'|clonable" [routerLink]="['/'+bourse_etudiantSrv.getRoutePrefix(),bourse_etudiant.id,'clone']" type="button"
+            class="btn btn-outline-secondary pull-right ml-1">
+            <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+          </button>
+          <button *ngIf="'BourseEtudiant'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeBourseEtudiant()"><i
+              class="fa fa-trash-o"></i> Supprimer</button>
+          <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+              class="fa fa-reply"></i> Retour</button>
+          <button *ngIf="'BourseEtudiant'|showable" type="button" class="btn btn-secondary ml-1" (click)="refresh()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+          </button>
+        </p-toolbar>
+      </p-fieldset>
+    </p-tabPanel>
+    <p-tabPanel header="Liste associée">
+      
+    </p-tabPanel>
+  </p-tabView>
+</p-fieldset>

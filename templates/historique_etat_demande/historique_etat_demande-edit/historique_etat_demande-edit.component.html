@@ -1,0 +1,42 @@
+
+<p-toast></p-toast>
+<!-- form historique_etat_demande info -->
+<form *ngIf="'HistoriqueEtatDemande'|editable" class="form" role="form" #historique_etat_demandeForm="ngForm" autocomplete="off" (ngSubmit)="updateHistoriqueEtatDemande()">
+  <p-fieldset legend="Modification utilisateur" [toggleable]="true">
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="historique_etat_demandeForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+    <!-- debut body -->
+    <div class="row">
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="date">Date</label>
+                    <input [(ngModel)]="historique_etat_demande.date" class="form-control" type="text" name="date" id="date">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="userMail">UserMail</label>
+                    <input [(ngModel)]="historique_etat_demande.userMail" class="form-control" type="text" name="userMail" id="userMail">
+                </div>
+            </div>
+                
+      
+    </div>
+    <!-- fin body -->
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="historique_etat_demandeForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+  </p-fieldset>
+</form>
+<!-- /form historique_etat_demande info -->

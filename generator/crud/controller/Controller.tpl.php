@@ -105,7 +105,7 @@ class <?= $class_name ?> extends <?= $parent_class_name; ?><?= "\n" ?>
     /**
      * @Rest\Delete("/{<?= $entity_identifier ?>}", name="<?= $route_name ?>_delete",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_<?= strtoupper($entity_class_name) ?>_DELETE")
+     * @IsGranted("ROLE_<?= strtoupper($entity_class_name) ?>_SUPPRESSION")
      */
     public function delete(<?= $entity_class_name ?> $<?= $entity_var_singular ?>): <?= $entity_class_name ?>
     {
@@ -119,7 +119,7 @@ class <?= $class_name ?> extends <?= $parent_class_name; ?><?= "\n" ?>
     /**
      * @Rest\Post("/delete-selection/", name="<?= $route_name ?>_selection_delete")
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_<?= strtoupper($entity_class_name) ?>_DELETE")
+     * @IsGranted("ROLE_<?= strtoupper($entity_class_name) ?>_SUPPRESSION")
      */
     public function deleteMultiple(Request $request): array {
         $entityManager = $this->getDoctrine()->getManager();

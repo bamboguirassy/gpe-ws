@@ -35,12 +35,44 @@ class Typedocument
      */
     private $libelletypedocument;
 
-    public function getId(): ?int
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="source", type="string", length=45, nullable=false)
+     */
+    private $source;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="type", type="string", length=45, nullable=false)
+     */
+    private $type;
+
+    public function getId()
     {
         return $this->id;
     }
 
-    public function getCodetypedocument(): ?string
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType(string $type): void
+    {
+        $this->type = $type;
+    }
+
+
+
+    public function getCodetypedocument()
     {
         return $this->codetypedocument;
     }
@@ -52,7 +84,7 @@ class Typedocument
         return $this;
     }
 
-    public function getLibelletypedocument(): ?string
+    public function getLibelletypedocument()
     {
         return $this->libelletypedocument;
     }
@@ -60,6 +92,18 @@ class Typedocument
     public function setLibelletypedocument(string $libelletypedocument): self
     {
         $this->libelletypedocument = $libelletypedocument;
+
+        return $this;
+    }
+
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    public function setSource(string $source): self
+    {
+        $this->source = $source;
 
         return $this;
     }

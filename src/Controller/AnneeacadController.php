@@ -20,10 +20,7 @@ class AnneeacadController extends AbstractController
     /**
      * @Rest\Get(path="/", name="anneeacad_index")
      * @Rest\View(StatusCode = 200)
-<<<<<<< HEAD
      * @IsGranted("ROLE_ANNEE ACADEMIQUE_LISTE")
-=======
->>>>>>> a6b34a05ab6936dbc2491eeaba2a9cb66569e685
      */
     public function index(): array
     {
@@ -42,7 +39,22 @@ class AnneeacadController extends AbstractController
     {
         $anneeacads = $this->getDoctrine()
             ->getRepository(Anneeacad::class)
-            ->findByEncours(true,['id'=>'desc'],3);
+            ->findByEncours(true,['id'=>'desc'],4);
+
+        return count($anneeacads)?$anneeacads:[];
+    }
+    
+    /**
+     * @Rest\Get(path="/public/admission/", name="anneeacad_for_admission")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findAnneeForAdmission(): array
+    {
+        $anneeacads = $this->getDoctrine()
+            ->getRepository(Anneeacad::class)
+            ->findByEncours(true,['id'=>'desc'],2);
+        $tempArray=[$anneeacads[0]->getAnneesuivante()];
+        $anneeacads = array_merge($tempArray,$anneeacads);
 
         return count($anneeacads)?$anneeacads:[];
     }
@@ -67,10 +79,7 @@ class AnneeacadController extends AbstractController
     /**
      * @Rest\Get(path="/{id}", name="anneeacad_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-<<<<<<< HEAD
      * @IsGranted("ROLE_ANNEE ACADEMIQUE_AFFICHAGE")
-=======
->>>>>>> a6b34a05ab6936dbc2491eeaba2a9cb66569e685
      */
     public function show(Anneeacad $anneeacad): Anneeacad {
         return $anneeacad;

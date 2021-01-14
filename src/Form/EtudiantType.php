@@ -50,6 +50,10 @@ class EtudiantType extends AbstractType
             ->add('adpays')
             ->add('nationalite')
             ->add('typeOrphelin')
+            ->add('typeHabitation')
+            ->add('campusSocial')
+            ->add('numeroChambre')
+            ->add('quartierEtudiant')
         ;
     }
 

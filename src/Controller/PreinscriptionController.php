@@ -30,19 +30,74 @@ class PreinscriptionController extends AbstractController {
 
         return count($preinscriptions) ? $preinscriptions : [];
     }
-    
-    
+
     /**
      * @Rest\Get(path="/active/", name="preinscription_active_etudiant")
      * @Rest\View(StatusCode = 200)
      */
     public function findActivePreinscriptionByEtudiant(): array {
-        $etudiant= EtudiantController::getEtudiantConnecte($this);
-        $preinscriptions = $this->getDoctrine()
+        $etudiant = EtudiantController::getEtudiantConnecte($this);
+        $preinscriptions = $this->getDoctrine()->getManager()
                 ->getRepository(Preinscription::class)
-                ->findBy(array('cni'=>$etudiant->getCni(),'estinscrit'=>0));
+                ->findBy(['cni'=>$etudiant->getCni(),
+                    'estinscrit'=>false]);
+        $tabPreinscription = [];
+        $dateDuJour = new \DateTime();
+        foreach ($preinscriptions as $preinscription) {
+            $active = ($preinscription->getDatenotif()<=$dateDuJour && $preinscription->getDatedelai()>=$dateDuJour);
+            $tabPreinscription[] = ['active'=>$active,'preinscription'=>$preinscription];
+        }
 
-        return count($preinscriptions) ? $preinscriptions : [];
+        return count($tabPreinscription) ? $tabPreinscription : [];
+    }
+
+    /**
+     * @Rest\Get(path="/public/request-etudiant-creation/{cni}", name="request_etudiant_creation")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function requestNewEtudiantCreation($cni) {
+        $em = $this->getDoctrine()->getManager();
+        $preinscriptionActifs = $em
+                ->createQuery('select p from App\Entity\Preinscription p '
+                        . 'where p.datenotif<=?1 and p.datedelai>=?2 '
+                        . 'and p.cni=?3 and p.estinscrit=?4')
+                ->setParameter(1, new \DateTime())
+                ->setParameter(2, new \DateTime())
+                ->setParameter(3, $cni)
+                ->setParameter(4, false)
+                ->getResult();
+        if (!count($preinscriptionActifs)) {
+            // si aucune préinscription actif, vérifier si l'étudiant a une préinscription en suspens
+            $preinscriptionInactifs = $em
+                    ->createQuery('select p from App\Entity\Preinscription p '
+                            . 'where p.cni=?3 and p.estinscrit=?4')
+                    ->setParameter(3, $cni)
+                    ->setParameter(4, false)
+                    ->getResult();
+            if (count($preinscriptionInactifs)) {
+                throw $this->createAccessDeniedException("Votre campagne d'inscription n'est pas encore ouverte, merci de patienter !");
+            }
+            throw $this->createNotFoundException("Nous n'avons pas pu vous authentifier, si vous pensez qu'il s'agit d'une erreur,"
+                    . " merci de vous rapprocher de la DSOS de l'université de Thiès.");
+        }
+        $etudiants = $em->getRepository('App\Entity\Etudiant')
+                ->findByCni($cni);
+
+        if (count($etudiants)) {
+            // verifier si l'étudiant a une inscription acad active
+            $inscriptionacads = $em->getRepository("App\Entity\Inscriptionacad")
+                    ->findByIdetudiant($etudiants[0]);
+            if (count($inscriptionacads)) {
+                throw $this->createAccessDeniedException("Vous êtes déja étudiant à l'université de Thiès,"
+                        . " cette interface est réservée aux étudiants qui viennent juste d'être admis"
+                        . " à l'université de Thiès, merci de vous rapprocher de la DSOS si vous pensez"
+                        . " qu'il s'agit d'une erreur.");
+            }
+            return ['code' => 'etudiant', 'etudiant' => $etudiants[0]];
+        }
+
+
+        return ['code' => 'preinscription', 'preinscription' => $preinscriptionActifs[0]];
     }
 
     /**
@@ -63,7 +118,7 @@ class PreinscriptionController extends AbstractController {
     }
 
     /**
-     * @Rest\Get(path="/{id}", name="preinscription_show",requirements = {"id"="\d+"})
+     * @Rest\Get(path="/public/{id}", name="preinscription_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      */
     public function show(Preinscription $preinscription): Preinscription {

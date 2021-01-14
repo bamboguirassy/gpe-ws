@@ -1,0 +1,55 @@
+<p-toast></p-toast>
+<p-fieldset *ngIf="'EtatReclamationBourse'|showable" legend="Affichage des informations - Utilisateur" [toggleable]="true">
+  <p-toolbar>
+    <button *ngIf="'EtatReclamationBourse'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+      [routerLink]="['/'+etat_reclamation_bourseSrv.getRoutePrefix(),etat_reclamation_bourse.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+      Modifier</button>
+    <button *ngIf="'EtatReclamationBourse'|clonable" [routerLink]="['/'+etat_reclamation_bourseSrv.getRoutePrefix(),etat_reclamation_bourse.id,'clone']" type="button"
+      class="btn btn-outline-secondary pull-right ml-1">
+      <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+    </button>
+    <button *ngIf="'EtatReclamationBourse'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeEtatReclamationBourse()"><i
+        class="fa fa-trash-o"></i> Supprimer</button>
+    <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+        class="fa fa-reply"></i> Retour</button>
+  </p-toolbar>
+  <p-tabView>
+    <p-tabPanel header="Détails">
+      <p-fieldset [legend]="etat_reclamation_bourse.id">
+        <table class="table">
+                                    <tr>
+                <th>Libelle</th>
+                <td>{{ etat_reclamation_bourse.libelle }}</td>
+            </tr>
+                                    <tr>
+                <th>CodeCouleur</th>
+                <td>{{ etat_reclamation_bourse.codeCouleur }}</td>
+            </tr>
+                                    <tr>
+                <th>Description</th>
+                <td>{{ etat_reclamation_bourse.description }}</td>
+            </tr>
+                    </table>
+        <p-toolbar>
+          <button *ngIf="'EtatReclamationBourse'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+            [routerLink]="['/'+etat_reclamation_bourseSrv.getRoutePrefix(),etat_reclamation_bourse.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+            Modifier</button>
+          <button *ngIf="'EtatReclamationBourse'|clonable" [routerLink]="['/'+etat_reclamation_bourseSrv.getRoutePrefix(),etat_reclamation_bourse.id,'clone']" type="button"
+            class="btn btn-outline-secondary pull-right ml-1">
+            <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+          </button>
+          <button *ngIf="'EtatReclamationBourse'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeEtatReclamationBourse()"><i
+              class="fa fa-trash-o"></i> Supprimer</button>
+          <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+              class="fa fa-reply"></i> Retour</button>
+          <button *ngIf="'EtatReclamationBourse'|showable" type="button" class="btn btn-secondary ml-1" (click)="refresh()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+          </button>
+        </p-toolbar>
+      </p-fieldset>
+    </p-tabPanel>
+    <p-tabPanel header="Liste associée">
+      
+    </p-tabPanel>
+  </p-tabView>
+</p-fieldset>

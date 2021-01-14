@@ -60,9 +60,12 @@ class InscriptionacadController extends AbstractController {
      */
     public function getInscriptionEtudiantConnecte(): array {
         $em = $this->getDoctrine()->getManager();
-        $inscriptionacads = $em->getRepository(Inscriptionacad::class)
-                ->findBy(['idetudiant' => EtudiantController::getEtudiantConnecte($this),
-            'etat' => 'V'], ['id' => 'DESC']);
+        $inscriptionacads = $em->createQuery('select ia from App\Entity\Inscriptionacad ia, '
+                        . 'App\Entity\Classe c, App\Entity\Anneeacad aa where '
+                        . 'ia.idclasse=c and c.idanneeacad=aa and ia.idetudiant=?1 '
+                        . 'order by aa.id DESC')
+                ->setParameter(1, EtudiantController::getEtudiantConnecte($this))
+                ->getResult();
         return count($inscriptionacads) ? $inscriptionacads : [];
     }
 
@@ -115,20 +118,32 @@ class InscriptionacadController extends AbstractController {
             throw $this->createNotFoundException("Modalité enseignement presentiel introuvable...");
         }
         $inscriptionacad->setIdmodaliteenseignement($modaliteEnseignementPresentiel);
-        //find moyen paiement orange money
-        $modepaiement = $entityManager->getRepository("App\Entity\Modepaiement")
-                ->findOneByCodemodepaiement("OM");
-        if (!$modepaiement) {
-            throw $this->createNotFoundException("Mode de paiement orange money introuvable...");
+        // si paiement déja effectué, prendre le paiement selectioné
+        // si paiement non effectué, selectionner touch comme moyen de paiement
+        if ($preinscription->getPaiementConfirme()) {
+            $inscriptionacad->setMontantinscriptionacad($preinscription->getMontant());
+        } else {
+            //find moyen paiement TouchPay
+            $modepaiement = $entityManager->getRepository("App\Entity\Modepaiement")
+                    ->findOneByCodemodepaiement("TP");
+            if (!$modepaiement) {
+                throw $this->createNotFoundException("Mode de paiement TouchPay introuvable...");
+            }
+            $inscriptionacad->setIdmodepaiement($modepaiement);
         }
-        $inscriptionacad->setIdmodepaiement($modepaiement);
+
         //find non boursier et le definir
-        $typeBourseNonBoursier=$entityManager->getRepository("App\Entity\Bourse")
+        $typeBourseNonBoursier = $entityManager->getRepository("App\Entity\Bourse")
                 ->findOneByCodebourse("NB");
-        if(!$typeBourseNonBoursier){
+        if (!$typeBourseNonBoursier) {
             throw $this->createNotFoundException("Type de bourse introuvable pour Non Boursier");
         }
         $inscriptionacad->setIdbourse($typeBourseNonBoursier);
+
+        // if etudiant sénégalais mettre croust à true
+        if ($inscriptionacad->getIdetudiant()->getNationalite()->getAlpha2() == 'SN') {
+            $inscriptionacad->setCroust(true);
+        }
 
         $entityManager->persist($inscriptionacad);
         $entityManager->flush();
@@ -153,6 +168,11 @@ class InscriptionacadController extends AbstractController {
         $form = $this->createForm(InscriptionacadType::class, $inscriptionacad);
         $form->submit(Utils::serializeRequestContent($request));
 
+        // if etudiant sénégalais mettre croust à true
+        if ($inscriptionacad->getIdetudiant()->getNationalite()->getAlpha2() == 'SN') {
+            $inscriptionacad->setCroust(true);
+        }
+
         $this->getDoctrine()->getManager()->flush();
 
         return $inscriptionacad;
@@ -173,6 +193,55 @@ class InscriptionacadController extends AbstractController {
         $em->flush();
 
         return $inscriptionacadNew;
+    }
+
+    /**
+     * @Rest\Put(path="/{id}/confirm-prepaid-inscription", name="prepaid_inscription_confirm",requirements = {"id"="\d+"})
+     * @Rest\View(StatusCode=200)
+     */
+    public function confirmPrepaidInscription(Inscriptionacad $inscriptionacad, \Swift_Mailer $mailer) {
+        $em = $this->getDoctrine()->getManager();
+        $preinscriptions = $em->getRepository(Preinscription::class)
+                ->findBy([
+            'idfiliere' => $inscriptionacad->getIdClasse()->getIdfiliere(),
+            'idniveau' => $inscriptionacad->getIdClasse()->getIdniveau(),
+            'idanneeacad' => $inscriptionacad->getIdClasse()->getIdanneeacad(),
+            'cni' => $inscriptionacad->getIdetudiant()->getCni()
+        ]);
+
+        if (count($preinscriptions)) {
+            if (count($preinscriptions) > 1) {
+                throw $this->createAccessDeniedException("Un problème a été detecté; plusieurs préinscriptions trouvées !!!");
+            }
+            $preinscriptions[0]->setEstinscrit(true);
+            $em->flush();
+            $preinscription = $preinscriptions[0];
+        } else {
+            throw $this->createNotFoundException("La préinscription est introuvable pour termine le processus d'inscription");
+        }
+
+        // Envoyer un email de confirmation
+
+        $message = (new \Swift_Message('Confirmation Préinscription'))
+                ->setFrom(Utils::$senderEmail)
+                ->setTo($preinscription->getEmail())
+                ->setBody(
+                $this->renderView(
+                        'emails/preinscription/confirmation-notification.html.twig', ['preinscription' => $preinscription]
+                ), 'text/html'
+        );
+        $i = 0;
+        $isMailSent = $mailer->send($message);
+        while (!$isMailSent) {
+            $isMailSent = $mailer->send($message);
+            $i++;
+            if ($i == 5 && !$isMailSent) {
+                throw $this->createAccessDeniedException("Impossible d'envoyer le mail de confirmation, des erreurs sont survenue après 5 tentatives au mail " . $preinscription->getEmail());
+            }
+        }
+
+
+        return $preinscription;
     }
 
     /**
