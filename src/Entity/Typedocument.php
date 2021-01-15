@@ -42,10 +42,35 @@ class Typedocument
      */
     private $source;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="type", type="string", length=45, nullable=false)
+     */
+    private $type;
+
     public function getId()
     {
         return $this->id;
     }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType(string $type): void
+    {
+        $this->type = $type;
+    }
+
+
 
     public function getCodetypedocument()
     {

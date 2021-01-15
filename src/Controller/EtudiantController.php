@@ -280,7 +280,7 @@ class EtudiantController extends AbstractController {
      * @Rest\Get(path="/send-by-email/{id}", name="send_email")
      * @Rest\View(StatusCode=200)
      */
-    public function SendEmail(Etudiant $etudiant,  \Swift_Mailer $mailer) {
+    public function sendEmail(Etudiant $etudiant,  \Swift_Mailer $mailer) {
         $message = (new \Swift_Message('Message'))
                 ->setFrom($etudiant->getEmailUniv())
                 ->setTo(Utils::$senderEmail)
