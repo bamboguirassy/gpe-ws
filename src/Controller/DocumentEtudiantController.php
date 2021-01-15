@@ -32,6 +32,7 @@ class DocumentEtudiantController extends AbstractController
     /**
      * @Rest\Post(path="/create", name="document_etudiant_new")
      * @Rest\View(statusCode=201)
+     * @IsGranted("ROLE_DOCUMENTETUDIANT_NOUVEAU")
      */
     public function new(Request $request, EntityManagerInterface $entityManager, FileUploader $uploader)
     {
@@ -102,6 +103,7 @@ class DocumentEtudiantController extends AbstractController
      * @param EntityManagerInterface $entityManager
      * @Rest\Put(path="/{id}/edit-other", name="document_etudiant_update", requirements={"id"="\d+"})
      * @Rest\View(statusCode=200)
+     * @IsGranted("ROLE_DOCUMENTETUDIANT_EDITION")
      * @return DocumentEtudiant
      */
     public function updateOther(Request $request, DocumentEtudiant $documentEtudiant, EntityManagerInterface $entityManager, FileUploader $uploader)
@@ -157,6 +159,7 @@ class DocumentEtudiantController extends AbstractController
     /**
      * @Rest\Delete("/{id}", name="document_etudiant_delete",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
+     * @IsGranted("ROLE_DOCUMENTETUDIANT_SUPPRESSION")
      */
     public function delete(Request $request, DocumentEtudiant $documentEtudiant): DocumentEtudiant
     {
