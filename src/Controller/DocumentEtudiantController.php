@@ -34,7 +34,7 @@ class DocumentEtudiantController extends AbstractController
      * @Rest\View(statusCode=201)
      * @IsGranted("ROLE_DOCUMENTETUDIANT_NOUVEAU")
      */
-    public function new(Request $request, EntityManagerInterface $entityManager, FileUploader $uploader)
+    public function create(Request $request, EntityManagerInterface $entityManager, FileUploader $uploader)
     {
         $documentEtudiant = new DocumentEtudiant();
         $httpHost = $request->getHttpHost();
