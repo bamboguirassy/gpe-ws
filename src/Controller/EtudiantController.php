@@ -281,12 +281,12 @@ class EtudiantController extends AbstractController {
      * @Rest\View(StatusCode=200)
      */
     public function sendEmail(Etudiant $etudiant,  \Swift_Mailer $mailer) {
-        $message = (new \Swift_Message('Message'))
+        $message = (new \Swift_Message('Demande Information'))
                 ->setFrom($etudiant->getEmailUniv())
                 ->setTo(Utils::$senderEmail)
                 ->setCc($etudiant->getEmail())
                  ->setBody(
-                         '',
+                         'Bonjour Monsieur le Directeur Je voulais des informations concernant mon dossier complet',
                          'text/htlm'
                 
         );
