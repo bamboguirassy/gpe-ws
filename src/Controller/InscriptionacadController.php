@@ -55,16 +55,16 @@ class InscriptionacadController extends AbstractController {
     }
 
     /**
-     * @Rest\Get(path="/mes-inscriptions/", name="mes_inscriptionacad_index")
+     * @Rest\Get(path="/inscriptions/{id}/etudiant", name="inscriptionacad_etudiabt")
      * @Rest\View(StatusCode = 200)
      */
-    public function getInscriptionEtudiantConnecte(): array {
+    public function getInscriptionEtudiant(Etudiant $etudiant): array {
         $em = $this->getDoctrine()->getManager();
         $inscriptionacads = $em->createQuery('select ia from App\Entity\Inscriptionacad ia, '
                         . 'App\Entity\Classe c, App\Entity\Anneeacad aa where '
                         . 'ia.idclasse=c and c.idanneeacad=aa and ia.idetudiant=?1 '
                         . 'order by aa.id DESC')
-                ->setParameter(1, EtudiantController::getEtudiantConnecte($this))
+                ->setParameter(1, $etudiant)
                 ->getResult();
         return count($inscriptionacads) ? $inscriptionacads : [];
     }

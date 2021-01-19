@@ -282,6 +282,11 @@ class Inscriptionacad
      */
     private $croust;
 
+    /**
+     * @ORM\OneToOne(targetEntity=VisiteMedicale::class, mappedBy="inscriptionacad", cascade={"persist", "remove"})
+     */
+    private $visiteMedicale;
+
     public function getId()
     {
         return $this->id;
@@ -691,6 +696,23 @@ class Inscriptionacad
     public function setCroust(?bool $croust): self
     {
         $this->croust = $croust;
+
+        return $this;
+    }
+
+    public function getVisiteMedicale(): ?VisiteMedicale
+    {
+        return $this->visiteMedicale;
+    }
+
+    public function setVisiteMedicale(VisiteMedicale $visiteMedicale): self
+    {
+        // set the owning side of the relation if necessary
+        if ($visiteMedicale->getInscriptionacad() !== $this) {
+            $visiteMedicale->setInscriptionacad($this);
+        }
+
+        $this->visiteMedicale = $visiteMedicale;
 
         return $this;
     }
