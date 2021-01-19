@@ -1,0 +1,13 @@
+{%extends "emails/email-template.html.twig"%}
+{% block title %}  Bonjour <b>{{etudiant.prenometudiant}} {{etudiant.nometudiant}}</b> {% endblock %}
+
+{% block paragraphe2 %}
+    <span>
+       Bonjour, la DSOS vous demande de bien vouloir entrer dans votre dossier étudiant (http://etudiant.univ-thies.sn)
+        et de charger le document: <span style="font-weight: bold" > {{ typeDocument.libelletypedocument }}. </span>
+    </span>
+{% endblock %}
+
+{% block paragraphe3 %}
+    Nous vous souhaitons une excellente experience avec espace Etudiant et comptons sur vous pour que la plateforme soit votre meilleure compagnonne.
+{% endblock %}
