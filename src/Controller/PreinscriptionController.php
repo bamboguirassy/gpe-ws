@@ -188,5 +188,28 @@ class PreinscriptionController extends AbstractController {
 
         return $preinscriptions;
     }
+    
+    /**
+     * @Rest\Get(path="/public/verifier-inscription-etudiant-active/{cni}", name="verifier-inscription-etudiant-active")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function verifierInscriptionEtudiantActif($cni) {
+        $isInscriptionActive = false;
+        $em = $this->getDoctrine()->getManager();
+        $preinscriptionActifs = $em
+                ->createQuery('select p from App\Entity\Preinscription p '
+                        . 'where p.datenotif<=?1 and p.datedelai>=?2 '
+                        . 'and p.cni=?3 and p.estinscrit=?4')
+                ->setParameter(1, new \DateTime())
+                ->setParameter(2, new \DateTime())
+                ->setParameter(3, $cni)
+                ->setParameter(4, false)
+                ->getResult();
+        
+        if(count($preinscriptionActifs)){
+            $isInscriptionActive = true;
+        }
+        return  $isInscriptionActive; 
+    }
 
 }
