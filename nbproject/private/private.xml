@@ -2,6 +2,7 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+<<<<<<< HEAD
         <group>
             <file>file:/C:/Users/MBENE%20DIA/Documents/gpe-ws/src/Controller/TypedocumentController.php</file>
             <file>file:/C:/Users/MBENE%20DIA/Documents/gpe-ws/.env</file>
@@ -11,5 +12,8 @@
             <file>file:/C:/Users/MBENE%20DIA/Documents/gpe-ws/templates/emails/preinscription/confirmation-notification.html.twig</file>
             <file>file:/C:/Users/MBENE%20DIA/Documents/gpe-ws/src/Controller/EtudiantController.php</file>
         </group>
+=======
+        <group/>
+>>>>>>> 3cf8c8f2304d7c155f5d3654d2f65aa03978cee8
     </open-files>
 </project-private>
