@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Etudiant;
+use App\Entity\FosUser;
 use App\Entity\Typedocument;
 use App\Form\TypedocumentType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,6 +30,34 @@ class TypedocumentController extends AbstractController
             ->findAll();
 
         return count($typedocuments) ? $typedocuments : [];
+    }
+
+    /**
+     * @Rest\Get(path="/send-query-mail/{id}/etudiant/{etudiantId}", name="typedocument_send_query_mail")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function sendMailForQuery(Request $request, Typedocument $typedocument, \Swift_Mailer $mailer, $etudiantId)
+    {
+        /** @var Etudiant $etudiant */
+        $etudiant =
+            $this->getDoctrine()
+            ->getRepository(Etudiant::class)
+            ->find($etudiantId);
+
+        $message = (new \Swift_Message('DSOS: Demande de document obligatoire'))
+            ->setFrom(\App\Utils\Utils::$senderEmail)
+            ->setTo($etudiant->getEmailUniv())
+            ->setBody(
+                $this->renderView(
+                    'emails/document/query-document.html.twig', [
+                        'typeDocument' => $typedocument,
+                        'etudiant' => $etudiant
+                    ]
+                ), 'text/html'
+            );
+        $mailer->send($message);
+
+        return $etudiant;
     }
 
     /**
@@ -120,6 +150,8 @@ class TypedocumentController extends AbstractController
 
         return $typedocument;
     }
+
+
 
     /**
      * @Rest\Post("/delete-selection/", name="typedocument_selection_delete")
