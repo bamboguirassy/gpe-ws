@@ -32,11 +32,10 @@ class PreinscriptionController extends AbstractController {
     }
 
     /**
-     * @Rest\Get(path="/active/", name="preinscription_active_etudiant")
+     * @Rest\Get(path="/active/{id}/etudiant", name="preinscription_active_etudiant")
      * @Rest\View(StatusCode = 200)
      */
-    public function findActivePreinscriptionByEtudiant(): array {
-        $etudiant = EtudiantController::getEtudiantConnecte($this);
+    public function findActivePreinscriptionByEtudiant(Etudiant $etudiant): array {
         $preinscriptions = $this->getDoctrine()->getManager()
                 ->getRepository(Preinscription::class)
                 ->findBy(['cni'=>$etudiant->getCni(),
