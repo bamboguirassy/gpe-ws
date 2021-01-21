@@ -32,11 +32,10 @@ class PreinscriptionController extends AbstractController {
     }
 
     /**
-     * @Rest\Get(path="/active/", name="preinscription_active_etudiant")
+     * @Rest\Get(path="/active/{id}/etudiant", name="preinscription_active_etudiant")
      * @Rest\View(StatusCode = 200)
      */
-    public function findActivePreinscriptionByEtudiant(): array {
-        $etudiant = EtudiantController::getEtudiantConnecte($this);
+    public function findActivePreinscriptionByEtudiant(Etudiant $etudiant): array {
         $preinscriptions = $this->getDoctrine()->getManager()
                 ->getRepository(Preinscription::class)
                 ->findBy(['cni'=>$etudiant->getCni(),
@@ -187,6 +186,29 @@ class PreinscriptionController extends AbstractController {
         $entityManager->flush();
 
         return $preinscriptions;
+    }
+    
+    /**
+     * @Rest\Get(path="/public/verifier-inscription-etudiant-active/{cni}", name="verifier-inscription-etudiant-active")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function verifierInscriptionEtudiantActif($cni) {
+        $isInscriptionActive = false;
+        $em = $this->getDoctrine()->getManager();
+        $preinscriptionActifs = $em
+                ->createQuery('select p from App\Entity\Preinscription p '
+                        . 'where p.datenotif<=?1 and p.datedelai>=?2 '
+                        . 'and p.cni=?3 and p.estinscrit=?4')
+                ->setParameter(1, new \DateTime())
+                ->setParameter(2, new \DateTime())
+                ->setParameter(3, $cni)
+                ->setParameter(4, false)
+                ->getResult();
+        
+        if(count($preinscriptionActifs)){
+            $isInscriptionActive = true;
+        }
+        return  $isInscriptionActive; 
     }
 
 }
