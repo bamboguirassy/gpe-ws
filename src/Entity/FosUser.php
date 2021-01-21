@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -389,5 +390,11 @@ class FosUser extends BaseUser
     {
         return $this->admission;
     }
-	
+
+    public function getGroups()
+    {
+        return [$this->idgroup] ?: [];
+    }
+
+
 }
