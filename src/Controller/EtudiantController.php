@@ -253,6 +253,19 @@ class EtudiantController extends AbstractController {
         }
         return $etudiant;
     }
+    
+    /**
+     * @Rest\Get(path="/public/numinterne/{numinterne}", name="etudiant_by_numdossier")
+     * @Rest\View(StatusCode=200)
+     */
+    public function findByNuminterne($numinterne): Etudiant {
+        $em = $this->getDoctrine()->getManager();
+        $etudiant = $em->getRepository(Etudiant::class)->findOneByNuminterne($numinterne);
+        if (!$etudiant) {
+            throw $this->createNotFoundException("Etudiant introuvable avec le numinterne :" . $numinterne);
+        }
+        return $etudiant;
+    }
 
     /**
      * @Rest\Get(path="/mon-compte/", name="etudiant_mon_compte")
