@@ -11,16 +11,17 @@ use Symfony\Component\Routing\Annotation\Route;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use App\Utils\Utils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 /**
- * @Route("/api/visite/medicale")
+ * @Route("/api/visitemedicale")
  */
 class VisiteMedicaleController extends AbstractController
 {
     /**
      * @Rest\Get(path="/", name="visite_medicale_index")
      * @Rest\View(StatusCode = 200)
-     * @IsGranted("ROLE_VISITEMEDICALE_LISTE")
+     * @IsGranted("ROLE_VISITE MEDICALE_LISTE")
      */
     public function index(): array
     {
@@ -28,19 +29,23 @@ class VisiteMedicaleController extends AbstractController
             ->getRepository(VisiteMedicale::class)
             ->findAll();
 
-        return count($visiteMedicales)?$visiteMedicales:[];
+        return count($visiteMedicales) ? $visiteMedicales : [];
     }
 
     /**
      * @Rest\Post(Path="/create", name="visite_medicale_new")
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_VISITEMEDICALE_NOUVEAU")
+     * @IsGranted("ROLE_VISITE MEDICALE_NOUVEAU")
      */
-    public function create(Request $request): VisiteMedicale    {
+    public function create(Request $request): VisiteMedicale
+    {
         $visiteMedicale = new VisiteMedicale();
         $form = $this->createForm(VisiteMedicaleType::class, $visiteMedicale);
         $form->submit(Utils::serializeRequestContent($request));
 
+        $requestData = Utils::getObjectFromRequest($request);
+        $visiteMedicale->setDate(new \DateTime($requestData->date));
+        
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($visiteMedicale);
         $entityManager->flush();
@@ -51,19 +56,21 @@ class VisiteMedicaleController extends AbstractController
     /**
      * @Rest\Get(path="/{id}", name="visite_medicale_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_VISITEMEDICALE_AFFICHAGE")
+     * @IsGranted("ROLE_VISITE MEDICALE_AFFICHAGE")
      */
-    public function show(VisiteMedicale $visiteMedicale): VisiteMedicale    {
+    public function show(VisiteMedicale $visiteMedicale): VisiteMedicale
+    {
         return $visiteMedicale;
     }
 
-    
+
     /**
      * @Rest\Put(path="/{id}/edit", name="visite_medicale_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_VISITEMEDICALE_EDITION")
+     * @IsGranted("ROLE_VISITE MEDICALE_EDITION")
      */
-    public function edit(Request $request, VisiteMedicale $visiteMedicale): VisiteMedicale    {
+    public function edit(Request $request, VisiteMedicale $visiteMedicale): VisiteMedicale
+    {
         $form = $this->createForm(VisiteMedicaleType::class, $visiteMedicale);
         $form->submit(Utils::serializeRequestContent($request));
 
@@ -71,15 +78,16 @@ class VisiteMedicaleController extends AbstractController
 
         return $visiteMedicale;
     }
-    
+
     /**
      * @Rest\Put(path="/{id}/clone", name="visite_medicale_clone",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_VISITEMEDICALE_CLONE")
+     * @IsGranted("ROLE_VISITE MEDICALE_CLONE")
      */
-    public function cloner(Request $request, VisiteMedicale $visiteMedicale):  VisiteMedicale {
-        $em=$this->getDoctrine()->getManager();
-        $visiteMedicaleNew=new VisiteMedicale();
+    public function cloner(Request $request, VisiteMedicale $visiteMedicale): VisiteMedicale
+    {
+        $em = $this->getDoctrine()->getManager();
+        $visiteMedicaleNew = new VisiteMedicale();
         $form = $this->createForm(VisiteMedicaleType::class, $visiteMedicaleNew);
         $form->submit(Utils::serializeRequestContent($request));
         $em->persist($visiteMedicaleNew);
@@ -92,22 +100,24 @@ class VisiteMedicaleController extends AbstractController
     /**
      * @Rest\Delete("/{id}", name="visite_medicale_delete",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_VISITEMEDICALE_SUPPRESSION")
+     * @IsGranted("ROLE_VISITE MEDICALE_SUPPRESSION")
      */
-    public function delete(VisiteMedicale $visiteMedicale): VisiteMedicale    {
+    public function delete(VisiteMedicale $visiteMedicale): VisiteMedicale
+    {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($visiteMedicale);
         $entityManager->flush();
 
         return $visiteMedicale;
     }
-    
+
     /**
      * @Rest\Post("/delete-selection/", name="visite_medicale_selection_delete")
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_VISITEMEDICALE_SUPPRESSION")
+     * @IsGranted("ROLE_VISITE MEDICALE_SUPPRESSION")
      */
-    public function deleteMultiple(Request $request): array {
+    public function deleteMultiple(Request $request): array
+    {
         $entityManager = $this->getDoctrine()->getManager();
         $visiteMedicales = Utils::getObjectFromRequest($request);
         if (!count($visiteMedicales)) {

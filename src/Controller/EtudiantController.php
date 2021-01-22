@@ -5,6 +5,9 @@ namespace App\Controller;
 use App\Entity\Etudiant;
 use App\Entity\Inscriptionacad;
 use App\Form\EtudiantType;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,6 +32,48 @@ class EtudiantController extends AbstractController {
                 ->findAll();
 
         return count($etudiants) ? $etudiants : [];
+    }
+
+    /**
+     * @Rest\Get(path="/search/{numeroInterne}", name="etudiant_search")
+     * @Rest\View(statusCode = 200)
+     */
+    public function searchByNumeroDossier(Request $request, $numeroInterne, EntityManagerInterface $entityManager) {
+
+        $query = "
+            SELECT et
+            FROM App\Entity\Etudiant et
+            WHERE et IN (
+                SELECT DISTINCT etu
+                FROM App\Entity\Inscriptionacad ia
+                JOIN ia.idetudiant etu
+                JOIN ia.idclasse classe
+                JOIN classe.idanneeacad anneeacad
+                WHERE anneeacad = (:lastAnneeEnCours)
+                    AND etu.numinterne LIKE :numeroInterneTerm
+            )
+        ";
+
+        $subQuery = '
+            SELECT an
+            FROM App\Entity\Anneeacad an
+            WHERE an.encours = :enCours
+            ORDER BY an.id DESC
+        ';
+
+        $lastAnneeEnCours = $entityManager
+            ->createQuery($subQuery)
+            ->setParameter('enCours', true)
+            ->setMaxResults(1)
+            ->getSingleResult();
+
+
+        return $entityManager
+            ->createQuery($query)
+            ->setParameter('numeroInterneTerm', $numeroInterne . '%')
+            ->setParameter('lastAnneeEnCours', $lastAnneeEnCours)
+            ->getResult();
+
     }
 
     /**
