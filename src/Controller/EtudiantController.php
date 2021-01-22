@@ -290,30 +290,23 @@ class EtudiantController extends AbstractController {
         return $etudiant;
     }
     /**
-     * @Rest\Get(path="/send-by-email/{id}", name="send_email")
+     * @Rest\Post(path="/send-by-email/{id}", name="send_email")
      * @Rest\View(StatusCode=200)
      */
-    public function sendEmail(Etudiant $etudiant,  \Swift_Mailer $mailer) {
-        $message = (new \Swift_Message('Confirmation Préinscription'))
-                  ->setFrom($etudiant->getEmail())
-                 ->setTo(Utils::$senderEmail)
-                ->setCc($etudiant->getEmailUniv())       
-                ->setBody(
-                         'Bonjour Monsieur le Directeur Je voulais des informations concernant mon dossier complet',
-                         'text/htlm'
-               
-        );
-        /**$message = (new \Swift_Message('Demande Information'))
-                ->setFrom($etudiant->getEmail())
-                ->setTo(Utils::$senderEmail)
-                ->setCc($etudiant->getEmailUniv())
-                 ->setBody(
-                         'Bonjour Monsieur le Directeur Je voulais des informations concernant mon dossier complet',
-                         'text/htlm'
-                
-        );**/
-       $mailer->send($message);
+    public function sendEmail(Etudiant $etudiant,  \Swift_Mailer $mailer, Request $request) {
+        $requestData = Utils::getObjectFromRequest($request);
+        $objet = $requestData->objet;
+        $contenu = $requestData->contenu;
+                $mail =(new \Swift_Message($objet))
+                        ->setFrom(Utils::$senderEmail)
+                        ->setTo($etudiant->getEmail())
+                         ->setCc($etudiant->getEmailUniv())
+                        ->setBody($contenu, 'text/html');
+       $mailer->send($mail);
        return $etudiant;
+       
+        
+        
        
     }
 

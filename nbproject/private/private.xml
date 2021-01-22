@@ -3,15 +3,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
-            <file>file:/C:/Users/MBENE%20DIA/Documents/gpe-ws/src/Controller/EtudiantController.php</file>
-=======
-            <file>file:/F:/spet/gpe-ws/src/Controller/AuthController.php</file>
-            <file>file:/F:/spet/gpe-ws/src/Entity/Etudiant.php</file>
-            <file>file:/F:/spet/gpe-ws/config/packages/security.yaml</file>
-            <file>file:/F:/spet/gpe-ws/src/Controller/EtudiantController.php</file>
-            <file>file:/F:/spet/gpe-ws/config/packages/fos_user.yaml</file>
->>>>>>> 4996a053cf3d91cee03b88f013fa2656dc4fc0f1
+            <file>file:/C:/Users/MBENE%20DIA/Documents/gpe-ws/src/Controller/ClasseController.php</file>
+            <file>file:/C:/Users/MBENE%20DIA/Documents/gpe-ws/src/Controller/PreinscriptionController.php</file>
         </group>
     </open-files>
 </project-private>
