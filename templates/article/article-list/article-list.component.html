@@ -1,0 +1,165 @@
+<p-toast></p-toast>
+<div class="row" *ngIf="'Article'|listable">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <p-fieldset legend="Liste des articles" [toggleable]="true">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+          <p-toolbar>
+            <button *ngIf="'Article'|listable" type="button" class="btn btn-outline-secondary" (click)="refreshList()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+            </button>
+            <button *ngIf="'Article'|deletable" (click)="deleteSelectedArticles()" type="button"
+              class="btn btn-outline-danger pull-right ml-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'Article'|creable" [routerLink]="['/'+articleSrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary pull-right ml-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+          <p-table #tt [value]="articles" [paginator]="true" [rows]="50" sortMode="multiple" selectionMode="multiple"
+            [(selection)]="selectedArticles" [resizableColumns]="true" [responsive]="true"
+            [contextMenu]="contextMenu" [(contextMenuSelection)]="selectedArticle" [scrollable]="true"
+            scrollHeight="400px" [globalFilterFields]="globalFilterFields" dataKey="id">
+            <ng-template pTemplate="caption">
+              Liste des articles<br>
+              <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+              <input type="text" pInputText size="50" placeholder="Rechercher dans le tableau"
+                (input)="tt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+              <div class="ui-helper-clearfix" style="text-align: left">
+                <button *ngIf="'Article'|listable" type="button" pButton icon="pi pi-file-pdf" iconPos="left" label="PDF"
+                  (click)="exportPdf()" class="ui-button-warning pull-right ml-1"></button>
+                <button *ngIf="'Article'|listable" type="button" pButton icon="pi pi-file-excel" iconPos="left"
+                  label="EXCEL" (click)="exportExcel()" style="margin-right: 0.5em;" class="ui-button-success pull-right"></button>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="colgroup">
+              <colgroup>
+                                  <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                    </colgroup>
+            </ng-template>
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                                <th [pSortableColumn]="'titre'" pResizableColumn>
+                  Titre <p-sortIcon [field]="'titre'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'contenu'" pResizableColumn>
+                  Contenu <p-sortIcon [field]="'contenu'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'dateCreation'" pResizableColumn>
+                  DateCreation <p-sortIcon [field]="'dateCreation'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'userCreation'" pResizableColumn>
+                  UserCreation <p-sortIcon [field]="'userCreation'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'publie'" pResizableColumn>
+                  Publie <p-sortIcon [field]="'publie'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'datePublication'" pResizableColumn>
+                  DatePublication <p-sortIcon [field]="'datePublication'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'userPublication'" pResizableColumn>
+                  UserPublication <p-sortIcon [field]="'userPublication'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'dateDesactivation'" pResizableColumn>
+                  DateDesactivation <p-sortIcon [field]="'dateDesactivation'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'userDesactivation'" pResizableColumn>
+                  UserDesactivation <p-sortIcon [field]="'userDesactivation'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'photoName'" pResizableColumn>
+                  PhotoName <p-sortIcon [field]="'photoName'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'photoPath'" pResizableColumn>
+                  PhotoPath <p-sortIcon [field]="'photoPath'"></p-sortIcon>
+              </th>
+                    </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-article let-editing="editing">
+              <tr [pEditableRow]="article" [pSelectableRow]="article" [pContextMenuRow]="article">
+                <td style="width: 3em">
+                  <p-tableCheckbox [value]="article"></p-tableCheckbox>
+                </td>
+                                                  <td class="ui-resizable-column">
+                  {{ article.titre }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ article.contenu }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ article.dateCreation ? article.dateCreation|date('Y-m-d H:i:s') : '' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ article.userCreation }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ article.publie ? 'Yes' : 'No' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ article.datePublication ? article.datePublication|date('Y-m-d H:i:s') : '' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ article.userPublication }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ article.dateDesactivation ? article.dateDesactivation|date('Y-m-d H:i:s') : '' }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ article.userDesactivation }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ article.photoName }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ article.photoPath }}
+                </td>
+                          </tr>
+            </ng-template>
+            <ng-template pTemplate="footer" let-columns>
+              <tr>
+                <td style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </td>
+                                   <td>Titre</td>
+                             <td>Contenu</td>
+                             <td>DateCreation</td>
+                             <td>UserCreation</td>
+                             <td>Publie</td>
+                             <td>DatePublication</td>
+                             <td>UserPublication</td>
+                             <td>DateDesactivation</td>
+                             <td>UserDesactivation</td>
+                             <td>PhotoName</td>
+                             <td>PhotoPath</td>
+                    </tr>
+            </ng-template>
+          </p-table>
+          <p-contextMenu #contextMenu [model]="cMenuItems"></p-contextMenu>
+          <p-toolbar>
+            <button *ngIf="'Article'|deletable" (click)="deleteSelectedArticles()" type="button"
+              class="btn btn-outline-danger mr-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'Article'|creable" [routerLink]="['/'+articleSrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary mr-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+        </div>
+      </div>
+    </p-fieldset>
+  </div>
+</div>

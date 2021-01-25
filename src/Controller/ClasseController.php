@@ -173,5 +173,6 @@ class ClasseController extends AbstractController
         return $manager->createQuery("SELECT c FROM App\Entity\Classe c, App\Entity\Filiere f WHERE f.libellefiliere = ?1 AND  c.idanneeacad = ?2 AND c.idniveau = ?3 AND c.idfiliere = f")
             ->setParameter(1, $data["libelleFiliere"])->setParameter(2, $data["annee"])->setParameter(3, $niveau)->getSingleResult();
     }
+    
 
 }
