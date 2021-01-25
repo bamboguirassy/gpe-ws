@@ -1,0 +1,96 @@
+
+<p-toast></p-toast>
+<!-- form article info -->
+<form *ngIf="'Article'|editable" class="form" role="form" #articleForm="ngForm" autocomplete="off" (ngSubmit)="updateArticle()">
+  <p-fieldset legend="Modification utilisateur" [toggleable]="true">
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="articleForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+    <!-- debut body -->
+    <div class="row">
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="titre">Titre</label>
+                    <input [(ngModel)]="article.titre" class="form-control" type="text" name="titre" id="titre">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="contenu">Contenu</label>
+                    <input [(ngModel)]="article.contenu" class="form-control" type="text" name="contenu" id="contenu">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="dateCreation">DateCreation</label>
+                    <input [(ngModel)]="article.dateCreation" class="form-control" type="text" name="dateCreation" id="dateCreation">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="userCreation">UserCreation</label>
+                    <input [(ngModel)]="article.userCreation" class="form-control" type="text" name="userCreation" id="userCreation">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="publie">Publie</label>
+                    <input [(ngModel)]="article.publie" class="form-control" type="text" name="publie" id="publie">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="datePublication">DatePublication</label>
+                    <input [(ngModel)]="article.datePublication" class="form-control" type="text" name="datePublication" id="datePublication">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="userPublication">UserPublication</label>
+                    <input [(ngModel)]="article.userPublication" class="form-control" type="text" name="userPublication" id="userPublication">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="dateDesactivation">DateDesactivation</label>
+                    <input [(ngModel)]="article.dateDesactivation" class="form-control" type="text" name="dateDesactivation" id="dateDesactivation">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="userDesactivation">UserDesactivation</label>
+                    <input [(ngModel)]="article.userDesactivation" class="form-control" type="text" name="userDesactivation" id="userDesactivation">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="photoName">PhotoName</label>
+                    <input [(ngModel)]="article.photoName" class="form-control" type="text" name="photoName" id="photoName">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="photoPath">PhotoPath</label>
+                    <input [(ngModel)]="article.photoPath" class="form-control" type="text" name="photoPath" id="photoPath">
+                </div>
+            </div>
+                
+      
+    </div>
+    <!-- fin body -->
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="articleForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+  </p-fieldset>
+</form>
+<!-- /form article info -->

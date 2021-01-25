@@ -1,0 +1,87 @@
+<p-toast></p-toast>
+<p-fieldset *ngIf="'Article'|showable" legend="Affichage des informations - Utilisateur" [toggleable]="true">
+  <p-toolbar>
+    <button *ngIf="'Article'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+      [routerLink]="['/'+articleSrv.getRoutePrefix(),article.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+      Modifier</button>
+    <button *ngIf="'Article'|clonable" [routerLink]="['/'+articleSrv.getRoutePrefix(),article.id,'clone']" type="button"
+      class="btn btn-outline-secondary pull-right ml-1">
+      <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+    </button>
+    <button *ngIf="'Article'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeArticle()"><i
+        class="fa fa-trash-o"></i> Supprimer</button>
+    <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+        class="fa fa-reply"></i> Retour</button>
+  </p-toolbar>
+  <p-tabView>
+    <p-tabPanel header="Détails">
+      <p-fieldset [legend]="article.id">
+        <table class="table">
+                                    <tr>
+                <th>Titre</th>
+                <td>{{ article.titre }}</td>
+            </tr>
+                                    <tr>
+                <th>Contenu</th>
+                <td>{{ article.contenu }}</td>
+            </tr>
+                                    <tr>
+                <th>DateCreation</th>
+                <td>{{ article.dateCreation ? article.dateCreation|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+                                    <tr>
+                <th>UserCreation</th>
+                <td>{{ article.userCreation }}</td>
+            </tr>
+                                    <tr>
+                <th>Publie</th>
+                <td>{{ article.publie ? 'Yes' : 'No' }}</td>
+            </tr>
+                                    <tr>
+                <th>DatePublication</th>
+                <td>{{ article.datePublication ? article.datePublication|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+                                    <tr>
+                <th>UserPublication</th>
+                <td>{{ article.userPublication }}</td>
+            </tr>
+                                    <tr>
+                <th>DateDesactivation</th>
+                <td>{{ article.dateDesactivation ? article.dateDesactivation|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+                                    <tr>
+                <th>UserDesactivation</th>
+                <td>{{ article.userDesactivation }}</td>
+            </tr>
+                                    <tr>
+                <th>PhotoName</th>
+                <td>{{ article.photoName }}</td>
+            </tr>
+                                    <tr>
+                <th>PhotoPath</th>
+                <td>{{ article.photoPath }}</td>
+            </tr>
+                    </table>
+        <p-toolbar>
+          <button *ngIf="'Article'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+            [routerLink]="['/'+articleSrv.getRoutePrefix(),article.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+            Modifier</button>
+          <button *ngIf="'Article'|clonable" [routerLink]="['/'+articleSrv.getRoutePrefix(),article.id,'clone']" type="button"
+            class="btn btn-outline-secondary pull-right ml-1">
+            <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+          </button>
+          <button *ngIf="'Article'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeArticle()"><i
+              class="fa fa-trash-o"></i> Supprimer</button>
+          <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+              class="fa fa-reply"></i> Retour</button>
+          <button *ngIf="'Article'|showable" type="button" class="btn btn-secondary ml-1" (click)="refresh()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+          </button>
+        </p-toolbar>
+      </p-fieldset>
+    </p-tabPanel>
+    <p-tabPanel header="Liste associée">
+      
+    </p-tabPanel>
+  </p-tabView>
+</p-fieldset>
