@@ -316,7 +316,7 @@ class EtudiantController extends AbstractController {
      * @Rest\Get(path="/mon-compte/", name="etudiant_mon_compte")
      * @Rest\View(StatusCode=200)
      */
-    public function getMonCompteEtudiant(): Etudiant {
+    public function getMonCompteEtudiant() {
         return EtudiantController::getEtudiantConnecte($this);
     }
 
@@ -370,7 +370,7 @@ class EtudiantController extends AbstractController {
                 ->setParameter(1, $controller->getUser()->getEmail())
                 ->getResult();
         if (count($etudiants) < 1) {
-            throw new \Exception("Votre compte n'est rattaché à aucun étudiant.", 401, null);
+            return null;
         }
         return $etudiants[0];
     }
