@@ -7,6 +7,7 @@ use App\Entity\Classe;
 use App\Entity\Etudiant;
 use App\Entity\Modaliteenseignement;
 use App\Entity\Preinscription;
+use App\Entity\InformationPaiementInscription;
 use App\Form\InscriptionacadType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -276,5 +277,41 @@ class InscriptionacadController extends AbstractController {
 
         return $inscriptionacads;
     }
+    
+     /**
+     * @Rest\Post("/public/pin/", name="payment_instant_notification")
+     * @Rest\View(StatusCode=200)
+     */
+     public function paymentInstantNotification(Request $request) {
+        $em = $this->getDoctrine()->getManager();
+        $paymentMode = $request->get('payment_mode');
+        $paidSum = $request->get('paid_sum');
+        $paidAmount = $request->get('paid_amount');
+        $paymentToken = $request->get('payment_token');
+        $paymentStatus = $request->get('payment_status');
+        $commandNumber = $request->get('command_number');
+        $paymentValidationDate = $request->get('payment_validation_date');
+        $incriptionacad = $em->getRepository(Inscriptionacad::class)->find($commandNumber);
+        $informationPaiementInscription = new InformationPaiementInscription();
+        $informationPaiementInscription->setNumeroTransaction($paymentToken);
+        $informationPaiementInscription->setOperateur($paymentMode);
+        $informationPaiementInscription->setMontant($paidAmount);
+        $informationPaiementInscription->setDate((new \DateTime())->setTimestamp($paymentValidationDate));
+        $informationPaiementInscription->setInscriptionacad($incriptionacad);
+        if($paymentStatus == 200){
+            $informationPaiementInscription->setStatus('Confirmé');
+        }else if($paymentStatus == 420){
+            $informationPaiementInscription->setStatus('Annulé');
+        } else {
+            throw $this->createNotFoundException("Erreur de la transaction");
+        }
+         
+        $em->persist($informationPaiementInscription);
+        $em->flush();
+        
+        return $informationPaiementInscription;
+         
+     }
+     
 
 }

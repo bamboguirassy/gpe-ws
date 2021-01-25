@@ -260,6 +260,7 @@ class EtudiantController extends AbstractController {
      */
     public function findByNuminterne($numinterne): Etudiant {
         $em = $this->getDoctrine()->getManager();
+        //throw $this->createNotFoundException("Etudiant numinterne :" . $numinterne);
         $etudiant = $em->getRepository(Etudiant::class)->findOneByNuminterne($numinterne);
         if (!$etudiant) {
             throw $this->createNotFoundException("Etudiant introuvable avec le numinterne :" . $numinterne);

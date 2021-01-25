@@ -204,7 +204,7 @@ class PreinscriptionController extends AbstractController {
                 ->setParameter(3, $cni)
                 ->setParameter(4, false)
                 ->getResult();
-        
+        //throw $this->createAccessDeniedException("PreActif ".$preinscriptionActifs[0].getDatenotif());
         if(count($preinscriptionActifs)){
             $isInscriptionActive = true;
         }
