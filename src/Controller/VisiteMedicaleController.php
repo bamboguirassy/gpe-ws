@@ -45,7 +45,7 @@ class VisiteMedicaleController extends AbstractController
 
         $requestData = Utils::getObjectFromRequest($request);
         $visiteMedicale->setDate(new \DateTime($requestData->date));
-        
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($visiteMedicale);
         $entityManager->flush();
