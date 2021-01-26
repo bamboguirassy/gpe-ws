@@ -35,6 +35,8 @@ class EtudiantController extends AbstractController {
     }
 
     /**
+     * Extrait les etudiant ayant au moins une inscription académique pour l'année en cours
+     *
      * @Rest\Get(path="/search/{numeroInterne}", name="etudiant_search")
      * @Rest\View(statusCode = 200)
      */
@@ -72,6 +74,33 @@ class EtudiantController extends AbstractController {
             ->createQuery($query)
             ->setParameter('numeroInterneTerm', $numeroInterne . '%')
             ->setParameter('lastAnneeEnCours', $lastAnneeEnCours)
+            ->getResult();
+
+    }
+
+    /**
+     * Recherche un etudiant par cni, prenom, nom, ine, numéro de dossier connaissant le numéro interne
+     *
+     * @Rest\Get(path="/search/term/{term}", name="etudiant_search")
+     * @Rest\View(statusCode = 200)
+     */
+    public function searchByTerm(Request $request, $term, EntityManagerInterface $entityManager) {
+
+        $query = "
+            SELECT et
+            FROM App\Entity\Etudiant et
+            WHERE et.numinterne LIKE :term
+            OR et.cni LIKE :term
+            OR et.prenometudiant LIKE :term
+            OR et.nometudiant LIKE :term
+            OR et.ine LIKE :term
+            OR CONCAT(et.prenometudiant, ' ', et.nometudiant) LIKE :term
+            OR CONCAT(et.nometudiant, ' ', et.prenometudiant) LIKE :term
+        ";
+
+        return $entityManager
+            ->createQuery($query)
+            ->setParameter('term', $term . '%')
             ->getResult();
 
     }
