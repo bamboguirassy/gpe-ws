@@ -37,7 +37,7 @@ class EtudiantController extends AbstractController {
     /**
      * Extrait les etudiant ayant au moins une inscription académique pour l'année en cours
      *
-     * @Rest\Get(path="/search/{numeroInterne}", name="etudiant_search")
+     * @Rest\Get(path="/search/{numeroInterne}", name="etudiant_search_numinterne")
      * @Rest\View(statusCode = 200)
      */
     public function searchByNumeroDossier(Request $request, $numeroInterne, EntityManagerInterface $entityManager) {
