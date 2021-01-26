@@ -44,6 +44,20 @@ class AnneeacadController extends AbstractController
         return count($anneeacads)?$anneeacads:[];
     }
     
+     /**
+     * @Rest\Get(path="/public/ouvertes/", name="anneeacad_ouver")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findAnneeOuvertes(): array
+    {
+        $anneeacads = $this->getDoctrine()
+            ->getRepository(Anneeacad::class)
+            ->findByEncours(true, ['id'=>'desc']);
+
+        return count($anneeacads)?$anneeacads:[];
+    }
+    
+    
     /**
      * @Rest\Get(path="/public/admission/", name="anneeacad_for_admission")
      * @Rest\View(StatusCode = 200)

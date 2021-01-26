@@ -6,6 +6,7 @@ use App\Entity\Anneeacad;
 use App\Entity\Classe;
 use App\Entity\Filiere;
 use App\Entity\Niveau;
+use App\Entity\Entite;
 use App\Form\ClasseType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
@@ -21,18 +22,17 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 /**
  * @Route("/api/classe")
  */
-class ClasseController extends AbstractController
-{
+class ClasseController extends AbstractController {
+
     /**
      * @Rest\Get(path="/", name="classe_index")
      * @Rest\View(StatusCode = 200)
      * @IsGranted("ROLE_CLASSE_LISTE")
      */
-    public function index(): array
-    {
+    public function index(): array {
         $classes = $this->getDoctrine()
-            ->getRepository(Classe::class)
-            ->findAll();
+                ->getRepository(Classe::class)
+                ->findAll();
 
         return count($classes) ? $classes : [];
     }
@@ -42,8 +42,7 @@ class ClasseController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_CLASSE_NOUVEAU")
      */
-    public function create(Request $request): Classe
-    {
+    public function create(Request $request): Classe {
         $classe = new Classe();
         $form = $this->createForm(ClasseType::class, $classe);
         $form->submit(Utils::serializeRequestContent($request));
@@ -60,19 +59,16 @@ class ClasseController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_CLASSE_AFFICHAGE")
      */
-    public function show(Classe $classe): Classe
-    {
+    public function show(Classe $classe): Classe {
         return $classe;
     }
-
 
     /**
      * @Rest\Put(path="/{id}/edit", name="classe_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_CLASSE_EDITION")
      */
-    public function edit(Request $request, Classe $classe): Classe
-    {
+    public function edit(Request $request, Classe $classe): Classe {
         $form = $this->createForm(ClasseType::class, $classe);
         $form->submit(Utils::serializeRequestContent($request));
 
@@ -86,8 +82,7 @@ class ClasseController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_CLASSE_CLONE")
      */
-    public function cloner(Request $request, Classe $classe): Classe
-    {
+    public function cloner(Request $request, Classe $classe): Classe {
         $em = $this->getDoctrine()->getManager();
         $classeNew = new Classe();
         $form = $this->createForm(ClasseType::class, $classeNew);
@@ -104,8 +99,7 @@ class ClasseController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_CLASSE_SUPPRESSION")
      */
-    public function delete(Classe $classe): Classe
-    {
+    public function delete(Classe $classe): Classe {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($classe);
         $entityManager->flush();
@@ -118,8 +112,7 @@ class ClasseController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_CLASSE_SUPPRESSION")
      */
-    public function deleteMultiple(Request $request): array
-    {
+    public function deleteMultiple(Request $request): array {
         $entityManager = $this->getDoctrine()->getManager();
         $classes = Utils::getObjectFromRequest($request);
         if (!count($classes)) {
@@ -135,28 +128,25 @@ class ClasseController extends AbstractController
     }
 
     /**
-     *Permet de recupérer une liste de classes en spécifiant le libelleFiliere et l'année académique
+     * Permet de recupérer une liste de classes en spécifiant le libelleFiliere et l'année académique
      *
      * @Rest\Post("/annee", name="by_anneeacad_filiere")
      * @Rest\View(statusCode=200)
      * @param Request $request
      * @return array
      */
-    public function findClasseByFiliereAndAnneeAcad(Request $request): array
-    {
+    public function findClasseByFiliereAndAnneeAcad(Request $request): array {
         /** @var Classe[] $classes */
         /** @var EntityManagerInterface $manager */
-
         $data = Utils::serializeRequestContent($request);
         $manager = $this->getDoctrine()->getManager();
 
         $classes = $manager->createQuery(
-            'SELECT c FROM App\Entity\Classe c, App\Entity\Filiere f WHERE c.idanneeacad = ?1 AND f.libellefiliere = ?2 AND c.idfiliere = f')
-            ->setParameter(1, $data['annee'])->setParameter(2, $data['libelleFiliere'])->getResult();
+                                'SELECT c FROM App\Entity\Classe c, App\Entity\Filiere f WHERE c.idanneeacad = ?1 AND f.libellefiliere = ?2 AND c.idfiliere = f')
+                        ->setParameter(1, $data['annee'])->setParameter(2, $data['libelleFiliere'])->getResult();
 
         return $classes;
     }
-
 
     /**
      *
@@ -166,13 +156,67 @@ class ClasseController extends AbstractController
      * @param Niveau $niveau
      * @return Classe
      */
-    public function findClasseByNiveau(Request $request, Niveau $niveau): Classe
-    {
+    public function findClasseByNiveau(Request $request, Niveau $niveau): Classe {
         $manager = $this->getDoctrine()->getManager();
         $data = Utils::serializeRequestContent($request);
         return $manager->createQuery("SELECT c FROM App\Entity\Classe c, App\Entity\Filiere f WHERE f.libellefiliere = ?1 AND  c.idanneeacad = ?2 AND c.idniveau = ?3 AND c.idfiliere = f")
-            ->setParameter(1, $data["libelleFiliere"])->setParameter(2, $data["annee"])->setParameter(3, $niveau)->getSingleResult();
+                        ->setParameter(1, $data["libelleFiliere"])->setParameter(2, $data["annee"])->setParameter(3, $niveau)->getSingleResult();
     }
-    
+
+    /**
+     * Lists all entite entities.
+     *
+     * @Rest\Get("/etablissement/",options={"expose":true}, name="entite_etablissement")
+     *  @Rest\View(statusCode=200)
+     */
+    public function findEtablissements() {
+        $em = $this->getDoctrine()->getManager();
+        $filieres = $em->createQuery('select f from App\Entity\UserFiliere'
+                        . ' uf, App\Entity\Filiere f where uf.idfiliere=f and uf.iduser=?1')
+                ->setParameter(1, $this->getUser())
+                ->getResult();
+        $institution = $em->getRepository('App\Entity\Entite')->findOneByIdentiteparent(null);
+        $etablissements = $em->createQuery('select etab from App\Entity\Entite etab, '
+                        . 'App\Entity\Entite e where e.identiteparent=etab and etab.identiteparent=?1 and'
+                        . '(select count(f) from App\Entity\Filiere f'
+                        . ' where (f.identite=e or f.identite=etab) and f in (?2) )>0')
+                ->setParameter(1, $institution)
+                ->setParameter(2, $filieres)
+                ->getResult();
+        return $etablissements;
+    }
+
+    /**
+     * 
+     * @Rest\Get("/entite/{id}/anneeacad/",options={"expose":true},name="classe_by_entite")
+     * @Rest\View(statusCode=200)
+     */
+    public function findClasseByAnneeAcadGroupByEntites(Anneeacad $anneeacad) {
+        $em = $this->getDoctrine()->getManager();
+        $etablissements = $em->createQuery('select etab from App\Entity\UserFiliere uf '
+                        . 'Join uf.idfiliere f '
+                        . 'Join f.identite e '
+                        . 'Join e.identiteparent etab '
+                        . 'where uf.iduser=?1'
+                )
+                ->setParameter(1, $this->getUser())
+                ->getResult();
+        $tab_classe = [];
+        foreach ($etablissements as $etablissement) {
+            $classes = $em->createQuery('select cl from App\Entity\Classe cl '
+                            . 'Join cl.idfiliere f '
+                            . 'Join f.identite e'
+                            . 'where e.identiteparent=?1 and cl.idanneeacad=?2'
+                    )
+                    ->setParameter(1, $etablissement)
+                    ->setParameter(2, $anneeacad)
+                    ->getResult();
+
+            $tab_classe[] = ['etablissement' => $etablissement, 'classe' => $classes];
+        }
+        return $tab_classe;
+    }
+
+
 
 }
