@@ -327,13 +327,13 @@ class EtudiantController extends AbstractController {
      */
     public function findUserByEmail($emailUniv) {
         $em = $this->getDoctrine()->getManager();
-        $etudiant = $em->createQuery('select fs from App\Entity\FosUser fs '
+        $etudiants = $em->createQuery('select fs from App\Entity\FosUser fs '
                         . 'where fs.username =?1')
                 ->setParameter(1, $emailUniv)
-                ->getSingleResult()
+                ->getResult()
         ;
 
-        return $etudiant;
+        return count($etudiants)?$etudiants[0]:null;
     }
     /**
      * @Rest\Post(path="/send-by-email/{id}", name="send_email")

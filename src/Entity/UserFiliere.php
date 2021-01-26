@@ -22,16 +22,22 @@ class UserFiliere
     private $id;
 
     /**
-     * @var int|null
+     * @var \FosUser
      *
-     * @ORM\Column(name="idUser", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="FosUser")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idUser", referencedColumnName="id")
+     * })
      */
     private $iduser;
 
     /**
-     * @var int|null
+     * @var \Filiere
      *
-     * @ORM\Column(name="idFiliere", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="Filiere")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idFiliere", referencedColumnName="id")
+     * })
      */
     private $idfiliere;
 
@@ -40,28 +46,49 @@ class UserFiliere
         return $this->id;
     }
 
-    public function getIduser(): ?int
-    {
-        return $this->iduser;
-    }
-
-    public function setIduser(?int $iduser): self
-    {
+    /**
+     * Set iduser
+     *
+     * @param \App\Entity\FosUser $iduser
+     *
+     * @return UserFiliere
+     */
+    public function setIduser(\App\Entity\FosUser $iduser = null) {
         $this->iduser = $iduser;
 
         return $this;
     }
 
-    public function getIdfiliere(): ?int
-    {
-        return $this->idfiliere;
+    /**
+     * Get iduser
+     *
+     * @return \App\Entity\FosUser
+     */
+    public function getIduser() {
+        return $this->iduser;
     }
 
-    public function setIdfiliere(?int $idfiliere): self
-    {
+    /**
+     * Set idfiliere
+     *
+     * @param \App\Entity\Filiere $idfiliere
+     *
+     * @return UserFiliere
+     */
+    public function setIdfiliere(\App\Entity\Filiere $idfiliere = null) {
         $this->idfiliere = $idfiliere;
 
         return $this;
+    }
+
+    /**
+     * Get idfiliere
+     *
+     * @return \App\Entity\Filiere
+     */
+    public function getIdfiliere() {
+
+        return $this->idfiliere;
     }
 
 

@@ -134,6 +134,7 @@ class ClasseController extends AbstractController {
      * @Rest\View(statusCode=200)
      * @param Request $request
      * @return array
+     * @IsGranted("ROLE_CLASSE_LISTE")
      */
     public function findClasseByFiliereAndAnneeAcad(Request $request): array {
         /** @var Classe[] $classes */
@@ -155,6 +156,7 @@ class ClasseController extends AbstractController {
      * @param Request $request
      * @param Niveau $niveau
      * @return Classe
+     * @IsGranted("ROLE_CLASSE_LISTE")
      */
     public function findClasseByNiveau(Request $request, Niveau $niveau): Classe {
         $manager = $this->getDoctrine()->getManager();
@@ -164,57 +166,34 @@ class ClasseController extends AbstractController {
     }
 
     /**
-     * Lists all entite entities.
-     *
-     * @Rest\Get("/etablissement/",options={"expose":true}, name="entite_etablissement")
-     *  @Rest\View(statusCode=200)
-     */
-    public function findEtablissements() {
-        $em = $this->getDoctrine()->getManager();
-        $filieres = $em->createQuery('select f from App\Entity\UserFiliere'
-                        . ' uf, App\Entity\Filiere f where uf.idfiliere=f and uf.iduser=?1')
-                ->setParameter(1, $this->getUser())
-                ->getResult();
-        $institution = $em->getRepository('App\Entity\Entite')->findOneByIdentiteparent(null);
-        $etablissements = $em->createQuery('select etab from App\Entity\Entite etab, '
-                        . 'App\Entity\Entite e where e.identiteparent=etab and etab.identiteparent=?1 and'
-                        . '(select count(f) from App\Entity\Filiere f'
-                        . ' where (f.identite=e or f.identite=etab) and f in (?2) )>0')
-                ->setParameter(1, $institution)
-                ->setParameter(2, $filieres)
-                ->getResult();
-        return $etablissements;
-    }
-
-    /**
      * 
-     * @Rest\Get("/entite/{id}/anneeacad/",options={"expose":true},name="classe_by_entite")
+     * @Rest\Get("/entite/{id}/anneeacad/",options={"expose":true},name="classe_by_annee_groupedby_entite")
      * @Rest\View(statusCode=200)
+     * @IsGranted("ROLE_CLASSE_LISTE")
      */
     public function findClasseByAnneeAcadGroupByEntites(Anneeacad $anneeacad) {
         $em = $this->getDoctrine()->getManager();
-        $etablissements = $em->createQuery('select etab from App\Entity\UserFiliere uf '
+        $etablissements = $em->createQuery('select etab from App\Entity\Entite etab,App\Entity\UserFiliere uf '
                         . 'Join uf.idfiliere f '
                         . 'Join f.identite e '
-                        . 'Join e.identiteparent etab '
-                        . 'where uf.iduser=?1'
+                        . 'where e.identiteparent=etab and uf.iduser=?1'
                 )
                 ->setParameter(1, $this->getUser())
                 ->getResult();
-        $tab_classe = [];
+        $tab_etablissement = [];
         foreach ($etablissements as $etablissement) {
             $classes = $em->createQuery('select cl from App\Entity\Classe cl '
                             . 'Join cl.idfiliere f '
-                            . 'Join f.identite e'
+                            . 'Join f.identite e '
                             . 'where e.identiteparent=?1 and cl.idanneeacad=?2'
                     )
                     ->setParameter(1, $etablissement)
                     ->setParameter(2, $anneeacad)
                     ->getResult();
 
-            $tab_classe[] = ['etablissement' => $etablissement, 'classe' => $classes];
+            $tab_etablissement[] = ['etablissement' => $etablissement, 'classes' => $classes];
         }
-        return $tab_classe;
+        return $tab_etablissement;
     }
 
 
