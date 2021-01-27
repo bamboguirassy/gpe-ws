@@ -4,7 +4,7 @@
 {% block paragraphe2 %}
     <span>
        Bonjour, la DSOS vous demande de bien vouloir entrer dans votre dossier étudiant (http://etudiant.univ-thies.sn)
-        et de charger le document: <span style="font-weight: bold" > {{ typeDocument.libelletypedocument }}. </span>
+        et de charger le document: <span style="font-weight: bold" > {{ typeDocument.libelletypedocument ?? documentTitle }}. </span>
     </span>
 {% endblock %}
 

@@ -61,6 +61,32 @@ class TypedocumentController extends AbstractController
     }
 
     /**
+     * @Rest\Post(path="/send-custom/etudiant/{id}", name="typedocument_send_query_mail_custom")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function sendCustomMail(Request $request, Etudiant $etudiant, \Swift_Mailer $mailer)
+    {
+        $requestData = Utils::getObjectFromRequest($request);
+        $documentTitle = $requestData->title;
+
+        $message = (new \Swift_Message('DSOS: Demande de document obligatoire'))
+            ->setFrom(\App\Utils\Utils::$senderEmail)
+            ->setTo($etudiant->getEmailUniv())
+            ->setBody(
+                $this->renderView(
+                    'emails/document/query-document.html.twig', [
+                        'typeDocument' => null,
+                        'documentTitle' => $documentTitle,
+                        'etudiant' => $etudiant
+                    ]
+                ), 'text/html'
+            );
+        $mailer->send($message);
+
+        return $etudiant;
+    }
+
+    /**
      * @return array
      * @Rest\Get(path="/input-documents", name="input_document_type")
      * @Rest\View(statusCode = 200)
