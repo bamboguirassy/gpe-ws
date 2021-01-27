@@ -353,7 +353,9 @@ class InscriptionacadController extends AbstractController {
         if ($paymentStatus == 200) {
             $informationPaiementInscription->setStatus('Confirmé');
             $preinscription = $em->getRepository(Preinscription::class)->findByCni($incriptionacad->getIdetudiant()->getCni());
-            $preinscription[0]->setEstinscrit(true);
+            if ($preinscription){
+                 $preinscription[0]->setEstinscrit(true);    
+            }
         } else if ($paymentStatus == 420) {
             $informationPaiementInscription->setStatus('Annulé');
         } else {

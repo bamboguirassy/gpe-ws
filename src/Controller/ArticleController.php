@@ -126,5 +126,15 @@ class ArticleController extends AbstractController {
 
         return $articles;
     }
+    
+     /**
+     * @Rest\Get(path="/public/publie", name="article_publie")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findByArticlePublie() {
+         $em = $this->getDoctrine()->getManager();
+         $articles = $em->getRepository(Article::class)->findByPublie(true);
+         return count($articles) ? $articles : [];
+     }
 
 }
