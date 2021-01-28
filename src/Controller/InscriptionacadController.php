@@ -359,15 +359,15 @@ class InscriptionacadController extends AbstractController {
         $informationPaiementInscription->setInscriptionacad($incriptionacad);
         if ($paymentStatus == 200) {
             $informationPaiementInscription->setStatus('Confirmé');
-        $preinscription = $em->getRepository(Preinscription::class)
-                ->findBy([
-                'idEtudiant'=>$incriptionacad->getIdetudiant()->getCni(), 
-                'idClasse'=>$incriptionacad->getIdClasse()->getIdFiliere(),
-                'idClasse'=>$incriptionacad->getIdClasse()->getIdAnneeAcad(),
-                'idClasse'=>$incriptionacad->getIdClasse()->getIdNiveau()]);
-            if ($preinscription){
-                 $preinscription[0]->setEstinscrit(true);    
-            }
+            $preinscription = $em->getRepository(Preinscription::class)
+                    ->findBy([
+                    'idEtudiant'=>$incriptionacad->getIdetudiant()->getCni(), 
+                    'idClasse'=>$incriptionacad->getIdClasse()->getIdFiliere(),
+                    'idClasse'=>$incriptionacad->getIdClasse()->getIdAnneeAcad(),
+                    'idClasse'=>$incriptionacad->getIdClasse()->getIdNiveau()]);
+                if ($preinscription){
+                    $preinscription[0]->setEstinscrit(true);    
+                }
         } else if ($paymentStatus == 420) {
             $informationPaiementInscription->setStatus('Annulé');
         } else {
