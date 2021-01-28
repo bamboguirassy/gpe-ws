@@ -64,18 +64,17 @@ class EtudiantController extends AbstractController {
         ';
 
         $lastAnneeEnCours = $entityManager
-            ->createQuery($subQuery)
-            ->setParameter('enCours', true)
-            ->setMaxResults(1)
-            ->getSingleResult();
+                ->createQuery($subQuery)
+                ->setParameter('enCours', true)
+                ->setMaxResults(1)
+                ->getSingleResult();
 
 
         return $entityManager
-            ->createQuery($query)
-            ->setParameter('numeroInterneTerm', $numeroInterne . '%')
-            ->setParameter('lastAnneeEnCours', $lastAnneeEnCours)
-            ->getResult();
-
+                        ->createQuery($query)
+                        ->setParameter('numeroInterneTerm', $numeroInterne . '%')
+                        ->setParameter('lastAnneeEnCours', $lastAnneeEnCours)
+                        ->getResult();
     }
 
     /**
@@ -99,10 +98,9 @@ class EtudiantController extends AbstractController {
         ";
 
         return $entityManager
-            ->createQuery($query)
-            ->setParameter('term', $term . '%')
-            ->getResult();
-
+                        ->createQuery($query)
+                        ->setParameter('term', $term . '%')
+                        ->getResult();
     }
 
     /**
@@ -327,7 +325,7 @@ class EtudiantController extends AbstractController {
         }
         return $etudiant;
     }
-    
+
     /**
      * @Rest\Get(path="/public/numinterne/{numinterne}", name="etudiant_by_numdossier")
      * @Rest\View(StatusCode=200)
@@ -362,47 +360,33 @@ class EtudiantController extends AbstractController {
                 ->getResult()
         ;
 
-        return count($etudiants)?$etudiants[0]:null;
+        return count($etudiants) ? $etudiants[0] : null;
     }
+
     /**
      * @Rest\Post(path="/send-by-email/{id}", name="send_email")
      * @Rest\View(StatusCode=200)
      */
-    public function sendEmail(Etudiant $etudiant,  \Swift_Mailer $mailer, Request $request) {
+    public function sendEmail(Etudiant $etudiant, \Swift_Mailer $mailer, Request $request) {
         $requestData = Utils::getObjectFromRequest($request);
         $objet = $requestData->objet;
         $contenu = $requestData->contenu;
-                $mail =(new \Swift_Message($objet))
-                        ->setFrom(Utils::$senderEmail)
-                        ->setTo($etudiant->getEmail())
-                         ->setCc($etudiant->getEmailUniv())
-                        ->setBody($contenu, 'text/html');
-       $mailer->send($mail);
-       return $etudiant;
-       
-        
-        
-       
+        $mail = (new \Swift_Message($objet))
+                ->setFrom(Utils::$senderEmail)
+                ->setTo($etudiant->getEmail())
+                ->setCc($etudiant->getEmailUniv())
+                ->setBody($contenu, 'text/html');
+        $mailer->send($mail);
+        return $etudiant;
     }
-
-
-    /*
-     * $em->createQuery("select ia from App\Entity\Inscriptionacad ia, "
-      . "App\Entity\Etudiant et where ia.idclasse=?1 and ia.idetudiant=et and et.cni=?2 ")
-      ->setParameter(1, $classe)
-      ->setParameter(2, $preinscription->getCni())
-      ->getResult();
-     */
 
     public static function getEtudiantConnecte($controller) {
         $etudiants = $controller->getDoctrine()->getManager()->createQuery('select et from App\Entity\Etudiant et '
                         . 'where et.emailUniv=?1')
                 ->setParameter(1, $controller->getUser()->getEmail())
                 ->getResult();
-        if (count($etudiants) < 1) {
-            return null;
-        }
-        return $etudiants[0];
+
+        return count($etudiants) ? $etudiants[0] : null;
     }
 
     /**

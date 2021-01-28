@@ -70,7 +70,7 @@ class FosUserController extends AbstractController
 
         if (!$user->isEnabled()) throw new BadRequestHttpException("Votre compte n'est pas encore actif");
 
-        if (!in_array($user->getProfession()->getCodeprofil(),['ADMIN', 'ETU', 'DSOS'])) throw new BadRequestHttpException("Vous n'êtes pas autorisé à vous connecter à la plateforme");
+        if (!in_array($user->getIdgroup()->getCodegroupe(),['ADMIN', 'ETU', 'DSOS','SA','ADSOS','MEDECIN'])) throw new BadRequestHttpException("Vous n'êtes pas autorisé à vous connecter à la plateforme");
 
         return $user;
     }
