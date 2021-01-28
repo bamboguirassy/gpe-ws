@@ -175,6 +175,13 @@ class InscriptionacadController extends AbstractController {
         // si paiement non effectué, selectionner touch comme moyen de paiement
         if ($preinscription->getPaiementConfirme()) {
             $inscriptionacad->setMontantinscriptionacad($preinscription->getMontant());
+            //find moyen paiement Campusen
+            $modepaiement = $entityManager->getRepository("App\Entity\Modepaiement")
+                    ->findOneByCodemodepaiement("CAMPUSEN");
+            if (!$modepaiement) {
+                throw $this->createNotFoundException("Mode de paiement Campusen introuvable...");
+            }
+            $inscriptionacad->setIdmodepaiement($modepaiement);
         } else {
             //find moyen paiement TouchPay
             $modepaiement = $entityManager->getRepository("App\Entity\Modepaiement")
@@ -352,7 +359,12 @@ class InscriptionacadController extends AbstractController {
         $informationPaiementInscription->setInscriptionacad($incriptionacad);
         if ($paymentStatus == 200) {
             $informationPaiementInscription->setStatus('Confirmé');
-            $preinscription = $em->getRepository(Preinscription::class)->findByCni($incriptionacad->getIdetudiant()->getCni());
+        $preinscription = $em->getRepository(Preinscription::class)
+                ->findBy([
+                'idEtudiant'=>$incriptionacad->getIdetudiant()->getCni(), 
+                'idClasse'=>$incriptionacad->getIdClasse()->getIdFiliere(),
+                'idClasse'=>$incriptionacad->getIdClasse()->getIdAnneeAcad(),
+                'idClasse'=>$incriptionacad->getIdClasse()->getIdNiveau()]);
             if ($preinscription){
                  $preinscription[0]->setEstinscrit(true);    
             }
