@@ -338,10 +338,10 @@ class InscriptionacadController extends AbstractController {
     }
 
     /**
-     * @Rest\Post("/public/pin/", name="payment_instant_notification")
+     * @Rest\Post("/public/pin", name="payment_instant_notification")
      * @Rest\View(StatusCode=200)
      */
-    public function paymentInstantNotification(Request $request) {
+    public function paymentInstantNotification(Request $request, \Swift_Mailer $mailer) {
         $em = $this->getDoctrine()->getManager();
         $paymentMode = $request->get('payment_mode');
         $paidSum = $request->get('paid_sum');
@@ -350,24 +350,49 @@ class InscriptionacadController extends AbstractController {
         $paymentStatus = $request->get('payment_status');
         $commandNumber = $request->get('command_number');
         $paymentValidationDate = $request->get('payment_validation_date');
-        $incriptionacad = $em->getRepository(Inscriptionacad::class)->find($commandNumber);
+        $inscriptionacad = $em->getRepository(Inscriptionacad::class)->find($commandNumber);
+        if (!$inscriptionacad) {
+            $message = (new \Swift_Message('Erreur confirmation paiement - PIN' . $commandNumber))
+                    ->setFrom(Utils::$senderEmail, 'SPET GPE')
+                    ->setTo(Utils::$adminMail)
+                    ->setBody(
+                    "Bonjour Admin,"
+                    . "Une erreur est survenue lors de la confirmation"
+                    . " de paiement de l'inscirption académique numero {$commandNumber},"
+                    . "Token de paiement : {$paymentToken} avec le statut {$paymentStatus}"
+                    , 'text/html'
+            );
+            $mailer->send($message);
+            throw $this->createNotFoundException("Inscription acad introuvable !!!");
+        }
         $informationPaiementInscription = new InformationPaiementInscription();
         $informationPaiementInscription->setNumeroTransaction($paymentToken);
         $informationPaiementInscription->setOperateur($paymentMode);
         $informationPaiementInscription->setMontant($paidAmount);
         $informationPaiementInscription->setDate((new \DateTime())->setTimestamp($paymentValidationDate));
-        $informationPaiementInscription->setInscriptionacad($incriptionacad);
+        $informationPaiementInscription->setInscriptionacad($inscriptionacad);
         if ($paymentStatus == 200) {
             $informationPaiementInscription->setStatus('Confirmé');
-        $preinscription = $em->getRepository(Preinscription::class)
-                ->findBy([
-                'idEtudiant'=>$incriptionacad->getIdetudiant()->getCni(), 
-                'idClasse'=>$incriptionacad->getIdClasse()->getIdFiliere(),
-                'idClasse'=>$incriptionacad->getIdClasse()->getIdAnneeAcad(),
-                'idClasse'=>$incriptionacad->getIdClasse()->getIdNiveau()]);
-            if ($preinscription){
-                 $preinscription[0]->setEstinscrit(true);    
+            $preinscriptions = $em->getRepository(Preinscription::class)
+                    ->findBy([
+                'cni' => $inscriptionacad->getIdetudiant()->getCni(),
+                'idfiliere' => $inscriptionacad->getIdclasse()->getIdfiliere(),
+                'idanneeacad' => $inscriptionacad->getIdclasse()->getIdanneeacad(),
+                'idniveau' => $inscriptionacad->getIdclasse()->getIdniveau(),
+                'estinscrit' => FALSE]);
+            if ($preinscriptions) {
+                $preinscriptions[0]->setEstinscrit(TRUE);
             }
+            $message = (new \Swift_Message('Confirmation paiement frais inscription administrative - Université de Thiès'))
+                    ->setFrom(Utils::$senderEmail, 'SPET GPE')
+                    ->setTo($inscriptionacad->getIdetudiant()->getEmailuniv())
+                    ->setBcc(Utils::$adminMail)
+                    ->setBody(
+                    "Bonjour, "
+                    . "Le paiement initié pour votre inscription académique est confirmé. A très bientôt !"
+                    , 'text/html'
+            );
+            $mailer->send($message);
         } else if ($paymentStatus == 420) {
             $informationPaiementInscription->setStatus('Annulé');
         } else {
