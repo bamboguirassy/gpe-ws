@@ -369,7 +369,8 @@ class InscriptionacadController extends AbstractController {
         $informationPaiementInscription->setNumeroTransaction($paymentToken);
         $informationPaiementInscription->setOperateur($paymentMode);
         $informationPaiementInscription->setMontant($paidAmount);
-        $informationPaiementInscription->setDate((new \DateTime())->setTimestamp($paymentValidationDate));
+//        $informationPaiementInscription->setDate((new \DateTime())->setTimestamp($paymentValidationDate));
+        $informationPaiementInscription->setDate(new \DateTime());
         $informationPaiementInscription->setInscriptionacad($inscriptionacad);
         if ($paymentStatus == 200) {
             $informationPaiementInscription->setStatus('Confirmé');
