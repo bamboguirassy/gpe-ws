@@ -3,7 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/C:/wamp64/www/gpe/gpe-ws/.env</file>
+=======
+            <file>file:/F:/spet/gpe-ws/.env</file>
+            <file>file:/F:/spet/gpe-ws/src/Controller/FosUserController.php</file>
+            <file>file:/F:/spet/gpe-ws/src/Entity/FosUser.php</file>
+>>>>>>> f470d8baa05b984c19beea623e1817d124e0aae2
         </group>
     </open-files>
 </project-private>
