@@ -200,8 +200,8 @@ class InscriptionacadController extends AbstractController {
         }
         $inscriptionacad->setIdbourse($typeBourseNonBoursier);
 
-        // if etudiant est beneficiere des services de croust
-        if ($inscriptionacad->getIdregimeinscription()->getCoderegimeinscription() == 'RNNP' || $inscriptionacad->getIdregimeinscription()->getCoderegimeinscription() == 'RPNP') {
+        // if etudiant sénégalais mettre croust à true
+        if ($inscriptionacad->getIdetudiant()->getNationalite()->getAlpha2() == 'SN') {
             $inscriptionacad->setCroust(true);
         }
 
@@ -369,9 +369,9 @@ class InscriptionacadController extends AbstractController {
         $informationPaiementInscription->setNumeroTransaction($paymentToken);
         $informationPaiementInscription->setOperateur($paymentMode);
         $informationPaiementInscription->setMontant($paidAmount);
-//        $informationPaiementInscription->setDate((new \DateTime())->setTimestamp($paymentValidationDate));
-        $informationPaiementInscription->setDate(new \DateTime());
+        $informationPaiementInscription->setDate((new \DateTime())->setTimestamp($paymentValidationDate));
         $informationPaiementInscription->setInscriptionacad($inscriptionacad);
+        $inscriptionacad->setNumquittance($paymentToken);
         if ($paymentStatus == 200) {
             $informationPaiementInscription->setStatus('Confirmé');
             $preinscriptions = $em->getRepository(Preinscription::class)

@@ -162,7 +162,7 @@ class LdapManager extends Controller {
         $people = "uid=" . $mail . ",ou=people,dc=univ-thies,dc=sn";
         $entry = new Entry($people, $info);
         // Creating a new entry
-       // LdapManager::$entryManager->add($entry);
+        LdapManager::$entryManager->add($entry);
         return $mail;
     }
 
