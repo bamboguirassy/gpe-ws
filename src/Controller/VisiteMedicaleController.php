@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\VisiteMedicale;
 use App\Form\VisiteMedicaleType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +22,6 @@ class VisiteMedicaleController extends AbstractController
     /**
      * @Rest\Get(path="/", name="visite_medicale_index")
      * @Rest\View(StatusCode = 200)
-     * @IsGranted("ROLE_VISITE MEDICALE_LISTE")
      */
     public function index(): array
     {
@@ -35,7 +35,6 @@ class VisiteMedicaleController extends AbstractController
     /**
      * @Rest\Post(Path="/create", name="visite_medicale_new")
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_VISITE MEDICALE_NOUVEAU")
      */
     public function create(Request $request): VisiteMedicale
     {
@@ -56,18 +55,51 @@ class VisiteMedicaleController extends AbstractController
     /**
      * @Rest\Get(path="/{id}", name="visite_medicale_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_VISITE MEDICALE_AFFICHAGE")
      */
     public function show(VisiteMedicale $visiteMedicale): VisiteMedicale
     {
         return $visiteMedicale;
     }
 
+    /**
+     * @Rest\Get(path="/with-inscriptionacad", name="visite_medicale_with_inscriptionacad")
+     * @Rest\View(StatusCode=200)
+     */
+    public function findWithAtLeastOneInsacad(Request $request, EntityManagerInterface $entityManager)
+    {
+       $query = '
+        SELECT vm
+        FROM App\Entity\VisiteMedicale vm
+        JOIN vm.inscriptionacad ia
+        JOIN ia.idetudiant etu
+        JOIN ia.idclasse classe
+        JOIN classe.idanneeacad aa
+        WHERE aa = :anneeEnCours
+       ';
+
+        $subQuery = '
+            SELECT an
+            FROM App\Entity\Anneeacad an
+            WHERE an.encours = :enCours
+            ORDER BY an.id DESC
+        ';
+
+        $lastAnneeEnCours = $entityManager
+            ->createQuery($subQuery)
+            ->setParameter('enCours', true)
+            ->setMaxResults(1)
+            ->getSingleResult();
+
+       return $entityManager
+           ->createQuery($query)
+           ->setParameter('anneeEnCours', $lastAnneeEnCours)
+           ->getResult();
+    }
+
 
     /**
      * @Rest\Put(path="/{id}/edit", name="visite_medicale_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_VISITE MEDICALE_EDITION")
      */
     public function edit(Request $request, VisiteMedicale $visiteMedicale): VisiteMedicale
     {
@@ -82,7 +114,6 @@ class VisiteMedicaleController extends AbstractController
     /**
      * @Rest\Put(path="/{id}/clone", name="visite_medicale_clone",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_VISITE MEDICALE_CLONE")
      */
     public function cloner(Request $request, VisiteMedicale $visiteMedicale): VisiteMedicale
     {
@@ -100,7 +131,6 @@ class VisiteMedicaleController extends AbstractController
     /**
      * @Rest\Delete("/{id}", name="visite_medicale_delete",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_VISITE MEDICALE_SUPPRESSION")
      */
     public function delete(VisiteMedicale $visiteMedicale): VisiteMedicale
     {
@@ -114,7 +144,6 @@ class VisiteMedicaleController extends AbstractController
     /**
      * @Rest\Post("/delete-selection/", name="visite_medicale_selection_delete")
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_VISITE MEDICALE_SUPPRESSION")
      */
     public function deleteMultiple(Request $request): array
     {
