@@ -64,18 +64,17 @@ class EtudiantController extends AbstractController {
         ';
 
         $lastAnneeEnCours = $entityManager
-            ->createQuery($subQuery)
-            ->setParameter('enCours', true)
-            ->setMaxResults(1)
-            ->getSingleResult();
+                ->createQuery($subQuery)
+                ->setParameter('enCours', true)
+                ->setMaxResults(1)
+                ->getSingleResult();
 
 
         return $entityManager
-            ->createQuery($query)
-            ->setParameter('numeroInterneTerm', $numeroInterne . '%')
-            ->setParameter('lastAnneeEnCours', $lastAnneeEnCours)
-            ->getResult();
-
+                        ->createQuery($query)
+                        ->setParameter('numeroInterneTerm', $numeroInterne . '%')
+                        ->setParameter('lastAnneeEnCours', $lastAnneeEnCours)
+                        ->getResult();
     }
 
     /**
@@ -99,10 +98,9 @@ class EtudiantController extends AbstractController {
         ";
 
         return $entityManager
-            ->createQuery($query)
-            ->setParameter('term', $term . '%')
-            ->getResult();
-
+                        ->createQuery($query)
+                        ->setParameter('term', $term . '%')
+                        ->getResult();
     }
 
     /**
@@ -205,7 +203,7 @@ class EtudiantController extends AbstractController {
                     . " merci de vous rapprocher de la DSOS de l'université de Thiès.");
         }
         $preinscription = $preinscriptionActifs[0];
-        $etudiant->setNuminterne($this->genererNumInterne($preinscription));
+        $etudiant->setNuminterne($this->genererNumInterne($preinscription,$this));
 
         //generer mail univ    si ça n'existe pas
 
@@ -327,7 +325,7 @@ class EtudiantController extends AbstractController {
         }
         return $etudiant;
     }
-    
+
     /**
      * @Rest\Get(path="/public/numinterne/{numinterne}", name="etudiant_by_numdossier")
      * @Rest\View(StatusCode=200)
@@ -362,47 +360,33 @@ class EtudiantController extends AbstractController {
                 ->getResult()
         ;
 
-        return count($etudiants)?$etudiants[0]:null;
+        return count($etudiants) ? $etudiants[0] : null;
     }
+
     /**
      * @Rest\Post(path="/send-by-email/{id}", name="send_email")
      * @Rest\View(StatusCode=200)
      */
-    public function sendEmail(Etudiant $etudiant,  \Swift_Mailer $mailer, Request $request) {
+    public function sendEmail(Etudiant $etudiant, \Swift_Mailer $mailer, Request $request) {
         $requestData = Utils::getObjectFromRequest($request);
         $objet = $requestData->objet;
         $contenu = $requestData->contenu;
-                $mail =(new \Swift_Message($objet))
-                        ->setFrom(Utils::$senderEmail)
-                        ->setTo($etudiant->getEmail())
-                         ->setCc($etudiant->getEmailUniv())
-                        ->setBody($contenu, 'text/html');
-       $mailer->send($mail);
-       return $etudiant;
-       
-        
-        
-       
+        $mail = (new \Swift_Message($objet))
+                ->setFrom(Utils::$senderEmail)
+                ->setTo($etudiant->getEmail())
+                ->setCc($etudiant->getEmailUniv())
+                ->setBody($contenu, 'text/html');
+        $mailer->send($mail);
+        return $etudiant;
     }
-
-
-    /*
-     * $em->createQuery("select ia from App\Entity\Inscriptionacad ia, "
-      . "App\Entity\Etudiant et where ia.idclasse=?1 and ia.idetudiant=et and et.cni=?2 ")
-      ->setParameter(1, $classe)
-      ->setParameter(2, $preinscription->getCni())
-      ->getResult();
-     */
 
     public static function getEtudiantConnecte($controller) {
         $etudiants = $controller->getDoctrine()->getManager()->createQuery('select et from App\Entity\Etudiant et '
                         . 'where et.emailUniv=?1')
                 ->setParameter(1, $controller->getUser()->getEmail())
                 ->getResult();
-        if (count($etudiants) < 1) {
-            return null;
-        }
-        return $etudiants[0];
+
+        return count($etudiants) ? $etudiants[0] : null;
     }
 
     /**
@@ -509,7 +493,7 @@ class EtudiantController extends AbstractController {
      * fonction qui permet de recuperer le dernier numero d'inscription academique
      * et le met à 5 chiffres si non existe
      */
-    public static function genererNumInterne(\App\Entity\Preinscription $preinscription) {
+    public static function genererNumInterne(\App\Entity\Preinscription $preinscription, $controller) {
         $numeroOrdreInscription = $preinscription->getIdanneeacad()->getNbreInscrits();
 
 
@@ -529,10 +513,19 @@ class EtudiantController extends AbstractController {
                 break;
         }
 
+        $em = $controller->getDoctrine()->getManager();
 
         $annee = $preinscription->getIdanneeacad()->getCodeanneeacad();
         $numInterne = substr($annee, -2) . '' . $preinscription->getIdfiliere()->getCodenum() . '' . $numeroOrdreInscription;
-        return $numInterne;
+        // verifier si c'est pas déja utilisé
+        $etudiants = $em->getRepository('App\Entity\Etudiant')
+                ->findByNuminterne($numInterne);
+        while(count($etudiants)) {
+            $numInterne = intval($numInterne)+1;
+            $etudiants = $em->getRepository('App\Entity\Etudiant')
+                ->findByNuminterne($numInterne);
+        }
+        return "".$numInterne;
     }
 
 }

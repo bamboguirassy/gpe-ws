@@ -70,7 +70,7 @@ class FosUserController extends AbstractController
 
         if (!$user->isEnabled()) throw new BadRequestHttpException("Votre compte n'est pas encore actif");
 
-        if (!in_array($user->getProfession()->getCodeprofil(),['ADMIN', 'ETU', 'DSOS'])) throw new BadRequestHttpException("Vous n'êtes pas autorisé à vous connecter à la plateforme");
+        if (!in_array($user->getIdgroup()->getCodegroupe(),['ADMIN', 'ETU', 'DSOS','SA','ADSOS','MEDECIN'])) throw new BadRequestHttpException("Vous n'êtes pas autorisé à vous connecter à la plateforme");
 
         return $user;
     }
@@ -174,6 +174,40 @@ class FosUserController extends AbstractController
 
         return $linkedUser;
     }
+    
+     /**
+     * @Rest\Post(path="/change-password/", name="user_change_password")
+     * @Rest\View(StatusCode=200)
+     */
+    
+    public function changerPassword(Request $request, \Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface $passwordEncoder): FosUser
+    {
+        $em = $this->getDoctrine()->getManager();
+        $updateData = json_decode($request->getContent());
+        $password = $updateData->newPassword;
+        $password2 = $updateData->newPasswordConfirm;
+        $passworactuel = $updateData->currentPassword;
+        $userManager = $this->getUser();
+        $verification = password_verify($passworactuel, $this->getUser()->getPassword());
+        
+         if ($verification) {
+             if($password != $password2){
+                throw $this->createNotFoundException("'Les deux mots de passe ne concordent pas.");               
+             }
+        } else {
+            throw $this->createNotFoundException("Mot de passe introuvable");
+        }
+
+       
+        $userManager->setConfirmationToken(null);
+        $userManager->setPasswordRequestedAt(null);
+        $userManager->setPassword($passwordEncoder->encodePassword($userManager, $password));
+
+        $em->flush();
+
+        return $userManager;
+    }
+    
 
     /**
      * @Rest\Post(Path="/create", name="fos_user_new")

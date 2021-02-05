@@ -45,43 +45,52 @@ class PublicController extends AbstractController {
         }
         $etudiant = $etudiants[0];
 
-        //check if the email is already associated to an account
-        $linkedEmailAccount = $em->getRepository(FosUser::class)->findByEmail($etudiant->getEmailUniv());
-        if ($linkedEmailAccount) {
-            throw $this->createAccessDeniedException("Vous avez déja un compte, merci de vous connecter.");
-        }
-
         if (!isset($reqData->password)) {
             throw $this->createNotFoundException("Le mot de passe est obligatoire");
         }
 
-        //create User
-        $user = new FosUser();
-        $password = $passwordEncoder->encodePassword($user, $reqData->password);
-        $user->setPassword($password);
-        $user->setPrenom($etudiant->getPrenometudiant());
-        $user->setNom($etudiant->getNometudiant());
-        $user->setEmail($etudiant->getEmailUniv());
-        $user->setEnabled(false);
-        $user->setUsername($etudiant->getEmailUniv());
-        $user->setSexe($etudiant->getGenre());
-        $user->setTitre('Etudiant');
-        $groupEtudiant = $em->getRepository(\App\Entity\FosGroup::class)->findOneByCodegroupe('ETU');
-        if (!$groupEtudiant) {
-            throw $this->createNotFoundException("Le groupe étudiant est introuvable");
-        }
-        $user->setIdgroup($groupEtudiant);
-        $profilEtudiant = $em->getRepository(\App\Entity\Profil::class)->findOneByCodeprofil('ETU');
-        if (!$profilEtudiant) {
-            throw $this->createNotFoundException("Le profil étudiant est introuvable");
-        }
-        $user->setProfession($profilEtudiant);
+        //check if the email is already associated to an account
+        $linkedEmailAccounts = $em->getRepository(FosUser::class)->findByEmail($etudiant->getEmailUniv());
+        if ($linkedEmailAccounts) {
+            $user = $linkedEmailAccounts[0];
+            if ($user->isEnabled()) {
+                throw $this->createAccessDeniedException("Vous avez déja un compte, merci de vous connecter.");
+            } else {
+                $password = $passwordEncoder->encodePassword($user, $reqData->password);
+                $user->setPassword($password);
+            }
+        } else {
+            //create User
+            $user = new FosUser();
+            $password = $passwordEncoder->encodePassword($user, $reqData->password);
+            $user->setPassword($password);
+            $user->setPrenom($etudiant->getPrenometudiant());
+            $user->setNom($etudiant->getNometudiant());
+            $user->setEmail($etudiant->getEmailUniv());
+            $user->setEnabled(false);
+            $user->setUsername($etudiant->getEmailUniv());
+            $user->setSexe($etudiant->getGenre());
+            $user->setTitre('Etudiant');
+            $groupEtudiant = $em->getRepository(\App\Entity\FosGroup::class)->findOneByCodegroupe('ETU');
+            if (!$groupEtudiant) {
+                throw $this->createNotFoundException("Le groupe étudiant est introuvable");
+            }
+            $user->setIdgroup($groupEtudiant);
+            $profilEtudiant = $em->getRepository(\App\Entity\Profil::class)->findOneByCodeprofil('ETU');
+            if (!$profilEtudiant) {
+                throw $this->createNotFoundException("Le profil étudiant est introuvable");
+            }
+            $user->setProfession($profilEtudiant);
 
-        $em->persist($user);
+            $em->persist($user);
+        }
+
         $em->flush();
+
+
         //send confirmation mail
         $message = (new \Swift_Message('Confirmation de compte'))
-                ->setFrom(\App\Utils\Utils::$senderEmail)
+                ->setFrom(\App\Utils\Utils::$senderEmail,'Support Etudiant')
                 ->setTo($etudiant->getEmail())
                 ->setBody(
                 $this->renderView(
@@ -91,13 +100,13 @@ class PublicController extends AbstractController {
                     'etudiant' => $etudiant]
                 ), 'text/html'
         );
-        $i=0;
+        $i = 0;
         $isMailSent = $mailer->send($message);
         while (!$isMailSent) {
             $isMailSent = $mailer->send($message);
             $i++;
-            if($i==5 && !$isMailSent) {
-                throw $this->createAccessDeniedException("Impossible d'envoyer le mail de confirmation, des erreurs sont survenue après 5 tentatives au mail ".$etudiant->getEmail());
+            if ($i == 5 && !$isMailSent) {
+                throw $this->createAccessDeniedException("Impossible d'envoyer le mail de confirmation, des erreurs sont survenue après 5 tentatives au mail " . $etudiant->getEmail());
             }
         }
 
@@ -186,13 +195,13 @@ class PublicController extends AbstractController {
                         'emails/registrations/etudiant.html.twig', ['user' => $etudiantAccount, 'link' => \App\Utils\Utils::$lienValidationCompteEtudiant . $etudiantAccount->getId()]
                 ), 'text/html'
         );
-        $i=0;
+        $i = 0;
         $isMailSent = $mailer->send($message);
         while (!$isMailSent) {
             $isMailSent = $mailer->send($message);
             $i++;
-            if($i==5 && !$isMailSent) {
-                throw $this->createAccessDeniedException("Impossible d'envoyer le mail de confirmation, des erreurs sont survenue après 5 tentatives au mail ".$etudiant->getEmail());
+            if ($i == 5 && !$isMailSent) {
+                throw $this->createAccessDeniedException("Impossible d'envoyer le mail de confirmation, des erreurs sont survenue après 5 tentatives au mail " . $etudiant->getEmail());
             }
         }
         return $etudiantAccount;
