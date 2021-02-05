@@ -203,7 +203,7 @@ class EtudiantController extends AbstractController {
                     . " merci de vous rapprocher de la DSOS de l'université de Thiès.");
         }
         $preinscription = $preinscriptionActifs[0];
-        $etudiant->setNuminterne($this->genererNumInterne($preinscription));
+        $etudiant->setNuminterne($this->genererNumInterne($preinscription,$this));
 
         //generer mail univ    si ça n'existe pas
 
@@ -493,7 +493,7 @@ class EtudiantController extends AbstractController {
      * fonction qui permet de recuperer le dernier numero d'inscription academique
      * et le met à 5 chiffres si non existe
      */
-    public static function genererNumInterne(\App\Entity\Preinscription $preinscription) {
+    public static function genererNumInterne(\App\Entity\Preinscription $preinscription, $controller) {
         $numeroOrdreInscription = $preinscription->getIdanneeacad()->getNbreInscrits();
 
 
@@ -513,10 +513,19 @@ class EtudiantController extends AbstractController {
                 break;
         }
 
+        $em = $controller->getDoctrine()->getManager();
 
         $annee = $preinscription->getIdanneeacad()->getCodeanneeacad();
         $numInterne = substr($annee, -2) . '' . $preinscription->getIdfiliere()->getCodenum() . '' . $numeroOrdreInscription;
-        return $numInterne;
+        // verifier si c'est pas déja utilisé
+        $etudiants = $em->getRepository('App\Entity\Etudiant')
+                ->findByNuminterne($numInterne);
+        while(count($etudiants)) {
+            $numInterne = intval($numInterne)+1;
+            $etudiants = $em->getRepository('App\Entity\Etudiant')
+                ->findByNuminterne($numInterne);
+        }
+        return "".$numInterne;
     }
 
 }

@@ -18,8 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 class Utils {
 
     static $senderName = 'GPE';
-    // static $senderEmail = 'support-spet@univ-thies.sn';
-    static $senderEmail = 'admission@univ-thies.sn'; //'support-spet@univ-thies.sn';
+     static $senderEmail = 'support-spet@univ-thies.sn';
+ //   static $senderEmail = 'admission@univ-thies.sn'; //'support-spet@univ-thies.sn';
     static $adminMail = 'moussa.fofana@univ-thies.sn';
 //    static $lienValidationCompteEtudiant = 'http://localhost:4200/register/confirmation/';
     static $lienValidationCompteEtudiant = 'https://etudiant.univ-thies.sn//register/confirmation/';
