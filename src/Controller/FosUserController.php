@@ -190,7 +190,7 @@ class FosUserController extends AbstractController
         $userManager = $this->getUser();
         $verification = password_verify($passworactuel, $this->getUser()->getPassword());
         
-         if ($verification) {
+        if ($verification) {
              if($password != $password2){
                 throw $this->createNotFoundException("'Les deux mots de passe ne concordent pas.");               
              }
