@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\FosGroup;
 use App\Entity\VisiteMedicale;
 use App\Form\VisiteMedicaleType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,14 +23,26 @@ class VisiteMedicaleController extends AbstractController
     /**
      * @Rest\Get(path="/", name="visite_medicale_index")
      * @Rest\View(StatusCode = 200)
+     * @IsGranted("ROLE_VISITE MEDICALE_LISTE")
      */
     public function index(): array
     {
-        $visiteMedicales = $this->getDoctrine()
-            ->getRepository(VisiteMedicale::class)
-            ->findAll();
+        /** @var FosGroup $groupe */
+        $groupe = $this->getUser()->getIdGroup();
+        if ($groupe->getCodegroupe() == 'MEDECIN') {
+            $visiteMedicales = $this->getDoctrine()
+                ->getRepository(VisiteMedicale::class)
+                ->findByUser($this->getUser()->getUsername());
+            return count($visiteMedicales) ? $visiteMedicales : [];
+        }
+        if ($groupe->getCodegroupe() == 'SA') {
+            $visiteMedicales = $this->getDoctrine()
+                ->getRepository(VisiteMedicale::class)
+                ->findAll();
+            return count($visiteMedicales) ? $visiteMedicales : [];
+        }
 
-        return count($visiteMedicales) ? $visiteMedicales : [];
+        throw $this->createAccessDeniedException('Accés Interdit, vous n\'avez pas le droit de visualiser ce contenu.');
     }
 
     /**
@@ -68,7 +81,9 @@ class VisiteMedicaleController extends AbstractController
      */
     public function findWithAtLeastOneInsacad(Request $request, EntityManagerInterface $entityManager)
     {
-       $query = '
+        /** @var FosGroup $currentUserGroupe */
+        $currentUserGroupe = $this->getUser()->getIdgroup();
+        $query = '
         SELECT vm
         FROM App\Entity\VisiteMedicale vm
         JOIN vm.inscriptionacad ia
@@ -77,6 +92,16 @@ class VisiteMedicaleController extends AbstractController
         JOIN classe.idanneeacad aa
         WHERE aa = :anneeEnCours
        ';
+
+        $doctorQuery = '
+        SELECT vm
+        FROM App\Entity\VisiteMedicale vm
+        JOIN vm.inscriptionacad ia
+        JOIN ia.idetudiant etu
+        JOIN ia.idclasse classe
+        JOIN classe.idanneeacad aa
+        WHERE aa = :anneeEnCours AND vm.user = :user
+        ';
 
         $subQuery = '
             SELECT an
@@ -91,10 +116,21 @@ class VisiteMedicaleController extends AbstractController
             ->setMaxResults(1)
             ->getSingleResult();
 
-       return $entityManager
-           ->createQuery($query)
-           ->setParameter('anneeEnCours', $lastAnneeEnCours)
-           ->getResult();
+        if ($currentUserGroupe->getCodegroupe() == 'SA') {
+            return $entityManager
+                ->createQuery($query)
+                ->setParameter('anneeEnCours', $lastAnneeEnCours)
+                ->getResult();
+        }
+        if ($currentUserGroupe->getCodegroupe() == 'MEDECIN') {
+            return $entityManager
+                ->createQuery($doctorQuery)
+                ->setParameters([
+                    'anneeEnCours' => $lastAnneeEnCours,
+                    'user' => $this->getUser()->getUsername()
+                ])->getResult();
+        }
+        throw $this->createAccessDeniedException('Accés Interdit, vous n\'avez pas le droit de visualiser ce contenu.');
     }
 
 
