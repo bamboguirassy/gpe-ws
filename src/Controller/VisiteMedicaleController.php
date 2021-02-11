@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\FosGroup;
+use App\Entity\Profil;
 use App\Entity\VisiteMedicale;
 use App\Form\VisiteMedicaleType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,13 +30,15 @@ class VisiteMedicaleController extends AbstractController
     {
         /** @var FosGroup $groupe */
         $groupe = $this->getUser()->getIdGroup();
+        /** @var Profil $currentUserProfile */
+        $currentUserProfile = $this->getUser()->getProfession();
         if ($groupe->getCodegroupe() == 'MEDECIN') {
             $visiteMedicales = $this->getDoctrine()
                 ->getRepository(VisiteMedicale::class)
                 ->findByUser($this->getUser()->getUsername());
             return count($visiteMedicales) ? $visiteMedicales : [];
         }
-        if ($groupe->getCodegroupe() == 'SA') {
+        if ($groupe->getCodegroupe() == 'SA' || $currentUserProfile->getCodeprofil() == 'DSOS' || $groupe->getCodegroupe() == 'ADSOS') {
             $visiteMedicales = $this->getDoctrine()
                 ->getRepository(VisiteMedicale::class)
                 ->findAll();
