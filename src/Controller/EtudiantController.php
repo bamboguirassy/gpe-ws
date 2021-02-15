@@ -354,13 +354,13 @@ class EtudiantController extends AbstractController {
      */
     public function findUserByEmail($emailUniv) {
         $em = $this->getDoctrine()->getManager();
-        $etudiants = $em->createQuery('select fs from App\Entity\FosUser fs '
+        $user = $em->createQuery('select fs from App\Entity\FosUser fs '
                         . 'where fs.username =?1')
                 ->setParameter(1, $emailUniv)
                 ->getResult()
         ;
 
-        return count($etudiants) ? $etudiants[0] : null;
+        return count($user) ? $user[0] : null;
     }
 
     /**
