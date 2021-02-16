@@ -34,6 +34,7 @@ class PreinscriptionType extends AbstractType
             ->add('montant')
             ->add('nationalite')
             ->add('idregimeinscription')
+            ->add('paiementConfirme')
         ;
     }
 

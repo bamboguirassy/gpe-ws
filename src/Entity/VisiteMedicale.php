@@ -49,6 +49,13 @@ class VisiteMedicale
      * @ORM\JoinColumn(name="inscriptionacad", referencedColumnName="id",nullable=false)
      */
     private $inscriptionacad;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="user", type="string", length=45, nullable=false)
+     */
+    private $user;
 
     public function getId(): ?int
     {
@@ -101,6 +108,19 @@ class VisiteMedicale
         $this->inscriptionacad = $inscriptionacad;
 
         return $this;
+    }
+    
+   
+    public function setUser($user)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getUser()
+    {
+        return $this->user;
     }
 
 
