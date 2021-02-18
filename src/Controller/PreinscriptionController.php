@@ -163,7 +163,7 @@ class PreinscriptionController extends AbstractController {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($preinscription);
         $entityManager->flush();
-
+ 
         return $preinscription;
     }
 
