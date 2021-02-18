@@ -22,9 +22,9 @@ class Utils {
  //   static $senderEmail = 'admission@univ-thies.sn'; //'support-spet@univ-thies.sn';
     static $adminMail = 'moussa.fofana@univ-thies.sn';
 //    static $lienValidationCompteEtudiant = 'http://localhost:4200/register/confirmation/';
-    static $lienValidationCompteEtudiant = 'https://etudiant.univ-thies.sn//register/confirmation/';
+    static $lienValidationCompteEtudiant = 'https://etudiant.univ-thies.sn/#/register/confirmation/';
 //    static $lienResetEtudiantPassword = 'http://localhost:4200/resetpassword/';
-    static $lienResetEtudiantPassword = 'https://etudiant.univ-thies.sn//resetpassword/';
+    static $lienResetEtudiantPassword = 'https://etudiant.univ-thies.sn/#/resetpassword/';
 
     public static function serializeRequestContent(Request $request) {
         return json_decode($request->getContent(), true);
