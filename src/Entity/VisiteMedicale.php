@@ -29,13 +29,6 @@ class VisiteMedicale
     private $date;
 
     /**
-     * @var bool
-     *
-     * @ORM\Column(name="apte", type="boolean", nullable=false)
-     */
-    private $apte;
-
-    /**
      * @var string|null
      *
      * @ORM\Column(name="commentaire", type="text", length=65535, nullable=true)
@@ -57,6 +50,11 @@ class VisiteMedicale
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="string", length=45)
+     */
+    private $resultat;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -70,18 +68,6 @@ class VisiteMedicale
     public function setDate($date): self
     {
         $this->date = $date;
-
-        return $this;
-    }
-
-    public function getApte(): ?bool
-    {
-        return $this->apte;
-    }
-
-    public function setApte(bool $apte): self
-    {
-        $this->apte = $apte;
 
         return $this;
     }
@@ -121,6 +107,18 @@ class VisiteMedicale
     public function getUser()
     {
         return $this->user;
+    }
+
+    public function getResultat(): ?string
+    {
+        return $this->resultat;
+    }
+
+    public function setResultat(string $resultat): self
+    {
+        $this->resultat = $resultat;
+
+        return $this;
     }
 
 

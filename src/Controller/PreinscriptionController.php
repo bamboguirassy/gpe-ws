@@ -38,13 +38,13 @@ class PreinscriptionController extends AbstractController {
     public function findActivePreinscriptionByEtudiant(Etudiant $etudiant): array {
         $preinscriptions = $this->getDoctrine()->getManager()
                 ->getRepository(Preinscription::class)
-                ->findBy(['cni'=>$etudiant->getCni(),
-                    'estinscrit'=>false]);
+                ->findBy(['cni' => $etudiant->getCni(),
+            'estinscrit' => false]);
         $tabPreinscription = [];
         $dateDuJour = new \DateTime();
         foreach ($preinscriptions as $preinscription) {
-            $active = ($preinscription->getDatenotif()<=$dateDuJour && $preinscription->getDatedelai()>=$dateDuJour);
-            $tabPreinscription[] = ['active'=>$active,'preinscription'=>$preinscription];
+            $active = ($preinscription->getDatenotif() <= $dateDuJour && $preinscription->getDatedelai() >= $dateDuJour);
+            $tabPreinscription[] = ['active' => $active, 'preinscription' => $preinscription];
         }
 
         return count($tabPreinscription) ? $tabPreinscription : [];
@@ -76,8 +76,10 @@ class PreinscriptionController extends AbstractController {
             if (count($preinscriptionInactifs)) {
                 throw $this->createAccessDeniedException("Votre campagne d'inscription n'est pas encore ouverte, merci de patienter !");
             }
-            throw $this->createNotFoundException("Nous n'avons pas pu vous authentifier, si vous pensez qu'il s'agit d'une erreur,"
-                    . " merci de vous rapprocher de la DSOS de l'université de Thiès.");
+            throw $this->createNotFoundException("Nous n'avons pas pu vous authentifier,"
+                    . " si vous pensez qu’il s’agit d’une erreur,"
+                    . " écrire un mail à dsos@univ-thies.sn en"
+                    . " précisant dans le mail votre INE et votre filière.");
         }
         $etudiants = $em->getRepository('App\Entity\Etudiant')
                 ->findByCni($cni);
@@ -187,7 +189,7 @@ class PreinscriptionController extends AbstractController {
 
         return $preinscriptions;
     }
-    
+
     /**
      * @Rest\Get(path="/public/verifier-inscription-etudiant-active/{cni}", name="verifier-inscription-etudiant-active")
      * @Rest\View(StatusCode = 200)
@@ -204,10 +206,10 @@ class PreinscriptionController extends AbstractController {
                 ->setParameter(3, $cni)
                 ->getResult();
         //throw $this->createAccessDeniedException("PreActif ".$preinscriptionActifs[0].getDatenotif());
-        if(count($preinscriptionActifs)){
+        if (count($preinscriptionActifs)) {
             $isInscriptionActive = true;
         }
-        return  $isInscriptionActive; 
+        return $isInscriptionActive;
     }
 
 }

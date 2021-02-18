@@ -176,8 +176,24 @@ class EtudiantController extends AbstractController {
         $form = $this->createForm(EtudiantType::class, $etudiant);
         $form->submit(Utils::serializeRequestContent($request));
         $reqData = Utils::getObjectFromRequest($request);
+        if ($etudiant->getNationalite() == NULL) {
+            throw $this->createNotFoundException("Votre nationalité n'est pas renseignée, merci de contacter la Scolarité "
+                    . "pour apporter les corrections necessaires.");
+        }
+        if ($etudiant->getLieunaiss() == NULL) {
+            throw $this->createNotFoundException("Votre lieu de naissance n'est pas renseigné, merci de contacter la Scolarité "
+                    . "pour apporter les corrections necessaires.");
+        }
+        if ($etudiant->getTeletudiant() == NULL) {
+            throw $this->createNotFoundException("Votre numéro de téléphone n'est pas renseigné, merci de contacter la Scolarité "
+                    . "pour apporter les corrections necessaires.");
+        }
+
         if (isset($reqData->datenaiss)) {
             $etudiant->setDatenaiss(new \DateTime($reqData->datenaiss));
+        } else {
+            throw $this->createNotFoundException("La date de naissance n'est pas correctement renseignée, merci de contacter la Scolarité "
+                    . "pour apporter les corrections necessaires.");
         }
         $preinscriptionActifs = $em
                 ->createQuery('select p from App\Entity\Preinscription p '
@@ -199,11 +215,13 @@ class EtudiantController extends AbstractController {
             if (count($preinscriptionInactifs)) {
                 throw $this->createAccessDeniedException("Votre campagne d'inscription n'est pas encore ouverte, merci de patienter !");
             }
-            throw $this->createNotFoundException("Nous n'avons pas pu vous authentifier, si vous pensez qu'il s'agit d'une erreur,"
-                    . " merci de vous rapprocher de la DSOS de l'université de Thiès.");
+            throw $this->createNotFoundException("Nous n'avons pas pu vous authentifier,"
+                    . " si vous pensez qu’il s’agit d’une erreur,"
+                    . " écrire un mail à dsos@univ-thies.sn en"
+                    . " précisant dans le mail votre INE et votre filière.");
         }
         $preinscription = $preinscriptionActifs[0];
-        $etudiant->setNuminterne($this->genererNumInterne($preinscription,$this));
+        $etudiant->setNuminterne($this->genererNumInterne($preinscription, $this));
 
         //generer mail univ    si ça n'existe pas
 
@@ -520,12 +538,12 @@ class EtudiantController extends AbstractController {
         // verifier si c'est pas déja utilisé
         $etudiants = $em->getRepository('App\Entity\Etudiant')
                 ->findByNuminterne($numInterne);
-        while(count($etudiants)) {
-            $numInterne = intval($numInterne)+1;
+        while (count($etudiants)) {
+            $numInterne = intval($numInterne) + 1;
             $etudiants = $em->getRepository('App\Entity\Etudiant')
-                ->findByNuminterne($numInterne);
+                    ->findByNuminterne($numInterne);
         }
-        return "".$numInterne;
+        return "" . $numInterne;
     }
 
 }
