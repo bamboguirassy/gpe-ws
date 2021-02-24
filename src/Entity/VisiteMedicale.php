@@ -55,6 +55,11 @@ class VisiteMedicale
      */
     private $resultat;
 
+    /**
+     * @ORM\Column(name="maladie_chroniques", type="string", length=255, nullable=true)
+     */
+    private $maladieChroniques;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -121,5 +126,16 @@ class VisiteMedicale
         return $this;
     }
 
+    public function getMaladieChroniques(): ?string
+    {
+        return $this->maladieChroniques;
+    }
+
+    public function setMaladieChroniques(?string $maladieChroniques): self
+    {
+        $this->maladieChroniques = $maladieChroniques;
+
+        return $this;
+    }
 
 }
