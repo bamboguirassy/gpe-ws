@@ -108,7 +108,7 @@ class InscriptionacadController extends AbstractController {
     }
 
     /**
-     * @Rest\Get(path="/inscriptions/{id}/etudiant", name="inscriptionacad_etudiabt")
+     * @Rest\Get(path="/inscriptions/{id}/etudiant", name="inscriptionacad_etudiant")
      * @Rest\View(StatusCode = 200)
      */
     public function getInscriptionEtudiant(Etudiant $etudiant): array {
@@ -229,9 +229,9 @@ class InscriptionacadController extends AbstractController {
         $form->submit(Utils::serializeRequestContent($request));
 
         // if etudiant sénégalais mettre croust à true
-        if ($inscriptionacad->getIdetudiant()->getNationalite()->getAlpha2() == 'SN') {
-            $inscriptionacad->setCroust(true);
-        }
+        /* if ($inscriptionacad->getIdetudiant()->getNationalite()->getAlpha2() == 'SN') {
+          $inscriptionacad->setCroust(true);
+          } */
 
         $this->getDoctrine()->getManager()->flush();
 
@@ -259,14 +259,14 @@ class InscriptionacadController extends AbstractController {
      * @Rest\Put(path="/{id}/confirm-prepaid-inscription", name="prepaid_inscription_confirm",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      */
-    public function confirmPrepaidInscription(Inscriptionacad $inscriptionacad, \Swift_Mailer $mailer) {
+    public function confirmPrepaidInscription(\App\Entity\InscriptionTemporaire $inscriptionTemporaire, \Swift_Mailer $mailer) {
         $em = $this->getDoctrine()->getManager();
         $preinscriptions = $em->getRepository(Preinscription::class)
                 ->findBy([
-            'idfiliere' => $inscriptionacad->getIdClasse()->getIdfiliere(),
-            'idniveau' => $inscriptionacad->getIdClasse()->getIdniveau(),
-            'idanneeacad' => $inscriptionacad->getIdClasse()->getIdanneeacad(),
-            'cni' => $inscriptionacad->getIdetudiant()->getCni()
+            'idfiliere' => $inscriptionTemporaire->getIdclasse()->getIdfiliere(),
+            'idniveau' => $inscriptionTemporaire->getIdClasse()->getIdniveau(),
+            'idanneeacad' => $inscriptionTemporaire->getIdClasse()->getIdanneeacad(),
+            'cni' => $inscriptionTemporaire->getIdetudiant()->getCni()
         ]);
 
         if (count($preinscriptions)) {
@@ -274,6 +274,8 @@ class InscriptionacadController extends AbstractController {
                 throw $this->createAccessDeniedException("Un problème a été detecté; plusieurs préinscriptions trouvées !!!");
             }
             $preinscriptions[0]->setEstinscrit(true);
+            $em->persist($this->createInscriptionAcadFromTemp($inscriptionTemporaire));
+            $em->remove($inscriptionTemporaire);
             $em->flush();
             $preinscription = $preinscriptions[0];
         } else {
@@ -299,7 +301,6 @@ class InscriptionacadController extends AbstractController {
                 throw $this->createAccessDeniedException("Impossible d'envoyer le mail de confirmation, des erreurs sont survenue après 5 tentatives au mail " . $preinscription->getEmail());
             }
         }
-
 
         return $preinscription;
     }
@@ -350,8 +351,8 @@ class InscriptionacadController extends AbstractController {
         $paymentStatus = $request->get('payment_status');
         $commandNumber = $request->get('command_number');
         $paymentValidationDate = $request->get('payment_validation_date');
-        $inscriptionacad = $em->getRepository(Inscriptionacad::class)->find($commandNumber);
-        if (!$inscriptionacad) {
+        $inscriptionTemporaire = $em->getRepository(\App\Entity\InscriptionTemporaire::class)->find($commandNumber);
+        if (!$inscriptionTemporaire) {
             $message = (new \Swift_Message('Erreur confirmation paiement - PIN' . $commandNumber))
                     ->setFrom(Utils::$senderEmail, 'SPET GPE')
                     ->setTo(Utils::$adminMail)
@@ -365,14 +366,20 @@ class InscriptionacadController extends AbstractController {
             $mailer->send($message);
             throw $this->createNotFoundException("Inscription acad introuvable !!!");
         }
-        $informationPaiementInscription = new InformationPaiementInscription();
-        $informationPaiementInscription->setNumeroTransaction($paymentToken);
-        $informationPaiementInscription->setOperateur($paymentMode);
-        $informationPaiementInscription->setMontant($paidAmount);
-        $informationPaiementInscription->setDate((new \DateTime())->setTimestamp($paymentValidationDate));
-        $informationPaiementInscription->setInscriptionacad($inscriptionacad);
-        $inscriptionacad->setNumquittance($paymentToken);
+
         if ($paymentStatus == 200) {
+            // créer inscription acad par inscription temp
+            $inscriptionacad = $this->createInscriptionAcadFromTemp($inscriptionTemporaire);
+            $em->persist($inscriptionacad);
+            // $em->flush();
+            /* */
+            $informationPaiementInscription = new InformationPaiementInscription();
+            $informationPaiementInscription->setNumeroTransaction($paymentToken);
+            $informationPaiementInscription->setOperateur($paymentMode);
+            $informationPaiementInscription->setMontant($paidAmount);
+            $informationPaiementInscription->setDate((new \DateTime())->setTimestamp($paymentValidationDate));
+            $informationPaiementInscription->setInscriptionacad($inscriptionacad);
+            $inscriptionacad->setNumquittance($paymentToken);
             $informationPaiementInscription->setStatus('Confirmé');
             $preinscriptions = $em->getRepository(Preinscription::class)
                     ->findBy([
@@ -384,6 +391,7 @@ class InscriptionacadController extends AbstractController {
             if ($preinscriptions) {
                 $preinscriptions[0]->setEstinscrit(TRUE);
             }
+            $em->remove($inscriptionTemporaire);
             $message = (new \Swift_Message('Confirmation paiement frais inscription administrative - Université de Thiès'))
                     ->setFrom(Utils::$senderEmail, 'SPET GPE')
                     ->setTo($inscriptionacad->getIdetudiant()->getEmailuniv())
@@ -395,7 +403,18 @@ class InscriptionacadController extends AbstractController {
             );
             $mailer->send($message);
         } else if ($paymentStatus == 420) {
-            $informationPaiementInscription->setStatus('Annulé');
+            //  $informationPaiementInscription->setStatus('Annulé');
+            $message = (new \Swift_Message('Erreur confirmation paiement - PIN' . $commandNumber))
+                    ->setFrom(Utils::$senderEmail, 'SPET GPE')
+                    ->setTo(Utils::$adminMail)
+                    ->setBody(
+                    "Bonjour Admin,"
+                    . "Une erreur est survenue lors de la confirmation"
+                    . " de paiement de l'inscription académique numero {$commandNumber},"
+                    . "Token de paiement : {$paymentToken} avec le statut {$paymentStatus}"
+                    , 'text/html'
+            );
+            $mailer->send($message);
         } else {
             throw $this->createNotFoundException("Erreur de la transaction");
         }
@@ -404,6 +423,25 @@ class InscriptionacadController extends AbstractController {
         $em->flush();
 
         return $informationPaiementInscription;
+    }
+
+    public function createInscriptionAcadFromTemp(\App\Entity\InscriptionTemporaire $inscriptionTemporaire) {
+        $inscriptionacad = new Inscriptionacad();
+        $inscriptionacad->setCroust($inscriptionTemporaire->getCroust());
+        $inscriptionacad->setDateinscacad(new \DateTime());
+        $inscriptionacad->setEtat('I');
+        $inscriptionacad->setIdbourse($inscriptionTemporaire->getIdbourse());
+        $inscriptionacad->setIdclasse($inscriptionTemporaire->getIdclasse());
+        $inscriptionacad->setIdetudiant($inscriptionTemporaire->getIdetudiant());
+        $inscriptionacad->setIdfosuser($this->getUser());
+        $inscriptionacad->setIdmodaliteenseignement($inscriptionTemporaire->getIdmodaliteenseignement());
+        $inscriptionacad->setIdmodepaiement($inscriptionTemporaire->getIdmodepaiement());
+        $inscriptionacad->setIdregimeinscription($inscriptionTemporaire->getIdregimeinscription());
+        $inscriptionacad->setIdspecialite($inscriptionTemporaire->getIdspecialite());
+        $inscriptionacad->setMontantinscriptionacad($inscriptionTemporaire->getMontantinscriptionacad());
+        $inscriptionacad->setPassage($inscriptionTemporaire->getPassage());
+        $inscriptionacad->setSource($inscriptionTemporaire->getSource());
+        return $inscriptionacad;
     }
 
 }
