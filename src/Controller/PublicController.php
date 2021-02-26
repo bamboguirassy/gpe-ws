@@ -90,7 +90,7 @@ class PublicController extends AbstractController {
 
         //send confirmation mail
         $message = (new \Swift_Message('Confirmation de compte'))
-                ->setFrom(\App\Utils\Utils::$senderEmail,'Support Etudiant')
+                ->setFrom(\App\Utils\Utils::$senderEmail,'Université de Thiès')
                 ->setTo($etudiant->getEmail())
                 ->setBody(
                 $this->renderView(
