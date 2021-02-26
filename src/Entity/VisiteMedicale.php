@@ -29,13 +29,6 @@ class VisiteMedicale
     private $date;
 
     /**
-     * @var bool
-     *
-     * @ORM\Column(name="apte", type="boolean", nullable=false)
-     */
-    private $apte;
-
-    /**
      * @var string|null
      *
      * @ORM\Column(name="commentaire", type="text", length=65535, nullable=true)
@@ -57,6 +50,16 @@ class VisiteMedicale
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="string", length=45)
+     */
+    private $resultat;
+
+    /**
+     * @ORM\Column(name="maladie_chroniques", type="string", length=255, nullable=true)
+     */
+    private $maladieChroniques;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -70,18 +73,6 @@ class VisiteMedicale
     public function setDate($date): self
     {
         $this->date = $date;
-
-        return $this;
-    }
-
-    public function getApte(): ?bool
-    {
-        return $this->apte;
-    }
-
-    public function setApte(bool $apte): self
-    {
-        $this->apte = $apte;
 
         return $this;
     }
@@ -123,5 +114,28 @@ class VisiteMedicale
         return $this->user;
     }
 
+    public function getResultat(): ?string
+    {
+        return $this->resultat;
+    }
+
+    public function setResultat(string $resultat): self
+    {
+        $this->resultat = $resultat;
+
+        return $this;
+    }
+
+    public function getMaladieChroniques(): ?string
+    {
+        return $this->maladieChroniques;
+    }
+
+    public function setMaladieChroniques(?string $maladieChroniques): self
+    {
+        $this->maladieChroniques = $maladieChroniques;
+
+        return $this;
+    }
 
 }
