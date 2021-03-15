@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * InscriptionTemporaire
  *
- * @ORM\Table(name="inscription_temporaire", uniqueConstraints={@ORM\UniqueConstraint(name="idClasse", columns={"idClasse", "idEtudiant"})}, indexes={@ORM\Index(name="fk_InscriptionAcad_Specialite1_idx", columns={"idSpecialite"}), @ORM\Index(name="fk_InscriptionAcad_ModaliteEnseignement1_idx", columns={"idModaliteEnseignement"}), @ORM\Index(name="fk_InscriptionAcad_ModePaiement1_idx", columns={"idModePaiement"}), @ORM\Index(name="fk_Inscription_Bourse1_idx", columns={"idBourse"}), @ORM\Index(name="fk_inscriptionacad_etudiant1_idx", columns={"idEtudiant"}), @ORM\Index(name="fk_InscriptionAcad_RegimeInscription1_idx", columns={"idRegimeInscription"}), @ORM\Index(name="fk_InscriptionAcad_Classe1_idx", columns={"idClasse"})})
+ * @ORM\Table(name="inscription_temporaire", uniqueConstraints={@ORM\UniqueConstraint(name="idClasse", columns={"idClasse", "idEtudiant"})}, indexes={@ORM\Index(name="fk_InscriptionAcad_RegimeInscription1_idx", columns={"idRegimeInscription"}), @ORM\Index(name="fk_InscriptionAcad_Classe1_idx", columns={"idClasse"}), @ORM\Index(name="fk_Inscription_Bourse1_idx", columns={"idBourse"}), @ORM\Index(name="fk_inscriptionacad_etudiant1_idx", columns={"idEtudiant"}), @ORM\Index(name="fk_InscriptionAcad_ModePaiement1_idx", columns={"idModePaiement"}), @ORM\Index(name="fk_InscriptionAcad_Specialite1_idx", columns={"idSpecialite"}), @ORM\Index(name="fk_InscriptionAcad_ModaliteEnseignement1_idx", columns={"idModaliteEnseignement"})})
  * @ORM\Entity
  */
 class InscriptionTemporaire
@@ -22,60 +22,11 @@ class InscriptionTemporaire
     private $id;
 
     /**
-     * @var int
-     *
-     * @ORM\Column(name="idClasse", type="integer", nullable=false)
-     */
-    private $idclasse;
-
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="idSpecialite", type="integer", nullable=true)
-     */
-    private $idspecialite;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idRegimeInscription", type="integer", nullable=false)
-     */
-    private $idregimeinscription;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idModaliteEnseignement", type="integer", nullable=false)
-     */
-    private $idmodaliteenseignement;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idEtudiant", type="integer", nullable=false)
-     */
-    private $idetudiant;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idBourse", type="integer", nullable=false)
-     */
-    private $idbourse;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="passage", type="string", length=45, nullable=false)
      */
     private $passage;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idModePaiement", type="integer", nullable=false)
-     */
-    private $idmodepaiement;
 
     /**
      * @var int|null
@@ -112,81 +63,79 @@ class InscriptionTemporaire
      */
     private $croust;
 
+    /**
+     * @var \Etudiant
+     *
+     * @ORM\ManyToOne(targetEntity="Etudiant")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idEtudiant", referencedColumnName="id")
+     * })
+     */
+    private $idetudiant;
+
+    /**
+     * @var \Classe
+     *
+     * @ORM\ManyToOne(targetEntity="Classe")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idClasse", referencedColumnName="id")
+     * })
+     */
+    private $idclasse;
+
+    /**
+     * @var \Specialite
+     *
+     * @ORM\ManyToOne(targetEntity="Specialite")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idSpecialite", referencedColumnName="id")
+     * })
+     */
+    private $idspecialite;
+
+    /**
+     * @var \Regimeinscription
+     *
+     * @ORM\ManyToOne(targetEntity="Regimeinscription")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idRegimeInscription", referencedColumnName="id")
+     * })
+     */
+    private $idregimeinscription;
+
+    /**
+     * @var \Modaliteenseignement
+     *
+     * @ORM\ManyToOne(targetEntity="Modaliteenseignement")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idModaliteEnseignement", referencedColumnName="id")
+     * })
+     */
+    private $idmodaliteenseignement;
+
+    /**
+     * @var \Modepaiement
+     *
+     * @ORM\ManyToOne(targetEntity="Modepaiement")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idModePaiement", referencedColumnName="id")
+     * })
+     */
+    private $idmodepaiement;
+
+    /**
+     * @var \Bourse
+     *
+     * @ORM\ManyToOne(targetEntity="Bourse")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="idBourse", referencedColumnName="id")
+     * })
+     */
+    private $idbourse;
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getIdclasse(): ?int
-    {
-        return $this->idclasse;
-    }
-
-    public function setIdclasse(int $idclasse): self
-    {
-        $this->idclasse = $idclasse;
-
-        return $this;
-    }
-
-    public function getIdspecialite(): ?int
-    {
-        return $this->idspecialite;
-    }
-
-    public function setIdspecialite(?int $idspecialite): self
-    {
-        $this->idspecialite = $idspecialite;
-
-        return $this;
-    }
-
-    public function getIdregimeinscription(): ?int
-    {
-        return $this->idregimeinscription;
-    }
-
-    public function setIdregimeinscription(int $idregimeinscription): self
-    {
-        $this->idregimeinscription = $idregimeinscription;
-
-        return $this;
-    }
-
-    public function getIdmodaliteenseignement(): ?int
-    {
-        return $this->idmodaliteenseignement;
-    }
-
-    public function setIdmodaliteenseignement(int $idmodaliteenseignement): self
-    {
-        $this->idmodaliteenseignement = $idmodaliteenseignement;
-
-        return $this;
-    }
-
-    public function getIdetudiant(): ?int
-    {
-        return $this->idetudiant;
-    }
-
-    public function setIdetudiant(int $idetudiant): self
-    {
-        $this->idetudiant = $idetudiant;
-
-        return $this;
-    }
-
-    public function getIdbourse(): ?int
-    {
-        return $this->idbourse;
-    }
-
-    public function setIdbourse(int $idbourse): self
-    {
-        $this->idbourse = $idbourse;
-
-        return $this;
     }
 
     public function getPassage(): ?string
@@ -197,18 +146,6 @@ class InscriptionTemporaire
     public function setPassage(string $passage): self
     {
         $this->passage = $passage;
-
-        return $this;
-    }
-
-    public function getIdmodepaiement(): ?int
-    {
-        return $this->idmodepaiement;
-    }
-
-    public function setIdmodepaiement(int $idmodepaiement): self
-    {
-        $this->idmodepaiement = $idmodepaiement;
 
         return $this;
     }
@@ -269,6 +206,90 @@ class InscriptionTemporaire
     public function setCroust(?bool $croust): self
     {
         $this->croust = $croust;
+
+        return $this;
+    }
+
+    public function getIdetudiant(): ?Etudiant
+    {
+        return $this->idetudiant;
+    }
+
+    public function setIdetudiant(?Etudiant $idetudiant): self
+    {
+        $this->idetudiant = $idetudiant;
+
+        return $this;
+    }
+
+    public function getIdclasse(): ?Classe
+    {
+        return $this->idclasse;
+    }
+
+    public function setIdclasse(?Classe $idclasse): self
+    {
+        $this->idclasse = $idclasse;
+
+        return $this;
+    }
+
+    public function getIdspecialite(): ?Specialite
+    {
+        return $this->idspecialite;
+    }
+
+    public function setIdspecialite(?Specialite $idspecialite): self
+    {
+        $this->idspecialite = $idspecialite;
+
+        return $this;
+    }
+
+    public function getIdregimeinscription(): ?Regimeinscription
+    {
+        return $this->idregimeinscription;
+    }
+
+    public function setIdregimeinscription(?Regimeinscription $idregimeinscription): self
+    {
+        $this->idregimeinscription = $idregimeinscription;
+
+        return $this;
+    }
+
+    public function getIdmodaliteenseignement(): ?Modaliteenseignement
+    {
+        return $this->idmodaliteenseignement;
+    }
+
+    public function setIdmodaliteenseignement(?Modaliteenseignement $idmodaliteenseignement): self
+    {
+        $this->idmodaliteenseignement = $idmodaliteenseignement;
+
+        return $this;
+    }
+
+    public function getIdmodepaiement(): ?Modepaiement
+    {
+        return $this->idmodepaiement;
+    }
+
+    public function setIdmodepaiement(?Modepaiement $idmodepaiement): self
+    {
+        $this->idmodepaiement = $idmodepaiement;
+
+        return $this;
+    }
+
+    public function getIdbourse(): ?Bourse
+    {
+        return $this->idbourse;
+    }
+
+    public function setIdbourse(?Bourse $idbourse): self
+    {
+        $this->idbourse = $idbourse;
 
         return $this;
     }
