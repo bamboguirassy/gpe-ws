@@ -18,26 +18,24 @@ use App\Entity\Modaliteenseignement;
 use App\Entity\Preinscription;
 use Doctrine\ORM\EntityManagerInterface;
 
-
 /**
  * @Route("/api/inscriptiontemporaire")
  */
-class InscriptionTemporaireController extends AbstractController
-{
+class InscriptionTemporaireController extends AbstractController {
+
     /**
      * @Rest\Get(path="/", name="inscription_temporaire_index")
      * @Rest\View(StatusCode = 200)
      * @IsGranted("ROLE_INSCRIPTIONTEMPORAIRE_LISTE")
      */
-    public function index(): array
-    {
+    public function index(): array {
         $inscriptionTemporaires = $this->getDoctrine()
-            ->getRepository(InscriptionTemporaire::class)
-            ->findAll();
+                ->getRepository(InscriptionTemporaire::class)
+                ->findAll();
 
-        return count($inscriptionTemporaires)?$inscriptionTemporaires:[];
+        return count($inscriptionTemporaires) ? $inscriptionTemporaires : [];
     }
-    
+
     /**
      * @Rest\Get(path="/en-cours/etudiant/{id}", name="find_inscription_temporaire_en_cours")
      * @Rest\View(StatusCode = 200)
@@ -77,8 +75,6 @@ class InscriptionTemporaireController extends AbstractController
                         ->setMaxResults(1)
                         ->getSingleResult();
     }
-    
-    
 
     /**
      * @Rest\Get(path="/preinscription/{id}", name="inscriptiontemporaire_by_preinscription")
@@ -96,20 +92,23 @@ class InscriptionTemporaireController extends AbstractController
                 ->setParameter(1, $classe)
                 ->setParameter(2, $preinscription->getCni())
                 ->getResult();
+        if (count($inscriptionTemporaires)) {
+            $em->remove($inscriptionTemporaires[0]);
+            $em->flush();
+        }
 
-
-        return count($inscriptionTemporaires) ? $inscriptionTemporaires[0] : array('id' => null);
+        return array('id'=>null);
     }
 
     /**
      * @Rest\Post(Path="/create", name="inscription_temporaire_new")
      * @Rest\View(StatusCode=200)
      */
-    public function create(Request $request): InscriptionTemporaire    {
+    public function create(Request $request): InscriptionTemporaire {
         $inscriptionTemporaire = new InscriptionTemporaire();
         $form = $this->createForm(InscriptionTemporaireType::class, $inscriptionTemporaire);
         $form->submit(Utils::serializeRequestContent($request));
-        
+
         $entityManager = $this->getDoctrine()->getManager();
 
         $requestData = json_decode($request->getContent());
@@ -191,19 +190,18 @@ class InscriptionTemporaireController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_INSCRIPTIONTEMPORAIRE_AFFICHAGE")
      */
-    public function show(InscriptionTemporaire $inscriptionTemporaire): InscriptionTemporaire    {
+    public function show(InscriptionTemporaire $inscriptionTemporaire): InscriptionTemporaire {
         return $inscriptionTemporaire;
     }
 
-    
     /**
      * @Rest\Put(path="/{id}/edit", name="inscription_temporaire_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      */
-    public function edit(Request $request, InscriptionTemporaire $inscriptionTemporaire): InscriptionTemporaire    {
+    public function edit(Request $request, InscriptionTemporaire $inscriptionTemporaire): InscriptionTemporaire {
         $form = $this->createForm(InscriptionTemporaireType::class, $inscriptionTemporaire);
         $form->submit(Utils::serializeRequestContent($request));
-        
+
         // if etudiant sénégalais mettre croust à true
         if ($inscriptionTemporaire->getIdetudiant()->getNationalite()->getAlpha2() == 'SN') {
             $inscriptionTemporaire->setCroust(true);
@@ -213,15 +211,15 @@ class InscriptionTemporaireController extends AbstractController
 
         return $inscriptionTemporaire;
     }
-    
+
     /**
      * @Rest\Put(path="/{id}/clone", name="inscription_temporaire_clone",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_INSCRIPTIONTEMPORAIRE_CLONE")
      */
-    public function cloner(Request $request, InscriptionTemporaire $inscriptionTemporaire):  InscriptionTemporaire {
-        $em=$this->getDoctrine()->getManager();
-        $inscriptionTemporaireNew=new InscriptionTemporaire();
+    public function cloner(Request $request, InscriptionTemporaire $inscriptionTemporaire): InscriptionTemporaire {
+        $em = $this->getDoctrine()->getManager();
+        $inscriptionTemporaireNew = new InscriptionTemporaire();
         $form = $this->createForm(InscriptionTemporaireType::class, $inscriptionTemporaireNew);
         $form->submit(Utils::serializeRequestContent($request));
         $em->persist($inscriptionTemporaireNew);
@@ -236,14 +234,14 @@ class InscriptionTemporaireController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_INSCRIPTIONTEMPORAIRE_SUPPRESSION")
      */
-    public function delete(InscriptionTemporaire $inscriptionTemporaire): InscriptionTemporaire    {
+    public function delete(InscriptionTemporaire $inscriptionTemporaire): InscriptionTemporaire {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($inscriptionTemporaire);
         $entityManager->flush();
 
         return $inscriptionTemporaire;
     }
-    
+
     /**
      * @Rest\Post("/delete-selection/", name="inscription_temporaire_selection_delete")
      * @Rest\View(StatusCode=200)
@@ -263,4 +261,5 @@ class InscriptionTemporaireController extends AbstractController
 
         return $inscriptionTemporaires;
     }
+
 }
