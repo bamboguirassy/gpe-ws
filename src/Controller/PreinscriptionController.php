@@ -51,7 +51,7 @@ class PreinscriptionController extends AbstractController {
     }
 
     /**
-     * @Rest\Get(path="/public/request-etudiant-creation/{cni}", name="request_etudiant_creation")
+     * @Rest\Get(path="/public/request-etudiant-creation/{cni}", name="request_etudiant_creation", requirements={"cni"=".+"})
      * @Rest\View(StatusCode = 200)
      */
     public function requestNewEtudiantCreation($cni) {
