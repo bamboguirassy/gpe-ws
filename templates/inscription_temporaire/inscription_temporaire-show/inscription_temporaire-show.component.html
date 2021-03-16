@@ -1,0 +1,95 @@
+<p-toast></p-toast>
+<p-fieldset *ngIf="'InscriptionTemporaire'|showable" legend="Affichage des informations - Utilisateur" [toggleable]="true">
+  <p-toolbar>
+    <button *ngIf="'InscriptionTemporaire'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+      [routerLink]="['/'+inscriptionTemporaireSrv.getRoutePrefix(),inscriptionTemporaire.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+      Modifier</button>
+    <button *ngIf="'InscriptionTemporaire'|clonable" [routerLink]="['/'+inscriptionTemporaireSrv.getRoutePrefix(),inscriptionTemporaire.id,'clone']" type="button"
+      class="btn btn-outline-secondary pull-right ml-1">
+      <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+    </button>
+    <button *ngIf="'InscriptionTemporaire'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeInscriptionTemporaire()"><i
+        class="fa fa-trash-o"></i> Supprimer</button>
+    <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+        class="fa fa-reply"></i> Retour</button>
+  </p-toolbar>
+  <p-tabView>
+    <p-tabPanel header="Détails">
+      <p-fieldset [legend]="inscriptionTemporaire.id">
+        <table class="table">
+                                    <tr>
+                <th>Idclasse</th>
+                <td>{{ inscriptionTemporaire.idclasse }}</td>
+            </tr>
+                                    <tr>
+                <th>Idspecialite</th>
+                <td>{{ inscriptionTemporaire.idspecialite }}</td>
+            </tr>
+                                    <tr>
+                <th>Idregimeinscription</th>
+                <td>{{ inscriptionTemporaire.idregimeinscription }}</td>
+            </tr>
+                                    <tr>
+                <th>Idmodaliteenseignement</th>
+                <td>{{ inscriptionTemporaire.idmodaliteenseignement }}</td>
+            </tr>
+                                    <tr>
+                <th>Idetudiant</th>
+                <td>{{ inscriptionTemporaire.idetudiant }}</td>
+            </tr>
+                                    <tr>
+                <th>Idbourse</th>
+                <td>{{ inscriptionTemporaire.idbourse }}</td>
+            </tr>
+                                    <tr>
+                <th>Passage</th>
+                <td>{{ inscriptionTemporaire.passage }}</td>
+            </tr>
+                                    <tr>
+                <th>Idmodepaiement</th>
+                <td>{{ inscriptionTemporaire.idmodepaiement }}</td>
+            </tr>
+                                    <tr>
+                <th>Montantinscriptionacad</th>
+                <td>{{ inscriptionTemporaire.montantinscriptionacad }}</td>
+            </tr>
+                                    <tr>
+                <th>Coutformation</th>
+                <td>{{ inscriptionTemporaire.coutformation }}</td>
+            </tr>
+                                    <tr>
+                <th>Numquittance</th>
+                <td>{{ inscriptionTemporaire.numquittance }}</td>
+            </tr>
+                                    <tr>
+                <th>Source</th>
+                <td>{{ inscriptionTemporaire.source }}</td>
+            </tr>
+                                    <tr>
+                <th>Croust</th>
+                <td>{{ inscriptionTemporaire.croust ? 'Yes' : 'No' }}</td>
+            </tr>
+                    </table>
+        <p-toolbar>
+          <button *ngIf="'InscriptionTemporaire'|editable" type="button" class="btn btn-outline-warning pull-right ml-1"
+            [routerLink]="['/'+inscriptionTemporaireSrv.getRoutePrefix(),inscriptionTemporaire.id,'edit']"><i class="fa fa-pencil-square-o ml-1"></i>
+            Modifier</button>
+          <button *ngIf="'InscriptionTemporaire'|clonable" [routerLink]="['/'+inscriptionTemporaireSrv.getRoutePrefix(),inscriptionTemporaire.id,'clone']" type="button"
+            class="btn btn-outline-secondary pull-right ml-1">
+            <i class="fa fa-clone" aria-hidden="true"></i> Cloner
+          </button>
+          <button *ngIf="'InscriptionTemporaire'|deletable" type="button" class="btn btn-outline-danger pull-right ml-1" (click)="removeInscriptionTemporaire()"><i
+              class="fa fa-trash-o"></i> Supprimer</button>
+          <button type="button" class="btn btn-outline-secondary pull-left ml-1" (click)="location.back()"><i
+              class="fa fa-reply"></i> Retour</button>
+          <button *ngIf="'InscriptionTemporaire'|showable" type="button" class="btn btn-secondary ml-1" (click)="refresh()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+          </button>
+        </p-toolbar>
+      </p-fieldset>
+    </p-tabPanel>
+    <p-tabPanel header="Liste associée">
+      
+    </p-tabPanel>
+  </p-tabView>
+</p-fieldset>

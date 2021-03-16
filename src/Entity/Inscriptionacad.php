@@ -676,31 +676,31 @@ class Inscriptionacad
         return $this;
     }
 
-    public function getSource(): ?string
+    public function getSource()
     {
         return $this->source;
     }
 
-    public function setSource(?string $source): self
+    public function setSource($source): self
     {
         $this->source = $source;
 
         return $this;
     }
 
-    public function getCroust(): ?bool
+    public function getCroust()
     {
         return $this->croust;
     }
 
-    public function setCroust(?bool $croust): self
+    public function setCroust($croust): self
     {
         $this->croust = $croust;
 
         return $this;
     }
 
-    public function getVisiteMedicale(): ?VisiteMedicale
+    public function getVisiteMedicale()
     {
         return $this->visiteMedicale;
     }
