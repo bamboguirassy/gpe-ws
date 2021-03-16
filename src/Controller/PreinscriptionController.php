@@ -191,7 +191,7 @@ class PreinscriptionController extends AbstractController {
     }
 
     /**
-     * @Rest\Get(path="/public/verifier-inscription-etudiant-active/{cni}", name="verifier-inscription-etudiant-active")
+     * @Rest\Get(path="/public/verifier-inscription-etudiant-active/{cni}", name="verifier-inscription-etudiant-active", requirements={"cni"=".+"})
      * @Rest\View(StatusCode = 200)
      */
     public function verifierInscriptionEtudiantActif($cni) {
