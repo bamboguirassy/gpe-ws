@@ -103,6 +103,14 @@ class FosUserController extends AbstractController
                         'link' => \App\Utils\Utils::$lienResetEtudiantPassword . $linkedUser->getConfirmationToken()]
                 ), 'text/html'
             );
+        // 19/03/2021 - Moussa Fofana - Verifier s'il s'agit d'un étudiant
+        $etudiants  = $em->getRepository(\App\Entity\Etudiant::class)
+                ->findByEmailUniv($email);
+        if(count($etudiants)>0) {
+            $emailPerso = $etudiants[0]->getEmail();
+            $message->setCc($emailPerso);
+        }
+        // fin mis à jour - Moussa Fofana - 19/03/2021
         $mailer->send($message);
 
         return true;

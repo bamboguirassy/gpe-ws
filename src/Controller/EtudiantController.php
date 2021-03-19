@@ -80,7 +80,7 @@ class EtudiantController extends AbstractController {
     /**
      * Recherche un etudiant par cni, prenom, nom, ine, numéro de dossier connaissant le numéro interne
      *
-     * @Rest\Get(path="/search/term/{term}", name="etudiant_search")
+     * @Rest\Get(path="/search/term/{term}", name="etudiant_search", requirements={"term"=".+"})
      * @Rest\View(statusCode = 200)
      */
     public function searchByTerm(Request $request, $term, EntityManagerInterface $entityManager) {
@@ -332,7 +332,7 @@ class EtudiantController extends AbstractController {
     }
 
     /**
-     * @Rest\Get(path="/cni/{cni}", name="etudiant_by_cni")
+     * @Rest\Get(path="/cni/{cni}", name="etudiant_by_cni", requirements={"cni"=".+"})
      * @Rest\View(StatusCode=200)
      */
     public function findByCni($cni): Etudiant {
