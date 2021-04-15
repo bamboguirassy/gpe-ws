@@ -364,7 +364,7 @@ class InscriptionacadController extends AbstractController {
                     , 'text/html'
             );
             $mailer->send($message);
-            throw $this->createNotFoundException("Inscription acad introuvable !!!");
+            return null;
         }
 
         if ($paymentStatus == 200) {
@@ -391,17 +391,29 @@ class InscriptionacadController extends AbstractController {
             if ($preinscriptions) {
                 $preinscriptions[0]->setEstinscrit(TRUE);
             }
-            $em->remove($inscriptionTemporaire);
+            // $em->remove($inscriptionTemporaire);
+            // find and remove all inscription temps on payment confirm => MF - 31/03/2021
+            $inscriptionTemps = $em->getRepository('App\Entity\InscriptionTemporaire')
+                    ->findBy(['idetudiant' => $inscriptionacad->getIdetudiant(),
+                'idclasse' => $inscriptionacad->getIdclasse()]);
+            foreach ($inscriptionTemps as $inscriptionTemp) {
+                $em->remove($inscriptionTemp);
+            }
+
+
+            $em->persist($informationPaiementInscription);
+            $em->flush();
             $message = (new \Swift_Message('Confirmation paiement frais inscription administrative - Université de Thiès'))
                     ->setFrom(Utils::$senderEmail, 'SPET GPE')
                     ->setTo($inscriptionacad->getIdetudiant()->getEmailuniv())
-                    ->setBcc(Utils::$adminMail)
+                    ->setBcc(array(Utils::$adminMail, 'dsos@univ-thies.sn'))
                     ->setBody(
                     "Bonjour, "
                     . "Le paiement initié pour votre inscription académique est confirmé. A très bientôt !"
                     , 'text/html'
             );
             $mailer->send($message);
+            return null;
         } else if ($paymentStatus == 420) {
             //  $informationPaiementInscription->setStatus('Annulé');
             $message = (new \Swift_Message('Erreur confirmation paiement - PIN' . $commandNumber))
@@ -415,12 +427,22 @@ class InscriptionacadController extends AbstractController {
                     , 'text/html'
             );
             $mailer->send($message);
+            return null;
         } else {
-            throw $this->createNotFoundException("Erreur de la transaction");
+            //  $informationPaiementInscription->setStatus('Annulé');
+            $message = (new \Swift_Message('Erreur Transaction - PIN' . $commandNumber))
+                    ->setFrom(Utils::$senderEmail, 'SPET GPE')
+                    ->setTo(Utils::$adminMail)
+                    ->setBody(
+                    "Bonjour Admin,"
+                    . "Une erreur est survenue lors de la confirmation"
+                    . " de paiement de l'inscription académique numero {$commandNumber},"
+                    . "Token de paiement : {$paymentToken} avec le statut {$paymentStatus}"
+                    , 'text/html'
+            );
+            $mailer->send($message);
+            return null;
         }
-
-        $em->persist($informationPaiementInscription);
-        $em->flush();
 
         return $informationPaiementInscription;
     }

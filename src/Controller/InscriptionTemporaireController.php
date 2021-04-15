@@ -81,7 +81,7 @@ class InscriptionTemporaireController extends AbstractController {
      * @Rest\View(StatusCode = 200)
      */
     public function findByPreinscription(Preinscription $preinscription) {
-        $em = $this->getDoctrine()->getManager();
+        /* $em = $this->getDoctrine()->getManager();
         $classe = $em->getRepository(Classe::class)->findOneBy(['idniveau' => $preinscription->getIdniveau(),
             'idfiliere' => $preinscription->getIdfiliere(), 'idanneeacad' => $preinscription->getIdanneeacad()]);
         if (!$classe) {
@@ -95,7 +95,7 @@ class InscriptionTemporaireController extends AbstractController {
         if (count($inscriptionTemporaires)) {
             $em->remove($inscriptionTemporaires[0]);
             $em->flush();
-        }
+        }*/
 
         return array('id'=>null);
     }

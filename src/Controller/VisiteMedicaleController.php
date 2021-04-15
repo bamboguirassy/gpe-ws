@@ -19,29 +19,28 @@ use Symfony\Component\Validator\Constraints\DateTime;
 /**
  * @Route("/api/visitemedicale")
  */
-class VisiteMedicaleController extends AbstractController
-{
+class VisiteMedicaleController extends AbstractController {
+
     /**
      * @Rest\Get(path="/", name="visite_medicale_index")
      * @Rest\View(StatusCode = 200)
      * @IsGranted("ROLE_VISITE MEDICALE_LISTE")
      */
-    public function index(): array
-    {
+    public function index(): array {
         /** @var FosGroup $groupe */
         $groupe = $this->getUser()->getIdGroup();
         /** @var Profil $currentUserProfile */
         $currentUserProfile = $this->getUser()->getProfession();
         if ($groupe->getCodegroupe() == 'MEDECIN') {
             $visiteMedicales = $this->getDoctrine()
-                ->getRepository(VisiteMedicale::class)
-                ->findByUser($this->getUser()->getUsername());
+                    ->getRepository(VisiteMedicale::class)
+                    ->findByUser($this->getUser()->getUsername());
             return count($visiteMedicales) ? $visiteMedicales : [];
         }
         if ($groupe->getCodegroupe() == 'SA' || $currentUserProfile->getCodeprofil() == 'DSOS' || $groupe->getCodegroupe() == 'ADSOS') {
-            $visiteMedicales = $this->getDoctrine()
-                ->getRepository(VisiteMedicale::class)
-                ->findAll();
+            $visiteMedicales = $this->getDoctrine()->getManager()
+                    ->createQuery('select vm from App\Entity\VisiteMedicale vm order by id desc')
+                    ->getResult();
             return count($visiteMedicales) ? $visiteMedicales : [];
         }
 
@@ -52,8 +51,7 @@ class VisiteMedicaleController extends AbstractController
      * @Rest\Post(Path="/create", name="visite_medicale_new")
      * @Rest\View(StatusCode=200)
      */
-    public function create(Request $request): VisiteMedicale
-    {
+    public function create(Request $request): VisiteMedicale {
         $visiteMedicale = new VisiteMedicale();
         $form = $this->createForm(VisiteMedicaleType::class, $visiteMedicale);
         $form->submit(Utils::serializeRequestContent($request));
@@ -73,8 +71,7 @@ class VisiteMedicaleController extends AbstractController
      * @Rest\Get(path="/{id}", name="visite_medicale_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      */
-    public function show(VisiteMedicale $visiteMedicale): VisiteMedicale
-    {
+    public function show(VisiteMedicale $visiteMedicale): VisiteMedicale {
         return $visiteMedicale;
     }
 
@@ -82,8 +79,7 @@ class VisiteMedicaleController extends AbstractController
      * @Rest\Get(path="/with-inscriptionacad", name="visite_medicale_with_inscriptionacad")
      * @Rest\View(StatusCode=200)
      */
-    public function findWithAtLeastOneInsacad(Request $request, EntityManagerInterface $entityManager)
-    {
+    public function findWithAtLeastOneInsacad(Request $request, EntityManagerInterface $entityManager) {
         /** @var FosGroup $currentUserGroupe */
         $currentUserGroupe = $this->getUser()->getIdgroup();
         $query = '
@@ -114,35 +110,36 @@ class VisiteMedicaleController extends AbstractController
         ';
 
         $lastAnneeEnCours = $entityManager
-            ->createQuery($subQuery)
-            ->setParameter('enCours', true)
-            ->setMaxResults(1)
-            ->getSingleResult();
+                ->createQuery($subQuery)
+                ->setParameter('enCours', true)
+                ->setMaxResults(1)
+                ->getSingleResult();
 
         if ($currentUserGroupe->getCodegroupe() == 'SA') {
             return $entityManager
-                ->createQuery($query)
-                ->setParameter('anneeEnCours', $lastAnneeEnCours)
-                ->getResult();
+                            ->createQuery($query)
+                            ->setParameter('anneeEnCours', $lastAnneeEnCours)
+                            ->setMaxResults(100)
+                            ->getResult();
         }
         if ($currentUserGroupe->getCodegroupe() == 'MEDECIN') {
             return $entityManager
-                ->createQuery($doctorQuery)
-                ->setParameters([
-                    'anneeEnCours' => $lastAnneeEnCours,
-                    'user' => $this->getUser()->getUsername()
-                ])->getResult();
+                            ->createQuery($doctorQuery)
+                            ->setParameters([
+                                'anneeEnCours' => $lastAnneeEnCours,
+                                'user' => $this->getUser()->getUsername()
+                            ])
+                            ->setMaxResults(100)
+                            ->getResult();
         }
         throw $this->createAccessDeniedException('Accés Interdit, vous n\'avez pas le droit de visualiser ce contenu.');
     }
-
 
     /**
      * @Rest\Put(path="/{id}/edit", name="visite_medicale_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      */
-    public function edit(Request $request, VisiteMedicale $visiteMedicale): VisiteMedicale
-    {
+    public function edit(Request $request, VisiteMedicale $visiteMedicale): VisiteMedicale {
         $form = $this->createForm(VisiteMedicaleType::class, $visiteMedicale);
         $form->submit(Utils::serializeRequestContent($request));
 
@@ -155,8 +152,7 @@ class VisiteMedicaleController extends AbstractController
      * @Rest\Put(path="/{id}/clone", name="visite_medicale_clone",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      */
-    public function cloner(Request $request, VisiteMedicale $visiteMedicale): VisiteMedicale
-    {
+    public function cloner(Request $request, VisiteMedicale $visiteMedicale): VisiteMedicale {
         $em = $this->getDoctrine()->getManager();
         $visiteMedicaleNew = new VisiteMedicale();
         $form = $this->createForm(VisiteMedicaleType::class, $visiteMedicaleNew);
@@ -172,8 +168,7 @@ class VisiteMedicaleController extends AbstractController
      * @Rest\Delete("/{id}", name="visite_medicale_delete",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      */
-    public function delete(VisiteMedicale $visiteMedicale): VisiteMedicale
-    {
+    public function delete(VisiteMedicale $visiteMedicale): VisiteMedicale {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($visiteMedicale);
         $entityManager->flush();
@@ -185,8 +180,7 @@ class VisiteMedicaleController extends AbstractController
      * @Rest\Post("/delete-selection/", name="visite_medicale_selection_delete")
      * @Rest\View(StatusCode=200)
      */
-    public function deleteMultiple(Request $request): array
-    {
+    public function deleteMultiple(Request $request): array {
         $entityManager = $this->getDoctrine()->getManager();
         $visiteMedicales = Utils::getObjectFromRequest($request);
         if (!count($visiteMedicales)) {
@@ -200,4 +194,5 @@ class VisiteMedicaleController extends AbstractController
 
         return $visiteMedicales;
     }
+
 }
