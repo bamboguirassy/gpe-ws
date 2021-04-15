@@ -364,7 +364,7 @@ class InscriptionacadController extends AbstractController {
                     , 'text/html'
             );
             $mailer->send($message);
-            return null;
+            return 0;
         }
 
         if ($paymentStatus == 200) {
@@ -406,17 +406,17 @@ class InscriptionacadController extends AbstractController {
             $message = (new \Swift_Message('Confirmation paiement frais inscription administrative - Université de Thiès'))
                     ->setFrom(Utils::$senderEmail, 'SPET GPE')
                     ->setTo($inscriptionacad->getIdetudiant()->getEmailuniv())
-                    ->setBcc(array(Utils::$adminMail, 'dsos@univ-thies.sn'))
+                    ->setBcc('dsos@univ-thies.sn')
                     ->setBody(
                     "Bonjour, "
                     . "Le paiement initié pour votre inscription académique est confirmé. A très bientôt !"
                     , 'text/html'
             );
             $mailer->send($message);
-            return null;
+            return 1;
         } else if ($paymentStatus == 420) {
             //  $informationPaiementInscription->setStatus('Annulé');
-            $message = (new \Swift_Message('Erreur confirmation paiement - PIN' . $commandNumber))
+           /* $message = (new \Swift_Message('Erreur confirmation paiement - PIN' . $commandNumber))
                     ->setFrom(Utils::$senderEmail, 'SPET GPE')
                     ->setTo(Utils::$adminMail)
                     ->setBody(
@@ -426,11 +426,11 @@ class InscriptionacadController extends AbstractController {
                     . "Token de paiement : {$paymentToken} avec le statut {$paymentStatus}"
                     , 'text/html'
             );
-            $mailer->send($message);
-            return null;
+            $mailer->send($message);*/
+            return 0;
         } else {
             //  $informationPaiementInscription->setStatus('Annulé');
-            $message = (new \Swift_Message('Erreur Transaction - PIN' . $commandNumber))
+          /*  $message = (new \Swift_Message('Erreur Transaction - PIN' . $commandNumber))
                     ->setFrom(Utils::$senderEmail, 'SPET GPE')
                     ->setTo(Utils::$adminMail)
                     ->setBody(
@@ -440,8 +440,8 @@ class InscriptionacadController extends AbstractController {
                     . "Token de paiement : {$paymentToken} avec le statut {$paymentStatus}"
                     , 'text/html'
             );
-            $mailer->send($message);
-            return null;
+            $mailer->send($message);*/
+            return 0;
         }
 
         return $informationPaiementInscription;

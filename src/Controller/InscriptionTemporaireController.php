@@ -37,6 +37,47 @@ class InscriptionTemporaireController extends AbstractController {
     }
 
     /**
+     * @Rest\Get(path="/preinscription/{numdossier}", name="inscription_temporaire_with_preinscription_by_numdossier")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findWithPreinscriptionByNumDossier($numdossier): array {
+        $em = $this->getDoctrine()->getManager();
+        $etudiant = $em->getRepository('App\Entity\Etudiant')
+        ->findOneByNuminterne($numdossier);
+        if(!$etudiant) {
+            throw $this->createNotFoundException("Aucun étudiant trouvé avec le numéro de dossier indiqué");
+        }
+        // rechercher les preinscriptions de l'étudiant ayant des inscriptions temporaire
+        $preinscriptionWithInscriptionTemps = $em->createQuery('select p from App\Entity\Preinscription p '
+                . 'where (select count(it) from App\Entity\InscriptionTemporaire it '
+                . 'JOIN it.idclasse c '
+                . 'JOIN it.idetudiant et where '
+                . 'p.idfiliere = c.idfiliere and c.idanneeacad = c.idanneeacad and p.idniveau=c.idniveau '
+                . 'and p.cni=et.cni and et=?1)>0')
+                ->setParameter(1, $etudiant)
+                ->getResult();
+        if(!count($preinscriptionWithInscriptionTemps)) {
+            throw $this->createNotFoundException("Aucune préinscription avec une inscription démarée n'a été trouvée");
+        }
+        $tabPreinscription = [];
+        foreach ($preinscriptionWithInscriptionTemps as $preinscription) {
+            $inscriptionTemps = $em->createQuery('select it from App\Entity\InscriptionTemporaire it '
+                    . ' JOIN it.idclasse c where '
+                    . 'c.idanneeacad=?1 and c.idfiliere=?2 and c.idniveau=?3 and '
+                    . 'it.idetudiant=?4 ')
+                    ->setParameter(1,$preinscription->getIdanneeacad())
+                    ->setParameter(2,$preinscription->getIdfiliere())
+                    ->setParameter(3,$preinscription->getIdniveau())
+                    ->setParameter(4,$etudiant)
+                    ->getResult();
+            $tabPreinscription[] = ['preinscription'=>$preinscription, 'inscriptionTemps'=>$inscriptionTemps];
+        }
+        
+
+        return count($tabPreinscription) ? $tabPreinscription : [];
+    }
+
+    /**
      * @Rest\Get(path="/en-cours/etudiant/{id}", name="find_inscription_temporaire_en_cours")
      * @Rest\View(StatusCode = 200)
      */
