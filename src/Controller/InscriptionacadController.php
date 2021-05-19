@@ -408,8 +408,11 @@ class InscriptionacadController extends AbstractController {
                     ->setTo($inscriptionacad->getIdetudiant()->getEmailuniv())
                     ->setBcc('dsos@univ-thies.sn')
                     ->setBody(
-                    "Bonjour, "
-                    . "Le paiement initié pour votre inscription académique est confirmé. A très bientôt !"
+                    "Bonjour {$inscriptionacad->getIdetudiant()->getPrenometudiant()} {$inscriptionacad->getIdetudiant()->getNometudiant()} "
+                    . "le payement de {$inscriptionacad->getMontantinscriptionacad()} Franc CFA pour votre inscription en {$inscriptionacad->getIdclasse()->getLibelleclasse()} à reussi "
+                    . " avec le numéro de transaction {$inscriptionacad->getNumquittance()}. "
+                    . "Vous pouvez maintenant procéder à la visite médicale si vous n'en êtes pas exempté. "
+                    . "A très bientôt !"
                     , 'text/html'
             );
             $mailer->send($message);
