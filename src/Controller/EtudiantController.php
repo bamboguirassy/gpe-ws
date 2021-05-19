@@ -222,6 +222,9 @@ class EtudiantController extends AbstractController {
         }
         $preinscription = $preinscriptionActifs[0];
         $etudiant->setNuminterne($this->genererNumInterne($preinscription, $this));
+        /*if($etudiant->getCni()=='1309200300042') {
+            return $etudiant;
+        }*/
 
         //generer mail univ    si ça n'existe pas
 

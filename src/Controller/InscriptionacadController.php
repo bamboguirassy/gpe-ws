@@ -352,7 +352,7 @@ class InscriptionacadController extends AbstractController {
         $commandNumber = $request->get('command_number');
         $paymentValidationDate = $request->get('payment_validation_date');
         $inscriptionTemporaire = $em->getRepository(\App\Entity\InscriptionTemporaire::class)->find($commandNumber);
-        if (!$inscriptionTemporaire) {
+        /*if (!$inscriptionTemporaire) {
             $message = (new \Swift_Message('Erreur confirmation paiement - PIN' . $commandNumber))
                     ->setFrom(Utils::$senderEmail, 'SPET GPE')
                     ->setTo(Utils::$adminMail)
@@ -365,7 +365,7 @@ class InscriptionacadController extends AbstractController {
             );
             $mailer->send($message);
             return 0;
-        }
+        }*/
 
         if ($paymentStatus == 200) {
             // créer inscription acad par inscription temp

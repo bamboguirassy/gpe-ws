@@ -119,7 +119,7 @@ class VisiteMedicaleController extends AbstractController {
             return $entityManager
                             ->createQuery($query)
                             ->setParameter('anneeEnCours', $lastAnneeEnCours)
-                            ->setMaxResults(100)
+                            ->setMaxResults(500)
                             ->getResult();
         }
         if ($currentUserGroupe->getCodegroupe() == 'MEDECIN') {

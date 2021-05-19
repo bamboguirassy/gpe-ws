@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\MaxDepth;
+
 
 /**
  * VisiteMedicale
@@ -40,6 +42,7 @@ class VisiteMedicale
      * @var \Inscriptionacad
      * @ORM\OneToOne(targetEntity=Inscriptionacad::class, inversedBy="visiteMedicale", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="inscriptionacad", referencedColumnName="id",nullable=false)
+     * @MaxDepth(1)
      */
     private $inscriptionacad;
     
