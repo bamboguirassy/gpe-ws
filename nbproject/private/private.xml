@@ -3,9 +3,17 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/C:/wamp64/www/gpe/gpe-ws/src/Entity/Classe.php</file>
             <file>file:/C:/wamp64/www/gpe/gpe-ws/src/Controller/InscriptionacadController.php</file>
             <file>file:/C:/wamp64/www/gpe/gpe-ws/src/Entity/Inscriptionacad.php</file>
+=======
+            <file>file:/C:/wamp64/www/projet_jpe3/gpe-ws/src/Entity/Inscriptionacad.php</file>
+            <file>file:/C:/wamp64/www/projet_jpe3/gpe-ws/src/Controller/TypedocumentController.php</file>
+            <file>file:/C:/wamp64/www/projet_jpe3/gpe-ws/src/Controller/DocumentEtudiantController.php</file>
+            <file>file:/C:/wamp64/www/projet_jpe3/gpe-ws/src/Controller/InscriptionacadController.php</file>
+            <file>file:/C:/wamp64/www/projet_jpe3/gpe-ws/src/Controller/EtudiantController.php</file>
+>>>>>>> 30866bd09a3c36e44d2a6b5e0c5e3c9a77c5873a
         </group>
     </open-files>
 </project-private>
