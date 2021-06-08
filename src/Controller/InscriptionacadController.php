@@ -403,13 +403,15 @@ class InscriptionacadController extends AbstractController {
 
             $em->persist($informationPaiementInscription);
             $em->flush();
-            $message = (new \Swift_Message('Confirmation paiement frais inscription administrative - Université de Thiès'))
+            $message = (new \Swift_Message("[Notif inscription] -"
+                    . " Inscription de {$inscriptionacad->getIdetudiant()->getPrenometudiant()} {$inscriptionacad->getIdetudiant()->getNometudiant()}"
+                    . " en {$inscriptionacad->getIdclasse()->getCodeclasse()}"))
                     ->setFrom(Utils::$senderEmail, 'SPET GPE')
                     ->setTo($inscriptionacad->getIdetudiant()->getEmailuniv())
                     ->setBcc('dsos@univ-thies.sn')
                     ->setBody(
-                    "Bonjour {$inscriptionacad->getIdetudiant()->getPrenometudiant()} {$inscriptionacad->getIdetudiant()->getNometudiant()} "
-                    . "le payement de {$inscriptionacad->getMontantinscriptionacad()} Franc CFA pour votre inscription en {$inscriptionacad->getIdclasse()->getLibelleclasse()} à reussi "
+                    "Bonjour {$inscriptionacad->getIdetudiant()->getPrenometudiant()} {$inscriptionacad->getIdetudiant()->getNometudiant()}. <br> "
+                    . "Le paiement de {$inscriptionacad->getMontantinscriptionacad()} Franc CFA pour votre inscription en {$inscriptionacad->getIdclasse()->getLibelleclasse()} a reussi "
                     . " avec le numéro de transaction {$inscriptionacad->getNumquittance()}. "
                     . "Vous pouvez maintenant procéder à la visite médicale si vous n'en êtes pas exempté. "
                     . "A très bientôt !"
