@@ -100,35 +100,6 @@ class TypedocumentController extends AbstractController
                 ['libelletypedocument' => 'ASC']
             );
     }
-    
-     /**
-     * @Rest\Get(path="/inscruptionacad-en-cours-by-etudiant/{id}", name="inscruptionacad_en_cours_by_etudiant")
-     * @Rest\View(statusCode = 200)
-     */
-     public function findInscriptionacadEnCoursByEtudiant(Etudiant $etudiant) {
-         $em = $this->getDoctrine()->getManager();
-         $lastAnneeEnCours = $em->createQuery('SELECT a
-            FROM App\Entity\Anneeacad a
-            WHERE a.encours = :enCours
-            ORDER BY a.id DESC')
-                ->setParameter('enCours', true)
-                ->setMaxResults(1)
-                ->getSingleResult();
-               
-        $inscriptionacad = $em->createQuery('SELECT insac
-            FROM App\Entity\Inscriptionacad insac 
-                JOIN insac.idclasse classe
-                JOIN classe.idanneeacad anneeacad
-            WHERE insac.idetudiant = :etudiant
-                    AND anneeacad = :lastAnneeEnCours')
-                ->setParameter('etudiant', $etudiant)
-                ->setParameter('lastAnneeEnCours', $lastAnneeEnCours)
-                ->setMaxResults(1)
-                ->getSingleResult();
-        
-        return $inscriptionacad ? $inscriptionacad : [];
-         
-    }
 
     /**
      * @Rest\Post(Path="/create", name="typedocument_new")

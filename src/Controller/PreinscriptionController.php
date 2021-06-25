@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Preinscription;
 use App\Entity\Etudiant;
+use App\Entity\Anneeacad;
 use App\Form\PreinscriptionType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -210,6 +211,107 @@ class PreinscriptionController extends AbstractController {
             $isInscriptionActive = true;
         }
         return $isInscriptionActive;
+    }
+    
+    /**
+     * @Rest\Post(path="/for/filter/anneeacad/{id}", name="preinscription_for_filter", requirements={"id"="\d+"})
+     * @Rest\View(StatusCode = 200, serializerEnableMaxDepthChecks=true)
+     */
+    public function findForFilterAction(Request $request, Anneeacad $anneeacad) {
+        ini_set('memory_limit', '512M');
+        $em = $this->getDoctrine()->getManager();
+        $redData = Utils::serializeRequestContent($request);
+        $estInscrit = $redData['estInscrit'];
+        $etablissement = $redData['etablissement'];        
+        $filiere = $redData['filiere'];
+        $niveau = $redData['niveau'];
+        if($estInscrit==2){
+            
+            if(isset($filiere) && isset($niveau)){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'where p.idfiliere=?1 and p.idanneeacad=?2 and p.idniveau=?3')
+                        ->setParameter(1, $filiere)
+                        ->setParameter(2, $anneeacad)
+                        ->setParameter(3, $niveau)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+            if(isset($filiere) && $niveau == NULL ){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'where p.idfiliere=?1 and p.idanneeacad=?2')
+                        ->setParameter(1, $filiere)
+                        ->setParameter(2, $anneeacad)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+            if(isset($etablissement) && (!isset($filiere) || $filiere == NULL) ){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'JOIN p.idfiliere f '
+                                . 'where f.identite=?1 and p.idanneeacad=?2')
+                        ->setParameter(1, $etablissement)
+                        ->setParameter(2, $anneeacad)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+            if(!isset($etablissement) || $etablissement == NULL){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'where p.idanneeacad=?1')
+                        ->setParameter(1, $anneeacad)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+        }
+           else {
+              // throw $this->createNotFoundException("Est Innscrit ".$estInscrit);
+            if(isset($filiere) && isset($niveau)){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'where p.idfiliere=?1 and p.idanneeacad=?2 and p.idniveau=?3 and p.estinscrit=?4')
+                        ->setParameter(1, $filiere)
+                        ->setParameter(2, $anneeacad)
+                        ->setParameter(3, $niveau)
+                        ->setParameter(4, $estInscrit)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+            if(isset($filiere) && $niveau == NULL ){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'where p.idfiliere=?1 and p.idanneeacad=?2 and p.estinscrit=?3')
+                        ->setParameter(1, $filiere)
+                        ->setParameter(2, $anneeacad)
+                        ->setParameter(3, $estInscrit)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+            if(isset($etablissement) && (!isset($filiere) || $filiere == NULL) ){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'JOIN p.idfiliere f '
+                                . 'where f.identite=?1 and p.idanneeacad=?2 and p.estinscrit=?3')
+                        ->setParameter(1, $etablissement)
+                        ->setParameter(2, $anneeacad)
+                        ->setParameter(3, $estInscrit)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+            if(!isset($etablissement) || $etablissement == NULL){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'where p.idanneeacad=?1 and p.estinscrit=?2')
+                        ->setParameter(1, $anneeacad)
+                        ->setParameter(2, $estInscrit)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+        }
+
+        return;
+        
     }
 
 }

@@ -65,14 +65,17 @@ class InscriptionacadController extends AbstractController {
                 ->createQuery($subQuery)
                 ->setParameter('enCours', true)
                 ->setMaxResults(1)
-                ->getSingleResult();
+                ->getResult();
 
-        return $entityManager
+        $inscritionacads = $entityManager
                         ->createQuery($query)
                         ->setParameter('etudiant', $etudiant)
                         ->setParameter('lastAnneeEnCours', $lastAnneeEnCours)
                         ->setMaxResults(1)
-                        ->getSingleResult();
+                        ->getResult();
+                  
+        return count($inscritionacads) ? $inscritionacads[0] : NULL;
+        
     }
 
     /**
