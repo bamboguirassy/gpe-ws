@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}DocumentPreinscription index{% endblock %}
+
+{% block body %}
+    <h1>DocumentPreinscription index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Filename</th>
+                <th>Url</th>
+                <th>DateAjout</th>
+                <th>Titre</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for document_preinscription in document_preinscriptions %}
+            <tr>
+                <td>{{ document_preinscription.id }}</td>
+                <td>{{ document_preinscription.filename }}</td>
+                <td>{{ document_preinscription.url }}</td>
+                <td>{{ document_preinscription.dateAjout ? document_preinscription.dateAjout|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ document_preinscription.titre }}</td>
+                <td>
+                    <a href="{{ path('document_preinscription_show', {'id': document_preinscription.id}) }}">show</a>
+                    <a href="{{ path('document_preinscription_edit', {'id': document_preinscription.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('document_preinscription_new') }}">Create new</a>
+{% endblock %}

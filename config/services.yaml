@@ -6,6 +6,7 @@
 parameters:
   etudiant_photo_directory: 'upload/etudiants/photos/'
   document_etudiant_directory: 'upload/etudiants/documents/'
+  document_preinscription_directory: 'upload/preinscription/documents/'
 
 services:
   # default configuration for services in *this* file

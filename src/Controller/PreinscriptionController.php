@@ -225,8 +225,7 @@ class PreinscriptionController extends AbstractController {
         $etablissement = $redData['etablissement'];        
         $filiere = $redData['filiere'];
         $niveau = $redData['niveau'];
-        if($estInscrit==2){
-            
+        if($estInscrit==2){            
             if(isset($filiere) && isset($niveau)){                
                 $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
                                 . 'where p.idfiliere=?1 and p.idanneeacad=?2 and p.idniveau=?3')
@@ -266,7 +265,6 @@ class PreinscriptionController extends AbstractController {
             }
         }
            else {
-              // throw $this->createNotFoundException("Est Innscrit ".$estInscrit);
             if(isset($filiere) && isset($niveau)){                
                 $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
                                 . 'where p.idfiliere=?1 and p.idanneeacad=?2 and p.idniveau=?3 and p.estinscrit=?4')
