@@ -16,6 +16,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use App\Utils\Utils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
+
 /**
  * @Route("/api/etudiant")
  */
@@ -547,6 +548,51 @@ class EtudiantController extends AbstractController {
                     ->findByNuminterne($numInterne);
         }
         return "" . $numInterne;
+    }
+    
+    
+    /**
+     * @Rest\Get(Path="/rotate-photo/{id}", name="rotate_photo_profil")
+     * @Rest\View(StatusCode=200)
+     */
+    public function setImageRotateProfil(Request $request, Etudiant $etudiant, \App\Utils\FileUploader $uploader){
+        $host = $request->getHttpHost();
+        $scheme = $request->getScheme();
+        //throw $this->createNotFoundException('upload/etudiants/photos/'.$etudiant->getPhoto());
+
+        $degrees = 180;
+        // Chargement
+        
+        $source = imagecreatefromjpeg('upload/etudiants/photos/'.$etudiant->getPhoto());
+
+        // Rotation
+        $rotate = imagerotate($source, $degrees, 0);
+        header("Content-type: image/jpg"); 
+  
+        //throw $this->createNotFoundException(''.$rotate);
+        // Affichage
+        //echo $rotate;
+        //imagepng($rotate);
+//        ob_start();
+//        imagepng($source);
+//        $stringdata = ob_get_contents(); 
+//        ob_end_clean(); 
+        throw $this->createNotFoundException('encodage => '.($rotate));
+
+//        $imageData = base64_encode($stringdata);
+//        file_put_contents($imageData, base64_decode($imageData));
+        $file = new \Symfony\Component\HttpFoundation\File\File($stringdata);
+        $newFileName = $uploader->setTargetDirectory('etudiant_photo_directory')->upload($file, $etudiant->getNuminterne(), $etudiant->getPhoto()); // old fileName
+        $etudiant->setPhotoLink("$scheme://$host/" . $uploader->getTargetDirectory() . $newFileName);
+        $etudiant->setPhoto($newFileName);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->flush();
+        
+        // Libération de la mémoire
+        imagedestroy($source);
+        imagedestroy($rotate);
+        
+        return $etudiant;
     }
 
 }
