@@ -96,6 +96,7 @@ class Filiere
      */
     private $idtypefiliere;
 
+
     public function getId(): ?int
     {
         return $this->id;
@@ -208,6 +209,7 @@ class Filiere
 
         return $this;
     }
+
 
 
 }
