@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\ParamFraisEncadrement;
+use App\Entity\Filiere;
 use App\Form\ParamFraisEncadrementType;
 use App\Repository\ParamFraisEncadrementRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,18 +15,22 @@ use App\Utils\Utils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
- * @Route("/api/param/frais/encadrement")
+ * @Route("/api/paramfraisencadrement")
  */
 class ParamFraisEncadrementController extends AbstractController
 {
     /**
      * @Rest\Get(path="/", name="param_frais_encadrement_index")
      * @Rest\View(StatusCode = 200)
-     * @IsGranted("ROLE_PARAMFRAISENCADREMENT_LISTE")
+     * 
      */
-    public function index(ParamFraisEncadrementRepository $paramFraisEncadrementRepository): array
+    public function index(): array
     {
-        return $paramFraisEncadrementRepository->findAll();
+        $paramFraisEncadrement = $this->getDoctrine()
+            ->getRepository(ParamFraisEncadrement::class)
+            ->findAll();
+      
+        return count($paramFraisEncadrement)?$paramFraisEncadrement:[];
     }
 
     /**
@@ -44,11 +49,32 @@ class ParamFraisEncadrementController extends AbstractController
 
         return $paramFraisEncadrement;
     }
+    
+     /**
+     * @Rest\Post(Path="/all-param-frais-encadrement-create", name="create_pluisieurs_param_frais_encadrement_new")
+     * @Rest\View(StatusCode=200)
+     *
+     */
+     public function ajouterPluisieursParamFraisEncadrement(Request $request) {
+        $entityManager = $this->getDoctrine()->getManager();
+        $redData = Utils::serializeRequestContent($request);
+        $params = $redData['paramFraisEncadrements'];
+        //throw $this->createNotFoundException($params[0]['filiere']['id']);
+        foreach ($params as $ligneparamfraisencadrement) {
+            $paramFraisEncadrement = new ParamFraisEncadrement();
+            $filiere = $entityManager->getRepository(Filiere::class)->find($ligneparamfraisencadrement['filiere']['id']);
+            $paramFraisEncadrement->setFiliere($filiere);
+            $paramFraisEncadrement->setFraisAnnuel($ligneparamfraisencadrement['fraisAnnuel']);
+            $entityManager->persist($paramFraisEncadrement);
+        }
+        $entityManager->flush();
+        return ;
+     }
 
     /**
      * @Rest\Get(path="/{id}", name="param_frais_encadrement_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_PARAMFRAISENCADREMENT_AFFICHAGE")
+     * 
      */
     public function show(ParamFraisEncadrement $paramFraisEncadrement): ParamFraisEncadrement    {
         return $paramFraisEncadrement;
@@ -58,7 +84,6 @@ class ParamFraisEncadrementController extends AbstractController
     /**
      * @Rest\Put(path="/{id}/edit", name="param_frais_encadrement_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_PARAMFRAISENCADREMENT_EDITION")
      */
     public function edit(Request $request, ParamFraisEncadrement $paramFraisEncadrement): ParamFraisEncadrement    {
         $form = $this->createForm(ParamFraisEncadrementType::class, $paramFraisEncadrement);

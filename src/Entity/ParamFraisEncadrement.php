@@ -5,8 +5,12 @@ namespace App\Entity;
 use App\Repository\ParamFraisEncadrementRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+
 /**
- * @ORM\Entity(repositoryClass=ParamFraisEncadrementRepository::class)
+ * ParamFraisEncadrement
+ *
+ * @ORM\Table(name="param_frais_encadrement")
+ * @ORM\Entity
  */
 class ParamFraisEncadrement
 {
