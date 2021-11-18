@@ -38,53 +38,53 @@ class PaiementFraisEncadrement
      */
     private $inscriptionacad;
 
-    public function getId(): ?int
+    public function getId()
     {
         return $this->id;
     }
 
-    public function getDatePaiement(): ?\DateTimeInterface
+    public function getDatePaiement()
     {
         return $this->datePaiement;
     }
 
-    public function setDatePaiement(\DateTimeInterface $datePaiement): self
+    public function setDatePaiement(\DateTimeInterface $datePaiement)
     {
         $this->datePaiement = $datePaiement;
 
         return $this;
     }
 
-    public function getMontantPaye(): ?int
+    public function getMontantPaye()
     {
         return $this->montantPaye;
     }
 
-    public function setMontantPaye(int $montantPaye): self
+    public function setMontantPaye(int $montantPaye)
     {
         $this->montantPaye = $montantPaye;
 
         return $this;
     }
 
-    public function getMethodePaiement(): ?string
+    public function getMethodePaiement()
     {
         return $this->methodePaiement;
     }
 
-    public function setMethodePaiement(string $methodePaiement): self
+    public function setMethodePaiement(string $methodePaiement)
     {
         $this->methodePaiement = $methodePaiement;
 
         return $this;
     }
 
-    public function getInscriptionacad(): ?Inscriptionacad
+    public function getInscriptionacad()
     {
         return $this->inscriptionacad;
     }
 
-    public function setInscriptionacad(?Inscriptionacad $inscriptionacad): self
+    public function setInscriptionacad($inscriptionacad)
     {
         $this->inscriptionacad = $inscriptionacad;
 

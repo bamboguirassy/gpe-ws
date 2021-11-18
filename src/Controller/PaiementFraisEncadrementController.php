@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\PaiementFraisEncadrement;
 use App\Form\PaiementFraisEncadrementType;
-use App\Repository\PaiementFraisEncadrementRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,9 +22,13 @@ class PaiementFraisEncadrementController extends AbstractController
      * @Rest\View(StatusCode = 200)
      * @IsGranted("ROLE_PAIEMENTFRAISENCADREMENT_LISTE")
      */
-    public function index(PaiementFraisEncadrementRepository $paiementFraisEncadrementRepository): array
+    public function index(): array
     {
-        return $paiementFraisEncadrementRepository->findAll();
+        $paiementFraisEncadrement = $this->getDoctrine()
+            ->getRepository(PaiementFraisEncadrement::class)
+            ->findAll();
+      
+        return count($paiementFraisEncadrement)?$paiementFraisEncadrement:[];
     }
 
     /**
