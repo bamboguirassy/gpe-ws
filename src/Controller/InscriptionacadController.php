@@ -168,6 +168,24 @@ class InscriptionacadController extends AbstractController {
     }
 
     /**
+     * @Rest\Get(path="/inscriptions-payant/{id}/etudiant", name="inscriptionacad_etudiant_payant")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function getInscriptionPayantEtudiant(Etudiant $etudiant, EntityManagerInterface $entityManager): array  {
+        return $entityManager->createQuery('
+            SELECT ia
+            FROM App\Entity\Inscriptionacad ia
+            JOIN ia.idetudiant et
+            JOIN ia.idregimeinscription r
+            WHERE et = :etudiant
+                AND r.coderegimeinscription IN (:regimes)
+        ')->setParameters([
+            'etudiant' => $etudiant,
+            'regimes' => ['RNP', 'RPP']
+        ])->getResult();
+    }
+
+    /**
      * @Rest\Post(Path="/create", name="inscriptionacad_new")
      * @Rest\View(StatusCode=200)
      */
