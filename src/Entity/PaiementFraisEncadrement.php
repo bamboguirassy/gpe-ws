@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\PaiementFraisEncadrementRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=PaiementFraisEncadrementRepository::class)
+ * PaiementFraisEncadrement
+ *
+ * @ORM\Table(name="paiement_frais_encadrement")
+ * @ORM\Entity
  */
 class PaiementFraisEncadrement
 {

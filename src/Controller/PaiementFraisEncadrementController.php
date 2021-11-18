@@ -20,7 +20,6 @@ class PaiementFraisEncadrementController extends AbstractController
     /**
      * @Rest\Get(path="/", name="paiement_frais_encadrement_index")
      * @Rest\View(StatusCode = 200)
-     * @IsGranted("ROLE_PAIEMENTFRAISENCADREMENT_LISTE")
      */
     public function index(): array
     {
@@ -30,18 +29,54 @@ class PaiementFraisEncadrementController extends AbstractController
       
         return count($paiementFraisEncadrement)?$paiementFraisEncadrement:[];
     }
+    
+    /**
+     * @Rest\Get(path="/inscriptionacad/{id}", name="paiement_frais_encadrement_by_inscriptionacad")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findByInscriptionacad(\App\Entity\Inscriptionacad $inscriptionacad) {
+        $em = $this->getDoctrine()->getManager();
+        $paiementfraisencadrements = $em->getRepository(PaiementFraisEncadrement::class)
+                ->findBy(['inscriptionacad' => $inscriptionacad]);
+        $paramfraisencadrement = $em->getRepository(\App\Entity\ParamFraisEncadrement::class)
+                ->findBy(['filiere'=>$inscriptionacad->getIdclasse()->getIdfiliere()]);
+        
+        $totalmontantpaye = 0;
+        
+        foreach ($paiementfraisencadrements as $paiementfraisencadrement){
+            $totalmontantpaye = $totalmontantpaye + $paiementfraisencadrement->getMontantPaye();
+            
+        }
+        
+        return ['paiementfraisencadrements'=>count($paiementfraisencadrements)?$paiementfraisencadrements:[],
+         'paramfraisencadrement'=> count($paramfraisencadrement)?$paramfraisencadrement:[], 'totalmontantpaye'=>$totalmontantpaye];
+        
+        
+    }
 
     /**
      * @Rest\Post(Path="/create", name="paiement_frais_encadrement_new")
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_PAIEMENTFRAISENCADREMENT_NOUVEAU")
      */
     public function create(Request $request): PaiementFraisEncadrement    {
-        $paiementFraisEncadrement = new PaiementFraisEncadrement();
-        $form = $this->createForm(PaiementFraisEncadrementType::class, $paiementFraisEncadrement);
-        $form->submit(Utils::serializeRequestContent($request));
-
         $entityManager = $this->getDoctrine()->getManager();
+        $redData = Utils::serializeRequestContent($request);
+        $methodePaiement = $redData['newPaiement']['methodePaiement'];
+        $montantPaye = $redData['newPaiement']['montantPaye'];
+        $idinscriptionacad = $redData['idinscriptionacad'];
+        
+        $inscriptionacad = $this->getDoctrine()
+            ->getRepository(\App\Entity\Inscriptionacad::class)
+            ->find($idinscriptionacad);
+      
+        //throw $this->createNotFoundException($montantPaye);
+        $paiementFraisEncadrement = new PaiementFraisEncadrement();
+        
+        $paiementFraisEncadrement->setDatePaiement(new \DateTime());
+        $paiementFraisEncadrement->setMontantPaye($montantPaye);
+        $paiementFraisEncadrement->setMethodePaiement($methodePaiement);
+        $paiementFraisEncadrement->setInscriptionacad($inscriptionacad);
+        
         $entityManager->persist($paiementFraisEncadrement);
         $entityManager->flush();
 
