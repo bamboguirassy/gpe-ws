@@ -27,7 +27,7 @@ class ParamFraisEncadrement
     private $fraisAnnuel;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Filiere::class)
+     * @ORM\OneToOne(targetEntity=Filiere::class, inversedBy="paramFraisEncadrement")
      * @ORM\JoinColumn(nullable=false)
      */
     private $filiere;
