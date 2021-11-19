@@ -53,7 +53,55 @@ class PaiementFraisEncadrementController extends AbstractController
         
         
     }
+  /**
+     * @Rest\Post(path="/inscriptionacad-filiere/", name="inscriptionacad_by_filiere", requirements={"id"="\d+"})
+     * @Rest\View(StatusCode = 200, serializerEnableMaxDepthChecks=true)
+     */
+    public function findByFiliere(Request $request) {
+        $em = $this->getDoctrine()->getManager();        
+        $redData = Utils::serializeRequestContent($request); 
+        $idanneAcad = $redData['idanneAcad'];
+        $idfiliere = $redData['idfiliere'];
+        $idniveau = $redData['idniveau'];
 
+        
+        $anneAcad =  $em->getRepository(Anneeacad::class)->find($idanneAcad);
+        $niveau =  $em->getRepository(Niveau::class)->find($idniveau);
+        //throw $this->createNotFoundException($niveau->getId());
+
+        //reccuperation classe
+        $classes = $em->getRepository(Classe::class)
+                ->findBy(array('idfiliere' => $idfiliere, 'idniveau' => $niveau, 'idanneeacad' => $anneAcad));
+        
+        //reccuperation classe
+        $inscriptionacads = null;
+        //test si classe exist
+        if (count($classes) > 0) {
+
+            //reccuperer preinscription classe
+            $inscriptionacads = $em->createQuery("select ia from "
+                            . "\App\Entity\Inscriptionacad ia where ia.idclasse in (?1)")
+                    ->setParameter(1, $classes)
+                    ->getResult();
+            //formatter date
+//            foreach ($inscriptionacads as $inscriptionacad) {
+//                $inscriptionacad->setDateinscacad(AppManager::formatDateTime($inscriptionacad->getDateinscacad()));
+//            }
+        }
+        return count($inscriptionacads) ? $inscriptionacads :[];
+    }
+
+      /**
+     * @Rest\Get(path="/classe/{id}", name="inscriptionacad_by_classe")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findByClasse(\App\Entity\Classe $classe) {
+        $em = $this->getDoctrine()->getManager();
+        $inscriptionacads = $em->getRepository('App\Entity\Inscriptionacad')
+                ->findBy(['idclasse' => $classe]);
+        return count($inscriptionacads) ? $inscriptionacads : [];
+    }
+    
     /**
      * @Rest\Post(Path="/create", name="paiement_frais_encadrement_new")
      * @Rest\View(StatusCode=200)
