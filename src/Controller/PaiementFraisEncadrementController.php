@@ -13,7 +13,7 @@ use App\Utils\Utils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
- * @Route("/api/paiement/frais/encadrement")
+ * @Route("/api/paiementfraisencadrement")
  */
 class PaiementFraisEncadrementController extends AbstractController
 {

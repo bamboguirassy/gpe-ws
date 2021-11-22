@@ -30,13 +30,13 @@ class PaiementFraisEncadrement
     private $montantPaye;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(name="methode_paiement_id" ,type="string", length=255)
      */
     private $methodePaiement;
 
     /**
      * @ORM\ManyToOne(targetEntity=Inscriptionacad::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(name="inscriptionacad_id", nullable=false)
      */
     private $inscriptionacad;
 
