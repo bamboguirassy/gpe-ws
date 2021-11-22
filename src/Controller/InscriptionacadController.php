@@ -297,7 +297,7 @@ class InscriptionacadController extends AbstractController
 
     /**
      * Uniquement réservé à l'etudiant connecté
-     * @Rest\Get(path="/{id}", name="inscriptionacad_show_etudiant",requirements = {"id"="\d+"})
+     * @Rest\Get(path="/{id}/find", name="inscriptionacad_show_etudiant",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @param Inscriptionacad $inscriptionacad
      * @return Inscriptionacad
