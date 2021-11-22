@@ -43,8 +43,6 @@ class PaiementFraisEncadrementController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $paiementfraisencadrements = $em->getRepository(PaiementFraisEncadrement::class)
                 ->findBy(['inscriptionacad' => $inscriptionacad]);
-        $paramfraisencadrement = $em->getRepository(\App\Entity\ParamFraisEncadrement::class)
-                ->findBy(['filiere'=>$inscriptionacad->getIdclasse()->getIdfiliere()]);
         
         $totalmontantpaye = 0;
         
@@ -53,7 +51,7 @@ class PaiementFraisEncadrementController extends AbstractController
         }
         
         return ['paiementfraisencadrements'=>count($paiementfraisencadrements)?$paiementfraisencadrements:[],
-         'paramfraisencadrement'=> count($paramfraisencadrement)?$paramfraisencadrement:[], 'totalmontantpaye'=>$totalmontantpaye];
+         'totalmontantpaye'=>$totalmontantpaye];
     }
 
     /**
