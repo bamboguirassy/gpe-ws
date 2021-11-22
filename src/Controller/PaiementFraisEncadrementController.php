@@ -97,8 +97,9 @@ class PaiementFraisEncadrementController extends AbstractController
             $resteAPaye=$montantAPaye - $somme;
             $tab[]= ["inscriptionacad"=>$inscriptionAcad, "totalmontantpaye"=>$totalMontantPaye,"resteAPaye"=>$resteAPaye];
         }
-        
+        var_dump($tab);
         return $tab;
+        
     }
     
     /**
