@@ -29,16 +29,28 @@ class PaiementFraisEncadrement
      */
     private $montantPaye;
 
+
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\ManyToOne(targetEntity=Inscriptionacad::class, cascade={"persist"})
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $inscriptionacad;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Modepaiement::class, cascade={"persist"})
+     * @ORM\JoinColumn(nullable=false)
      */
     private $methodePaiement;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Inscriptionacad::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\Column(type="string", length=150)
      */
-    private $inscriptionacad;
+    private $filename;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $url;
 
     public function getId()
     {
@@ -50,7 +62,7 @@ class PaiementFraisEncadrement
         return $this->datePaiement;
     }
 
-    public function setDatePaiement(\DateTimeInterface $datePaiement)
+    public function setDatePaiement($datePaiement)
     {
         $this->datePaiement = $datePaiement;
 
@@ -74,7 +86,7 @@ class PaiementFraisEncadrement
         return $this->methodePaiement;
     }
 
-    public function setMethodePaiement(string $methodePaiement)
+    public function setMethodePaiement($methodePaiement)
     {
         $this->methodePaiement = $methodePaiement;
 
@@ -89,6 +101,30 @@ class PaiementFraisEncadrement
     public function setInscriptionacad($inscriptionacad)
     {
         $this->inscriptionacad = $inscriptionacad;
+
+        return $this;
+    }
+
+    public function getFilename(): ?string
+    {
+        return $this->filename;
+    }
+
+    public function setFilename(string $filename): self
+    {
+        $this->filename = $filename;
+
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(string $url): self
+    {
+        $this->url = $url;
 
         return $this;
     }

@@ -32,6 +32,11 @@ class ParamFraisEncadrement
      */
     private $filiere;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $mensualite;
+
     public function getId()
     {
         return $this->id;
@@ -57,6 +62,18 @@ class ParamFraisEncadrement
     public function setFiliere(Filiere $filiere)
     {
         $this->filiere = $filiere;
+
+        return $this;
+    }
+
+    public function getMensualite(): ?int
+    {
+        return $this->mensualite;
+    }
+
+    public function setMensualite(?int $mensualite): self
+    {
+        $this->mensualite = $mensualite;
 
         return $this;
     }

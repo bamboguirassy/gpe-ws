@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Anneeacad;
 use App\Entity\Filiere;
 use App\Entity\Niveau;
+use App\Utils\FileUploader;
 use App\Entity\PaiementFraisEncadrement;
 use App\Form\PaiementFraisEncadrementType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -47,11 +48,13 @@ class PaiementFraisEncadrementController extends AbstractController
         $totalmontantpaye = 0;
         
         foreach ($paiementfraisencadrements as $paiementfraisencadrement) {
+            //throw $this->createNotFoundException(date_format($paiementfraisencadrement->getDatePaiement(),"d/m/Y"));
             $totalmontantpaye = $totalmontantpaye + $paiementfraisencadrement->getMontantPaye();
+            //$paiementfraisencadrement->setDatePaiement(date_format($paiementfraisencadrement->getDatePaiement(), "Y-m-d"));
         }
         
         return ['paiementfraisencadrements'=>count($paiementfraisencadrements)?$paiementfraisencadrements:[],
-         'totalmontantpaye'=>$totalmontantpaye];
+         'totalmontantpaye'=>$totalmontantpaye, 'inscriptionacad'=>$inscriptionacad];
     }
 
     /**
@@ -103,25 +106,34 @@ class PaiementFraisEncadrementController extends AbstractController
      * @Rest\Post(Path="/create", name="paiement_frais_encadrement_new")
      * @Rest\View(StatusCode=200)
      */
-    public function create(Request $request): PaiementFraisEncadrement
+    public function create(Request $request, FileUploader $uploader, EntityManagerInterface $entityManager): PaiementFraisEncadrement
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $redData = Utils::serializeRequestContent($request);
-        $methodePaiement = $redData['newPaiement']['methodePaiement'];
-        $montantPaye = $redData['newPaiement']['montantPaye'];
-        $idinscriptionacad = $redData['idinscriptionacad'];
+        $paiementFraisEncadrement = new PaiementFraisEncadrement();
+        $httpHost = $request->getHttpHost();
+        $protocolVersion = $request->getScheme();
+        $data = Utils::getObjectFromRequest($request);
+        $idmethodePaiement = $data->methodePaiement;
+        $montantPaye = $data->montantPaye;
+        $idinscriptionacad = $data->idinscriptionacad;
         
-        $inscriptionacad = $this->getDoctrine()
+        $deserializedDocument = Utils::getObjectFromRequest($request);
+        $newFilename = $uploader->decodeAndUploadTo($deserializedDocument, $this->getParameter('document_paiementfraisencadrement_directory'));
+        $inscriptionacad = $entityManager
             ->getRepository(\App\Entity\Inscriptionacad::class)
             ->find($idinscriptionacad);
-      
-        //throw $this->createNotFoundException($montantPaye);
-        $paiementFraisEncadrement = new PaiementFraisEncadrement();
+        $methodePaiement = $entityManager
+            ->getRepository(\App\Entity\Modepaiement::class)
+            ->find($idmethodePaiement);
         
-        $paiementFraisEncadrement->setDatePaiement(new \DateTime());
-        $paiementFraisEncadrement->setMontantPaye($montantPaye);
-        $paiementFraisEncadrement->setMethodePaiement($methodePaiement);
-        $paiementFraisEncadrement->setInscriptionacad($inscriptionacad);
+        $paiementFraisEncadrement
+            ->setFilename($newFilename)
+            ->setDatePaiement(new \DateTime())
+            ->setMontantPaye($montantPaye)
+            ->setMethodePaiement($methodePaiement)
+            ->setInscriptionacad($inscriptionacad);
+        
+        $paiementFraisEncadrement
+            ->setUrl($protocolVersion . '://' . $httpHost . '/' . $this->getParameter('document_paiementfraisencadrement_directory') . $paiementFraisEncadrement->getFilename());
         
         $entityManager->persist($paiementFraisEncadrement);
         $entityManager->flush();
@@ -163,7 +175,7 @@ class PaiementFraisEncadrementController extends AbstractController
     public function cloner(Request $request, PaiementFraisEncadrement $paiementFraisEncadrement):  PaiementFraisEncadrement
     {
         $em=$this->getDoctrine()->getManager();
-        $paiementFraisEncadrementNew=new PaiementFraisEncadrement();
+        $paiementFraisEncadrementNew = new PaiementFraisEncadrement();
         $form = $this->createForm(PaiementFraisEncadrementType::class, $paiementFraisEncadrementNew);
         $form->submit(Utils::serializeRequestContent($request));
         $em->persist($paiementFraisEncadrementNew);
@@ -176,7 +188,6 @@ class PaiementFraisEncadrementController extends AbstractController
     /**
      * @Rest\Delete("/{id}", name="paiement_frais_encadrement_delete",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_PAIEMENTFRAISENCADREMENT_SUPPRESSION")
      */
     public function delete(PaiementFraisEncadrement $paiementFraisEncadrement): PaiementFraisEncadrement
     {
