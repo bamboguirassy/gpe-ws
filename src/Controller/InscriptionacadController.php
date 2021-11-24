@@ -25,16 +25,18 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 /**
  * @Route("/api/inscriptionacad")
  */
-class InscriptionacadController extends AbstractController {
+class InscriptionacadController extends AbstractController
+{
 
     /**
      * @Rest\Get(path="/", name="inscriptionacad_index")
      * @Rest\View(StatusCode = 200)
      */
-    public function index() {
+    public function index()
+    {
         $inscriptionacads = $this->getDoctrine()
-                ->getRepository(Inscriptionacad::class)
-                ->findAll();
+            ->getRepository(Inscriptionacad::class)
+            ->findAll();
 
         return $inscriptionacads;
     }
@@ -43,7 +45,8 @@ class InscriptionacadController extends AbstractController {
      * @Rest\Get(path="/en-cours/etudiant/{id}", name="find_inscription_acad_en_cours")
      * @Rest\View(StatusCode = 200)
      */
-    public function findEncoursByEtudiant(Etudiant $etudiant, EntityManagerInterface $entityManager) {
+    public function findEncoursByEtudiant(Etudiant $etudiant, EntityManagerInterface $entityManager)
+    {
         $query = "
             SELECT insac
             FROM App\Entity\Inscriptionacad insac
@@ -66,20 +69,20 @@ class InscriptionacadController extends AbstractController {
         ';
 
         $lastAnneeEnCours = $entityManager
-                ->createQuery($subQuery)
-                ->setParameter('enCours', true)
-                ->setMaxResults(1)
-                ->getResult();
+            ->createQuery($subQuery)
+            ->setParameter('enCours', true)
+            ->setMaxResults(1)
+            ->getResult();
 
         $inscritionacads = $entityManager
-                        ->createQuery($query)
-                        ->setParameter('etudiant', $etudiant)
-                        ->setParameter('lastAnneeEnCours', $lastAnneeEnCours)
-                        ->setMaxResults(1)
-                        ->getResult();
-                  
+            ->createQuery($query)
+            ->setParameter('etudiant', $etudiant)
+            ->setParameter('lastAnneeEnCours', $lastAnneeEnCours)
+            ->setMaxResults(1)
+            ->getResult();
+
         return count($inscritionacads) ? $inscritionacads[0] : NULL;
-        
+
     }
 
     /**
@@ -103,7 +106,8 @@ class InscriptionacadController extends AbstractController {
      * @Rest\Get(path="/preinscription/{id}", name="inscriptionacad_by_preinscription")
      * @Rest\View(StatusCode = 200)
      */
-    public function findByPreinscription(Preinscription $preinscription) {
+    public function findByPreinscription(Preinscription $preinscription)
+    {
         $em = $this->getDoctrine()->getManager();
         $classe = $em->getRepository(Classe::class)->findOneBy(['idniveau' => $preinscription->getIdniveau(),
             'idfiliere' => $preinscription->getIdfiliere(), 'idanneeacad' => $preinscription->getIdanneeacad()]);
@@ -111,36 +115,37 @@ class InscriptionacadController extends AbstractController {
             throw $this->createNotFoundException("Classe introuvable pour la preinscription selectionnée");
         }
         $inscriptionacads = $em->createQuery("select ia from App\Entity\Inscriptionacad ia, "
-                        . "App\Entity\Etudiant et where ia.idclasse=?1 and ia.idetudiant=et and et.cni=?2 ")
-                ->setParameter(1, $classe)
-                ->setParameter(2, $preinscription->getCni())
-                ->getResult();
+            . "App\Entity\Etudiant et where ia.idclasse=?1 and ia.idetudiant=et and et.cni=?2 ")
+            ->setParameter(1, $classe)
+            ->setParameter(2, $preinscription->getCni())
+            ->getResult();
 
 
         return count($inscriptionacads) ? $inscriptionacads[0] : array('id' => null);
     }
-    
-   
+
+
     /**
      * @Rest\Post(path="/inscriptionacad-filiere/", name="inscriptionacad_by_filiere", requirements={"id"="\d+"})
      * @Rest\View(StatusCode = 200, serializerEnableMaxDepthChecks=true)
      */
-    public function findByFiliere(Request $request) {
-        $em = $this->getDoctrine()->getManager();        
-        $redData = Utils::serializeRequestContent($request); 
+    public function findByFiliere(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $redData = Utils::serializeRequestContent($request);
         $idanneAcad = $redData['idanneAcad'];
         $idfiliere = $redData['idfiliere'];
         $idniveau = $redData['idniveau'];
 
-        
-        $anneAcad =  $em->getRepository(Anneeacad::class)->find($idanneAcad);
-        $niveau =  $em->getRepository(Niveau::class)->find($idniveau);
+
+        $anneAcad = $em->getRepository(Anneeacad::class)->find($idanneAcad);
+        $niveau = $em->getRepository(Niveau::class)->find($idniveau);
         //throw $this->createNotFoundException($niveau->getId());
 
         //reccuperation classe
         $classes = $em->getRepository(Classe::class)
-                ->findBy(array('idfiliere' => $idfiliere, 'idniveau' => $niveau, 'idanneeacad' => $anneAcad));
-        
+            ->findBy(array('idfiliere' => $idfiliere, 'idniveau' => $niveau, 'idanneeacad' => $anneAcad));
+
         //reccuperation classe
         $inscriptionacads = null;
         //test si classe exist
@@ -148,25 +153,26 @@ class InscriptionacadController extends AbstractController {
 
             //reccuperer preinscription classe
             $inscriptionacads = $em->createQuery("select ia from "
-                            . "\App\Entity\Inscriptionacad ia where ia.idclasse in (?1)")
-                    ->setParameter(1, $classes)
-                    ->getResult();
+                . "\App\Entity\Inscriptionacad ia where ia.idclasse in (?1)")
+                ->setParameter(1, $classes)
+                ->getResult();
             //formatter date
 //            foreach ($inscriptionacads as $inscriptionacad) {
 //                $inscriptionacad->setDateinscacad(AppManager::formatDateTime($inscriptionacad->getDateinscacad()));
 //            }
         }
-        return count($inscriptionacads) ? $inscriptionacads :[];
+        return count($inscriptionacads) ? $inscriptionacads : [];
     }
 
     /**
      * @Rest\Get(path="/classe/{id}", name="inscriptionacad_by_classe")
      * @Rest\View(StatusCode = 200)
      */
-    public function findByClasse(\App\Entity\Classe $classe) {
+    public function findByClasse(\App\Entity\Classe $classe)
+    {
         $em = $this->getDoctrine()->getManager();
         $inscriptionacads = $em->getRepository('App\Entity\Inscriptionacad')
-                ->findBy(['idclasse' => $classe]);
+            ->findBy(['idclasse' => $classe]);
         return count($inscriptionacads) ? $inscriptionacads : [];
     }
 
@@ -174,14 +180,15 @@ class InscriptionacadController extends AbstractController {
      * @Rest\Get(path="/inscriptions/{id}/etudiant", name="inscriptionacad_etudiant")
      * @Rest\View(StatusCode = 200)
      */
-    public function getInscriptionEtudiant(Etudiant $etudiant): array {
+    public function getInscriptionEtudiant(Etudiant $etudiant): array
+    {
         $em = $this->getDoctrine()->getManager();
         $inscriptionacads = $em->createQuery('select ia from App\Entity\Inscriptionacad ia, '
-                        . 'App\Entity\Classe c, App\Entity\Anneeacad aa where '
-                        . 'ia.idclasse=c and c.idanneeacad=aa and ia.idetudiant=?1 '
-                        . 'order by aa.id DESC')
-                ->setParameter(1, $etudiant)
-                ->getResult();
+            . 'App\Entity\Classe c, App\Entity\Anneeacad aa where '
+            . 'ia.idclasse=c and c.idanneeacad=aa and ia.idetudiant=?1 '
+            . 'order by aa.id DESC')
+            ->setParameter(1, $etudiant)
+            ->getResult();
         return count($inscriptionacads) ? $inscriptionacads : [];
     }
 
@@ -189,8 +196,9 @@ class InscriptionacadController extends AbstractController {
      * @Rest\Get(path="/inscriptions-payant/{id}/etudiant", name="inscriptionacad_etudiant_payant")
      * @Rest\View(StatusCode = 200)
      */
-    public function getInscriptionPayantEtudiant(Etudiant $etudiant, EntityManagerInterface $entityManager): array  {
-        return $entityManager->createQuery('
+    public function getInscriptionPayantEtudiant(Etudiant $etudiant, EntityManagerInterface $entityManager): array
+    {
+        $inscriptionacads = $entityManager->createQuery('
             SELECT ia
             FROM App\Entity\Inscriptionacad ia
             JOIN ia.idetudiant et
@@ -221,7 +229,8 @@ class InscriptionacadController extends AbstractController {
      * @Rest\Post(Path="/create", name="inscriptionacad_new")
      * @Rest\View(StatusCode=200)
      */
-    public function create(Request $request): Inscriptionacad {
+    public function create(Request $request): Inscriptionacad
+    {
         $inscriptionacad = new Inscriptionacad();
         $form = $this->createForm(InscriptionacadType::class, $inscriptionacad);
         $form->submit(Utils::serializeRequestContent($request));
@@ -236,22 +245,22 @@ class InscriptionacadController extends AbstractController {
         }
         $preinscriptionId = $requestData->preinscirptionId;
         $preinscription = $entityManager->getRepository(Preinscription::class)
-                ->find($preinscriptionId);
+            ->find($preinscriptionId);
         $inscriptionacad->setPassage($preinscription->getPassage());
         $inscriptionacad->setIdfosuser($this->getUser());
         $inscriptionacad->setEtat("I");
 
         $etudiant = $entityManager->getRepository(Etudiant::class)
-                ->findOneByCni($preinscription->getCni());
+            ->findOneByCni($preinscription->getCni());
         if (!$etudiant) {
             throw $this->createNotFoundException("Etudiant introuvable...");
         }
         $inscriptionacad->setIdetudiant($etudiant);
 
         $classe = $entityManager->getRepository(Classe::class)
-                ->findOneBy(['idfiliere' => $preinscription->getIdfiliere(),
-            'idniveau' => $preinscription->getidniveau(),
-            'idanneeacad' => $preinscription->getIdanneeacad()]);
+            ->findOneBy(['idfiliere' => $preinscription->getIdfiliere(),
+                'idniveau' => $preinscription->getidniveau(),
+                'idanneeacad' => $preinscription->getIdanneeacad()]);
         if (!$classe) {
             throw $this->createNotFoundException("Aucune classe trouvée pour effectuer l'inscription...");
         }
@@ -260,8 +269,8 @@ class InscriptionacadController extends AbstractController {
 
         //set default modalité enseignement à presentiel
         $modaliteEnseignementPresentiel = $entityManager
-                ->getRepository("App\Entity\Modaliteenseignement")
-                ->findOneByCodemodaliteenseignement('PRES');
+            ->getRepository("App\Entity\Modaliteenseignement")
+            ->findOneByCodemodaliteenseignement('PRES');
         if (!$modaliteEnseignementPresentiel) {
             throw $this->createNotFoundException("Modalité enseignement presentiel introuvable...");
         }
@@ -272,7 +281,7 @@ class InscriptionacadController extends AbstractController {
             $inscriptionacad->setMontantinscriptionacad($preinscription->getMontant());
             //find moyen paiement Campusen
             $modepaiement = $entityManager->getRepository("App\Entity\Modepaiement")
-                    ->findOneByCodemodepaiement("CAMPUSEN");
+                ->findOneByCodemodepaiement("CAMPUSEN");
             if (!$modepaiement) {
                 throw $this->createNotFoundException("Mode de paiement Campusen introuvable...");
             }
@@ -280,7 +289,7 @@ class InscriptionacadController extends AbstractController {
         } else {
             //find moyen paiement TouchPay
             $modepaiement = $entityManager->getRepository("App\Entity\Modepaiement")
-                    ->findOneByCodemodepaiement("TP");
+                ->findOneByCodemodepaiement("TP");
             if (!$modepaiement) {
                 throw $this->createNotFoundException("Mode de paiement TouchPay introuvable...");
             }
@@ -289,7 +298,7 @@ class InscriptionacadController extends AbstractController {
 
         //find non boursier et le definir
         $typeBourseNonBoursier = $entityManager->getRepository("App\Entity\Bourse")
-                ->findOneByCodebourse("NB");
+            ->findOneByCodebourse("NB");
         if (!$typeBourseNonBoursier) {
             throw $this->createNotFoundException("Type de bourse introuvable pour Non Boursier");
         }
@@ -311,7 +320,8 @@ class InscriptionacadController extends AbstractController {
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_INSCRIPTIONACAD_AFFICHAGE")
      */
-    public function show(Inscriptionacad $inscriptionacad): Inscriptionacad {
+    public function show(Inscriptionacad $inscriptionacad): Inscriptionacad
+    {
         return $inscriptionacad;
     }
 
@@ -319,7 +329,8 @@ class InscriptionacadController extends AbstractController {
      * @Rest\Put(path="/{id}/edit", name="inscriptionacad_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      */
-    public function edit(Request $request, Inscriptionacad $inscriptionacad): Inscriptionacad {
+    public function edit(Request $request, Inscriptionacad $inscriptionacad): Inscriptionacad
+    {
         $form = $this->createForm(InscriptionacadType::class, $inscriptionacad);
         $form->submit(Utils::serializeRequestContent($request));
 
@@ -338,7 +349,8 @@ class InscriptionacadController extends AbstractController {
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_INSCRIPTIONACAD_CLONE")
      */
-    public function cloner(Request $request, Inscriptionacad $inscriptionacad): Inscriptionacad {
+    public function cloner(Request $request, Inscriptionacad $inscriptionacad): Inscriptionacad
+    {
         $em = $this->getDoctrine()->getManager();
         $inscriptionacadNew = new Inscriptionacad();
         $form = $this->createForm(InscriptionacadType::class, $inscriptionacadNew);
@@ -354,15 +366,16 @@ class InscriptionacadController extends AbstractController {
      * @Rest\Put(path="/{id}/confirm-prepaid-inscription", name="prepaid_inscription_confirm",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      */
-    public function confirmPrepaidInscription(\App\Entity\InscriptionTemporaire $inscriptionTemporaire, \Swift_Mailer $mailer) {
+    public function confirmPrepaidInscription(\App\Entity\InscriptionTemporaire $inscriptionTemporaire, \Swift_Mailer $mailer)
+    {
         $em = $this->getDoctrine()->getManager();
         $preinscriptions = $em->getRepository(Preinscription::class)
-                ->findBy([
-            'idfiliere' => $inscriptionTemporaire->getIdclasse()->getIdfiliere(),
-            'idniveau' => $inscriptionTemporaire->getIdClasse()->getIdniveau(),
-            'idanneeacad' => $inscriptionTemporaire->getIdClasse()->getIdanneeacad(),
-            'cni' => $inscriptionTemporaire->getIdetudiant()->getCni()
-        ]);
+            ->findBy([
+                'idfiliere' => $inscriptionTemporaire->getIdclasse()->getIdfiliere(),
+                'idniveau' => $inscriptionTemporaire->getIdClasse()->getIdniveau(),
+                'idanneeacad' => $inscriptionTemporaire->getIdClasse()->getIdanneeacad(),
+                'cni' => $inscriptionTemporaire->getIdetudiant()->getCni()
+            ]);
 
         if (count($preinscriptions)) {
             if (count($preinscriptions) > 1) {
@@ -380,13 +393,13 @@ class InscriptionacadController extends AbstractController {
         // Envoyer un email de confirmation
 
         $message = (new \Swift_Message('Confirmation Préinscription'))
-                ->setFrom(Utils::$senderEmail)
-                ->setTo($preinscription->getEmail())
-                ->setBody(
+            ->setFrom(Utils::$senderEmail)
+            ->setTo($preinscription->getEmail())
+            ->setBody(
                 $this->renderView(
-                        'emails/preinscription/confirmation-notification.html.twig', ['preinscription' => $preinscription]
+                    'emails/preinscription/confirmation-notification.html.twig', ['preinscription' => $preinscription]
                 ), 'text/html'
-        );
+            );
         $i = 0;
         $isMailSent = $mailer->send($message);
         while (!$isMailSent) {
@@ -405,7 +418,8 @@ class InscriptionacadController extends AbstractController {
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_INSCRIPTIONACAD_DELETE")
      */
-    public function delete(Inscriptionacad $inscriptionacad): Inscriptionacad {
+    public function delete(Inscriptionacad $inscriptionacad): Inscriptionacad
+    {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($inscriptionacad);
         $entityManager->flush();
@@ -418,7 +432,8 @@ class InscriptionacadController extends AbstractController {
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_INSCRIPTIONACAD_DELETE")
      */
-    public function deleteMultiple(Request $request): array {
+    public function deleteMultiple(Request $request): array
+    {
         $entityManager = $this->getDoctrine()->getManager();
         $inscriptionacads = Utils::getObjectFromRequest($request);
         if (!count($inscriptionacads)) {
@@ -437,7 +452,8 @@ class InscriptionacadController extends AbstractController {
      * @Rest\Post("/public/pin", name="payment_instant_notification")
      * @Rest\View(StatusCode=200)
      */
-    public function paymentInstantNotification(Request $request, \Swift_Mailer $mailer) {
+    public function paymentInstantNotification(Request $request, \Swift_Mailer $mailer)
+    {
         $em = $this->getDoctrine()->getManager();
         $paymentMode = $request->get('payment_mode');
         $paidSum = $request->get('paid_sum');
@@ -477,20 +493,20 @@ class InscriptionacadController extends AbstractController {
             $inscriptionacad->setNumquittance($paymentToken);
             $informationPaiementInscription->setStatus('Confirmé');
             $preinscriptions = $em->getRepository(Preinscription::class)
-                    ->findBy([
-                'cni' => $inscriptionacad->getIdetudiant()->getCni(),
-                'idfiliere' => $inscriptionacad->getIdclasse()->getIdfiliere(),
-                'idanneeacad' => $inscriptionacad->getIdclasse()->getIdanneeacad(),
-                'idniveau' => $inscriptionacad->getIdclasse()->getIdniveau(),
-                'estinscrit' => FALSE]);
+                ->findBy([
+                    'cni' => $inscriptionacad->getIdetudiant()->getCni(),
+                    'idfiliere' => $inscriptionacad->getIdclasse()->getIdfiliere(),
+                    'idanneeacad' => $inscriptionacad->getIdclasse()->getIdanneeacad(),
+                    'idniveau' => $inscriptionacad->getIdclasse()->getIdniveau(),
+                    'estinscrit' => FALSE]);
             if ($preinscriptions) {
                 $preinscriptions[0]->setEstinscrit(TRUE);
             }
             // $em->remove($inscriptionTemporaire);
             // find and remove all inscription temps on payment confirm => MF - 31/03/2021
             $inscriptionTemps = $em->getRepository('App\Entity\InscriptionTemporaire')
-                    ->findBy(['idetudiant' => $inscriptionacad->getIdetudiant(),
-                'idclasse' => $inscriptionacad->getIdclasse()]);
+                ->findBy(['idetudiant' => $inscriptionacad->getIdetudiant(),
+                    'idclasse' => $inscriptionacad->getIdclasse()]);
             foreach ($inscriptionTemps as $inscriptionTemp) {
                 $em->remove($inscriptionTemp);
             }
@@ -499,55 +515,56 @@ class InscriptionacadController extends AbstractController {
             $em->persist($informationPaiementInscription);
             $em->flush();
             $message = (new \Swift_Message("[Notif inscription] -"
-                    . " Inscription de {$inscriptionacad->getIdetudiant()->getPrenometudiant()} {$inscriptionacad->getIdetudiant()->getNometudiant()}"
-                    . " en {$inscriptionacad->getIdclasse()->getCodeclasse()}"))
-                    ->setFrom(Utils::$senderEmail, 'SPET GPE')
-                    ->setTo($inscriptionacad->getIdetudiant()->getEmailuniv())
-                    ->setBcc('dsos@univ-thies.sn')
-                    ->setBody(
+                . " Inscription de {$inscriptionacad->getIdetudiant()->getPrenometudiant()} {$inscriptionacad->getIdetudiant()->getNometudiant()}"
+                . " en {$inscriptionacad->getIdclasse()->getCodeclasse()}"))
+                ->setFrom(Utils::$senderEmail, 'SPET GPE')
+                ->setTo($inscriptionacad->getIdetudiant()->getEmailuniv())
+                ->setBcc('dsos@univ-thies.sn')
+                ->setBody(
                     "Bonjour {$inscriptionacad->getIdetudiant()->getPrenometudiant()} {$inscriptionacad->getIdetudiant()->getNometudiant()}. <br> "
                     . "Le paiement de {$inscriptionacad->getMontantinscriptionacad()} Franc CFA pour votre inscription en {$inscriptionacad->getIdclasse()->getLibelleclasse()} a reussi "
                     . " avec le numéro de transaction {$inscriptionacad->getNumquittance()}. "
                     . "Vous pouvez maintenant procéder à la visite médicale si vous n'en êtes pas exempté. "
                     . "A très bientôt !"
                     , 'text/html'
-            );
+                );
             $mailer->send($message);
             return 1;
         } else if ($paymentStatus == 420) {
             //  $informationPaiementInscription->setStatus('Annulé');
-           /* $message = (new \Swift_Message('Erreur confirmation paiement - PIN' . $commandNumber))
-                    ->setFrom(Utils::$senderEmail, 'SPET GPE')
-                    ->setTo(Utils::$adminMail)
-                    ->setBody(
-                    "Bonjour Admin,"
-                    . "Une erreur est survenue lors de la confirmation"
-                    . " de paiement de l'inscription académique numero {$commandNumber},"
-                    . "Token de paiement : {$paymentToken} avec le statut {$paymentStatus}"
-                    , 'text/html'
-            );
-            $mailer->send($message);*/
+            /* $message = (new \Swift_Message('Erreur confirmation paiement - PIN' . $commandNumber))
+                     ->setFrom(Utils::$senderEmail, 'SPET GPE')
+                     ->setTo(Utils::$adminMail)
+                     ->setBody(
+                     "Bonjour Admin,"
+                     . "Une erreur est survenue lors de la confirmation"
+                     . " de paiement de l'inscription académique numero {$commandNumber},"
+                     . "Token de paiement : {$paymentToken} avec le statut {$paymentStatus}"
+                     , 'text/html'
+             );
+             $mailer->send($message);*/
             return 0;
         } else {
             //  $informationPaiementInscription->setStatus('Annulé');
-          /*  $message = (new \Swift_Message('Erreur Transaction - PIN' . $commandNumber))
-                    ->setFrom(Utils::$senderEmail, 'SPET GPE')
-                    ->setTo(Utils::$adminMail)
-                    ->setBody(
-                    "Bonjour Admin,"
-                    . "Une erreur est survenue lors de la confirmation"
-                    . " de paiement de l'inscription académique numero {$commandNumber},"
-                    . "Token de paiement : {$paymentToken} avec le statut {$paymentStatus}"
-                    , 'text/html'
-            );
-            $mailer->send($message);*/
+            /*  $message = (new \Swift_Message('Erreur Transaction - PIN' . $commandNumber))
+                      ->setFrom(Utils::$senderEmail, 'SPET GPE')
+                      ->setTo(Utils::$adminMail)
+                      ->setBody(
+                      "Bonjour Admin,"
+                      . "Une erreur est survenue lors de la confirmation"
+                      . " de paiement de l'inscription académique numero {$commandNumber},"
+                      . "Token de paiement : {$paymentToken} avec le statut {$paymentStatus}"
+                      , 'text/html'
+              );
+              $mailer->send($message);*/
             return 0;
         }
 
         return $informationPaiementInscription;
     }
 
-    public function createInscriptionAcadFromTemp(\App\Entity\InscriptionTemporaire $inscriptionTemporaire) {
+    public function createInscriptionAcadFromTemp(\App\Entity\InscriptionTemporaire $inscriptionTemporaire)
+    {
         $inscriptionacad = new Inscriptionacad();
         $inscriptionacad->setCroust($inscriptionTemporaire->getCroust());
         $inscriptionacad->setDateinscacad(new \DateTime());
