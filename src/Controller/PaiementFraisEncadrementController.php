@@ -94,7 +94,11 @@ class PaiementFraisEncadrementController extends AbstractController
                . " where pfe.inscriptionacad=?1")
                ->setParameter(1, $inscriptionAcad)
                ->getSingleScalarResult();
-            $totalMontantPaye=$somme;
+            if ($somme) {
+                $totalMontantPaye=$somme;
+            }else {
+                $totalMontantPaye=0;
+            }
             $resteAPaye=$montantAPaye - $somme;
             $tab[]= ["inscriptionacad"=>$inscriptionAcad, "totalmontantpaye"=>$totalMontantPaye,"resteAPaye"=>$resteAPaye];
         }
