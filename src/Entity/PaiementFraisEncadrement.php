@@ -30,7 +30,8 @@ class PaiementFraisEncadrement
     private $montantPaye;
 
     /**
-     * @ORM\Column(name="methode_paiement_id" ,type="string", length=255)
+     * @ORM\ManyToOne(targetEntity=Modepaiement::class)
+     * @ORM\JoinColumn(name="methode_paiement_id")
      */
     private $methodePaiement;
 

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Anneeacad;
+use App\Entity\Classe;
 use App\Entity\Filiere;
 use App\Entity\Niveau;
 use App\Entity\PaiementFraisEncadrement;
@@ -43,6 +44,8 @@ class PaiementFraisEncadrementController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $paiementfraisencadrements = $em->getRepository(PaiementFraisEncadrement::class)
                 ->findBy(['inscriptionacad' => $inscriptionacad]);
+        $paramfraisencadrement = $em->getRepository(\App\Entity\ParamFraisEncadrement::class)
+                ->findBy(['filiere'=>$inscriptionacad->getIdclasse()->getIdfiliere()]);
         
         $totalmontantpaye = 0;
         
@@ -51,18 +54,18 @@ class PaiementFraisEncadrementController extends AbstractController
         }
         
         return ['paiementfraisencadrements'=>count($paiementfraisencadrements)?$paiementfraisencadrements:[],
-         'totalmontantpaye'=>$totalmontantpaye];
+         'paramfraisencadrement'=> count($paramfraisencadrement)?$paramfraisencadrement:[], 'totalmontantpaye'=>$totalmontantpaye];
     }
 
     /**
-     * @Rest\Get(path="/paiementetudiants", name="paiements_etudiants")
+     * @Rest\Post(path="/paiementetudiants/", name="paiements_etudiants")
      * @Rest\View(StatusCode = 200)
      */
     public function findByClasse(Request $request):array
     {
         $em = $this->getDoctrine()->getManager();
         $redData = Utils::serializeRequestContent($request);
-        $idanneAcad = $redData['idanneAcad'];
+        $idanneAcad = $redData['idanneeacad'];
         $idfiliere = $redData['idfiliere'];
         $idniveau = $redData['idniveau'];
         $tab=[];
@@ -74,7 +77,7 @@ class PaiementFraisEncadrementController extends AbstractController
         }
         //reccuperation des inscriptionAcads des etudiants privés de la classe
         $inscriptionAcads = $em->createQuery("select ia from App\Entity\Inscriptionacad ia, "
-                        . "App\Entity\Regimeinscription ri where ia.idclasse=?1 and ia.idregimeinscription=ir and (ir.coderegimeinscription=?2 or ir.coderegimeinscription=?3)")
+                        . "App\Entity\Regimeinscription ri where ia.idclasse=?1 and ia.idregimeinscription=ri and (ri.coderegimeinscription=?2 or ri.coderegimeinscription=?3)")
                 ->setParameter(1, $classe)
                 ->setParameter(2, 'RNP')
                 ->setParameter(3, 'RPP')
@@ -91,7 +94,11 @@ class PaiementFraisEncadrementController extends AbstractController
                . " where pfe.inscriptionacad=?1")
                ->setParameter(1, $inscriptionAcad)
                ->getSingleScalarResult();
-            $totalMontantPaye=$somme;
+            if ($somme) {
+                $totalMontantPaye=$somme;
+            }else {
+                $totalMontantPaye=0;
+            }
             $resteAPaye=$montantAPaye - $somme;
             $tab[]= ["inscriptionacad"=>$inscriptionAcad, "totalmontantpaye"=>$totalMontantPaye,"resteAPaye"=>$resteAPaye];
         }
