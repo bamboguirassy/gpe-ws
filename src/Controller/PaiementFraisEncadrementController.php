@@ -51,17 +51,11 @@ class PaiementFraisEncadrementController extends AbstractController
         $totalmontantpaye = 0;
         
         foreach ($paiementfraisencadrements as $paiementfraisencadrement) {
-            //throw $this->createNotFoundException(date_format($paiementfraisencadrement->getDatePaiement(),"d/m/Y"));
             $totalmontantpaye = $totalmontantpaye + $paiementfraisencadrement->getMontantPaye();
-            //$paiementfraisencadrement->setDatePaiement(date_format($paiementfraisencadrement->getDatePaiement(), "Y-m-d"));
         }
         
         return ['paiementfraisencadrements'=>count($paiementfraisencadrements)?$paiementfraisencadrements:[],
-<<<<<<< HEAD
          'totalmontantpaye'=>$totalmontantpaye, 'inscriptionacad'=>$inscriptionacad];
-=======
-         'paramfraisencadrement'=> count($paramfraisencadrement)?$paramfraisencadrement:[], 'totalmontantpaye'=>$totalmontantpaye];
->>>>>>> cf2bc195da89ac48dfdc810bfcad201618991674
     }
 
     /**
