@@ -14,6 +14,7 @@ class ParamFraisEncadrementType extends AbstractType
         $builder
             ->add('fraisAnnuel')
             ->add('filiere')
+            ->add('mensualite')
         ;
     }
 

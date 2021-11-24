@@ -14,6 +14,8 @@ class PaiementFraisEncadrementType extends AbstractType
         $builder
             ->add('datePaiement')
             ->add('montantPaye')
+            ->add('filename')
+            ->add('url')
             ->add('methodePaiement')
             ->add('inscriptionacad')
         ;

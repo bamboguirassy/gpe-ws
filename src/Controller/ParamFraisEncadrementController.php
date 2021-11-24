@@ -102,11 +102,13 @@ class ParamFraisEncadrementController extends AbstractController
         $params = $redData['paramFraisEncadrements'];
         //throw $this->createNotFoundException($params[0]['filiere']['id']);
         foreach ($params as $ligneparamfraisencadrement) {
-            $paramFraisEncadrement = new ParamFraisEncadrement();
-            $filiere = $entityManager->getRepository(Filiere::class)->find($ligneparamfraisencadrement['filiere']['id']);
-            $paramFraisEncadrement->setFiliere($filiere);
-            $paramFraisEncadrement->setFraisAnnuel($ligneparamfraisencadrement['fraisAnnuel']);
-            $entityManager->persist($paramFraisEncadrement);
+            if($ligneparamfraisencadrement['fraisAnnuel']){                
+                $paramFraisEncadrement = new ParamFraisEncadrement();
+                $filiere = $entityManager->getRepository(Filiere::class)->find($ligneparamfraisencadrement['filiere']['id']);
+                $paramFraisEncadrement->setFiliere($filiere);
+                $paramFraisEncadrement->setFraisAnnuel($ligneparamfraisencadrement['fraisAnnuel']);
+                $entityManager->persist($paramFraisEncadrement);
+            }
         }
         $entityManager->flush();
         return ;
