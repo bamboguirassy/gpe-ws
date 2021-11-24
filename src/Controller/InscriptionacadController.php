@@ -9,6 +9,7 @@ use App\Entity\Anneeacad;
 use App\Entity\Niveau;
 use App\Entity\Filiere;
 use App\Entity\Modaliteenseignement;
+use App\Entity\PaiementFraisEncadrement;
 use App\Entity\Preinscription;
 use App\Entity\InformationPaiementInscription;
 use App\Form\InscriptionacadType;
@@ -182,7 +183,7 @@ class InscriptionacadController extends AbstractController
      */
     public function getInscriptionPayantEtudiant(Etudiant $etudiant, EntityManagerInterface $entityManager): array
     {
-        return $entityManager->createQuery('
+        $inscriptionacads = $entityManager->createQuery('
             SELECT ia
             FROM App\Entity\Inscriptionacad ia
             JOIN ia.idetudiant et
@@ -193,6 +194,20 @@ class InscriptionacadController extends AbstractController
             'etudiant' => $etudiant,
             'regimes' => ['RNP', 'RPP']
         ])->getResult();
+        $result = [];
+        foreach ($inscriptionacads as $inscriptionacad) {
+            $bindedPaiementFraisEncadrements = $entityManager
+                ->getRepository(PaiementFraisEncadrement::class)
+                ->findByInscriptionacad($inscriptionacad);
+
+            $result[] = [
+                'inscriptionacad' => $inscriptionacad,
+                'paiementFraisEncadrements' => $bindedPaiementFraisEncadrements
+            ];
+
+        }
+
+        return $result;
     }
 
     /**

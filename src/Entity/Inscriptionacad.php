@@ -716,6 +716,4 @@ class Inscriptionacad
 
         return $this;
     }
-
-
 }
