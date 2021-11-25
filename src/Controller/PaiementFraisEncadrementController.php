@@ -6,6 +6,8 @@ use App\Entity\Anneeacad;
 use App\Entity\Classe;
 use App\Entity\Filiere;
 use App\Entity\Niveau;
+use App\Entity\PaiementFraisTemp;
+use App\Form\PaiementFraisTempType;
 use App\Utils\FileUploader;
 use App\Entity\PaiementFraisEncadrement;
 use App\Form\PaiementFraisEncadrementType;
@@ -32,10 +34,10 @@ class PaiementFraisEncadrementController extends AbstractController
         $paiementFraisEncadrement = $this->getDoctrine()
             ->getRepository(PaiementFraisEncadrement::class)
             ->findAll();
-      
-        return count($paiementFraisEncadrement)?$paiementFraisEncadrement:[];
+
+        return count($paiementFraisEncadrement) ? $paiementFraisEncadrement : [];
     }
-    
+
     /**
      * @Rest\Get(path="/inscriptionacad/{id}", name="paiement_frais_encadrement_by_inscriptionacad")
      * @Rest\View(StatusCode = 200)
@@ -44,69 +46,69 @@ class PaiementFraisEncadrementController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $paiementfraisencadrements = $em->getRepository(PaiementFraisEncadrement::class)
-                ->findBy(['inscriptionacad' => $inscriptionacad]);
+            ->findBy(['inscriptionacad' => $inscriptionacad]);
         $paramfraisencadrement = $em->getRepository(\App\Entity\ParamFraisEncadrement::class)
-                ->findBy(['filiere'=>$inscriptionacad->getIdclasse()->getIdfiliere()]);
-        
+            ->findBy(['filiere' => $inscriptionacad->getIdclasse()->getIdfiliere()]);
+
         $totalmontantpaye = 0;
-        
+
         foreach ($paiementfraisencadrements as $paiementfraisencadrement) {
             $totalmontantpaye = $totalmontantpaye + $paiementfraisencadrement->getMontantPaye();
         }
-        
-        return ['paiementfraisencadrements'=>count($paiementfraisencadrements)?$paiementfraisencadrements:[],
-         'totalmontantpaye'=>$totalmontantpaye, 'inscriptionacad'=>$inscriptionacad];
+
+        return ['paiementfraisencadrements' => count($paiementfraisencadrements) ? $paiementfraisencadrements : [],
+            'totalmontantpaye' => $totalmontantpaye, 'inscriptionacad' => $inscriptionacad];
     }
 
     /**
      * @Rest\Post(path="/paiementetudiants/", name="paiements_etudiants")
      * @Rest\View(StatusCode = 200)
      */
-    public function findByClasse(Request $request):array
+    public function findByClasse(Request $request): array
     {
         $em = $this->getDoctrine()->getManager();
         $redData = Utils::serializeRequestContent($request);
         $idanneAcad = $redData['idanneeacad'];
         $idfiliere = $redData['idfiliere'];
         $idniveau = $redData['idniveau'];
-        $tab=[];
+        $tab = [];
         //reccuperation de la classe
         $classe = $em->getRepository(Classe::class)
-         ->findOneBy(['idfiliere' => $idfiliere, 'idniveau' => $idniveau, 'idanneeacad' => $idanneAcad]);
+            ->findOneBy(['idfiliere' => $idfiliere, 'idniveau' => $idniveau, 'idanneeacad' => $idanneAcad]);
         if (!$classe) {
             throw $this->createNotFoundException("Classe introuvable pour la preinscription selectionnée");
         }
         //reccuperation des inscriptionAcads des etudiants privés de la classe
         $inscriptionAcads = $em->createQuery("select ia from App\Entity\Inscriptionacad ia, "
-                        . "App\Entity\Regimeinscription ri where ia.idclasse=?1 and ia.idregimeinscription=ri and (ri.coderegimeinscription=?2 or ri.coderegimeinscription=?3)")
-                ->setParameter(1, $classe)
-                ->setParameter(2, 'RNP')
-                ->setParameter(3, 'RPP')
-                ->getResult();
+            . "App\Entity\Regimeinscription ri where ia.idclasse=?1 and ia.idregimeinscription=ri and (ri.coderegimeinscription=?2 or ri.coderegimeinscription=?3)")
+            ->setParameter(1, $classe)
+            ->setParameter(2, 'RNP')
+            ->setParameter(3, 'RPP')
+            ->getResult();
         //calcul du montant total payé pour chaque etudiant
-        $montantAPaye= $em->createQuery("select pfe.fraisAnnuel from App\Entity\ParamFraisEncadrement pfe "
-        . " where pfe.filiere=?1")
-        ->setParameter(1, $idfiliere)
-        ->getSingleScalarResult();
-        $totalMontantPaye=0;
-        $resteAPaye=0;
+        $montantAPaye = $em->createQuery("select pfe.fraisAnnuel from App\Entity\ParamFraisEncadrement pfe "
+            . " where pfe.filiere=?1")
+            ->setParameter(1, $idfiliere)
+            ->getSingleScalarResult();
+        $totalMontantPaye = 0;
+        $resteAPaye = 0;
         foreach ($inscriptionAcads as $inscriptionAcad) {
-            $somme= $em->createQuery("select sum(pfe.montantPaye) from App\Entity\PaiementFraisEncadrement pfe "
-               . " where pfe.inscriptionacad=?1")
-               ->setParameter(1, $inscriptionAcad)
-               ->getSingleScalarResult();
+            $somme = $em->createQuery("select sum(pfe.montantPaye) from App\Entity\PaiementFraisEncadrement pfe "
+                . " where pfe.inscriptionacad=?1")
+                ->setParameter(1, $inscriptionAcad)
+                ->getSingleScalarResult();
             if ($somme) {
-                $totalMontantPaye=$somme;
-            }else {
-                $totalMontantPaye=0;
+                $totalMontantPaye = $somme;
+            } else {
+                $totalMontantPaye = 0;
             }
-            $resteAPaye=$montantAPaye - $somme;
-            $tab[]= ["inscriptionacad"=>$inscriptionAcad, "totalmontantpaye"=>$totalMontantPaye,"resteAPaye"=>$resteAPaye];
+            $resteAPaye = $montantAPaye - $somme;
+            $tab[] = ["inscriptionacad" => $inscriptionAcad, "totalmontantpaye" => $totalMontantPaye, "resteAPaye" => $resteAPaye];
         }
-        
+
         return $tab;
     }
-    
+
     /**
      * @Rest\Post(Path="/create", name="paiement_frais_encadrement_new")
      * @Rest\View(StatusCode=200)
@@ -120,7 +122,7 @@ class PaiementFraisEncadrementController extends AbstractController
         $idmethodePaiement = $data->methodePaiement;
         $montantPaye = $data->montantPaye;
         $idinscriptionacad = $data->idinscriptionacad;
-        
+
         $deserializedDocument = Utils::getObjectFromRequest($request);
         $newFilename = $uploader->decodeAndUploadTo($deserializedDocument, $this->getParameter('document_paiementfraisencadrement_directory'));
         $inscriptionacad = $entityManager
@@ -129,21 +131,52 @@ class PaiementFraisEncadrementController extends AbstractController
         $methodePaiement = $entityManager
             ->getRepository(\App\Entity\Modepaiement::class)
             ->find($idmethodePaiement);
-        
+
         $paiementFraisEncadrement
             ->setFilename($newFilename)
             ->setDatePaiement(new \DateTime())
             ->setMontantPaye($montantPaye)
             ->setMethodePaiement($methodePaiement)
             ->setInscriptionacad($inscriptionacad);
-        
+
         $paiementFraisEncadrement
             ->setUrl($protocolVersion . '://' . $httpHost . '/' . $this->getParameter('document_paiementfraisencadrement_directory') . $paiementFraisEncadrement->getFilename());
-        
+
         $entityManager->persist($paiementFraisEncadrement);
         $entityManager->flush();
 
         return $paiementFraisEncadrement;
+    }
+
+    /**
+     * @Rest\Post(Path="/init-payment", name="paiement_frais_encadrement_init_payment")
+     * @Rest\View(StatusCode=200)
+     */
+    public function initPayment(Request $request, EntityManagerInterface $entityManager)
+    {
+        $ref_command = uniqid();
+        $paiementFraisTemp = new PaiementFraisTemp();
+        $paiementFraisTemp->setRefCommand($ref_command);
+        $form = $this->createForm(PaiementFraisTempType::class, $paiementFraisTemp);
+        $form->submit(Utils::serializeRequestContent($request));
+
+        $jsonResponse = (new PayTech('%env(string:PAYTECH_API_KEY)%', '%env(string:PAYTECH_SECRET_KEY)%'))->setQuery([
+            'item_name' => 'Paiement frais encadrement',
+            'item_price' => $paiementFraisTemp->getMontant(),
+            'command_name' => "Paiement des frais d'encadrements pour {$paiementFraisTemp->getInscriptionacad()->getIdclasse()->getLibelleclasse( )}",
+        ])
+            ->setTestMode(true)
+            ->setCurrency('XOF')
+            ->setRefCommand($ref_command)
+//            ->setNotificationUrl([
+//                'ipn_url' => BASE_URL.'/ipn.php', //only https
+//                'success_url' => BASE_URL.'/index.php?state=success&id='.$id,
+//                'cancel_url' =>   BASE_URL.'/index.php?state=cancel&id='.$id
+//            ])
+            ->send();
+
+//        die($jsonResponse);
+        return $jsonResponse;
     }
 
     /**
@@ -156,7 +189,7 @@ class PaiementFraisEncadrementController extends AbstractController
         return $paiementFraisEncadrement;
     }
 
-    
+
     /**
      * @Rest\Put(path="/{id}/edit", name="paiement_frais_encadrement_edit",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
@@ -171,15 +204,15 @@ class PaiementFraisEncadrementController extends AbstractController
 
         return $paiementFraisEncadrement;
     }
-    
+
     /**
      * @Rest\Put(path="/{id}/clone", name="paiement_frais_encadrement_clone",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_PAIEMENTFRAISENCADREMENT_CLONE")
      */
-    public function cloner(Request $request, PaiementFraisEncadrement $paiementFraisEncadrement):  PaiementFraisEncadrement
+    public function cloner(Request $request, PaiementFraisEncadrement $paiementFraisEncadrement): PaiementFraisEncadrement
     {
-        $em=$this->getDoctrine()->getManager();
+        $em = $this->getDoctrine()->getManager();
         $paiementFraisEncadrementNew = new PaiementFraisEncadrement();
         $form = $this->createForm(PaiementFraisEncadrementType::class, $paiementFraisEncadrementNew);
         $form->submit(Utils::serializeRequestContent($request));
@@ -202,7 +235,7 @@ class PaiementFraisEncadrementController extends AbstractController
 
         return $paiementFraisEncadrement;
     }
-    
+
     /**
      * @Rest\Post("/delete-selection/", name="paiement_frais_encadrement_selection_delete")
      * @Rest\View(StatusCode=200)

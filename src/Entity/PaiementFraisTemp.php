@@ -43,9 +43,12 @@ class PaiementFraisTemp
     private $date = 'CURRENT_TIMESTAMP';
 
     /**
-     * @var int
+     * @var Inscriptionacad
      *
-     * @ORM\Column(name="inscriptionacad", type="integer", nullable=false)
+     * @ORM\ManyToOne(targetEntity="Inscriptionacad")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="inscriptionacad", referencedColumnName="id")
+     * })
      */
     private $inscriptionacad;
 
@@ -90,7 +93,7 @@ class PaiementFraisTemp
         return $this;
     }
 
-    public function getInscriptionacad(): ?int
+    public function getInscriptionacad(): ?Inscriptionacad
     {
         return $this->inscriptionacad;
     }
