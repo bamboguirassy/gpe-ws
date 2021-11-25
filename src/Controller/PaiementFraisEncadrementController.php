@@ -11,6 +11,7 @@ use App\Form\PaiementFraisTempType;
 use App\Utils\FileUploader;
 use App\Entity\PaiementFraisEncadrement;
 use App\Form\PaiementFraisEncadrementType;
+use App\Utils\PayTech;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -156,11 +157,12 @@ class PaiementFraisEncadrementController extends AbstractController
     {
         $ref_command = uniqid();
         $paiementFraisTemp = new PaiementFraisTemp();
+        $paiementFraisTemp->setDate(new \DateTime());
         $paiementFraisTemp->setRefCommand($ref_command);
         $form = $this->createForm(PaiementFraisTempType::class, $paiementFraisTemp);
         $form->submit(Utils::serializeRequestContent($request));
 
-        $jsonResponse = (new PayTech('%env(string:PAYTECH_API_KEY)%', '%env(string:PAYTECH_SECRET_KEY)%'))->setQuery([
+        $jsonResponse = (new PayTech(Utils::$PAYTECH_API_KEY, Utils::$PAYTECH_SECRET_KEY))->setQuery([
             'item_name' => 'Paiement frais encadrement',
             'item_price' => $paiementFraisTemp->getMontant(),
             'command_name' => "Paiement des frais d'encadrements pour {$paiementFraisTemp->getInscriptionacad()->getIdclasse()->getLibelleclasse( )}",
@@ -168,16 +170,29 @@ class PaiementFraisEncadrementController extends AbstractController
             ->setTestMode(true)
             ->setCurrency('XOF')
             ->setRefCommand($ref_command)
-//            ->setNotificationUrl([
-//                'ipn_url' => BASE_URL.'/ipn.php', //only https
-//                'success_url' => BASE_URL.'/index.php?state=success&id='.$id,
-//                'cancel_url' =>   BASE_URL.'/index.php?state=cancel&id='.$id
-//            ])
+            ->setNotificationUrl([
+                'ipn_url' => "", //only https
+                'success_url' => "http://localhost:4200/#/espace-paiement/ {$paiementFraisTemp->getInscriptionacad()->getId()}",
+                'cancel_url' =>   "http://localhost:4200/#/espace-paiement/ {$paiementFraisTemp->getInscriptionacad()->getId()}"
+            ])
             ->send();
 
-//        die($jsonResponse);
+       // $entityManager->flush();
         return $jsonResponse;
     }
+
+
+    /**
+     * @Rest\Post(Path="/public/ipn-paytech", name="paiement_frais_encadrement_init_payment")
+     * @Rest\View(StatusCode=200)
+     */
+    public function init(Request $request, EntityManagerInterface $entityManager)
+    {
+
+//        return $jsonResponse;
+    }
+
+
 
     /**
      * @Rest\Get(path="/{id}", name="paiement_frais_encadrement_show",requirements = {"id"="\d+"})

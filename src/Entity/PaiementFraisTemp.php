@@ -74,19 +74,19 @@ class PaiementFraisTemp
         return $this->refCommand;
     }
 
-    public function setRefCommand(string $refCommand): self
+    public function setRefCommand($refCommand): self
     {
         $this->refCommand = $refCommand;
 
         return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?\DateTime
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): self
+    public function setDate($date): self
     {
         $this->date = $date;
 
@@ -98,7 +98,7 @@ class PaiementFraisTemp
         return $this->inscriptionacad;
     }
 
-    public function setInscriptionacad(int $inscriptionacad): self
+    public function setInscriptionacad(>$inscriptionacad): self
     {
         $this->inscriptionacad = $inscriptionacad;
 
