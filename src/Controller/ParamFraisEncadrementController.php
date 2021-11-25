@@ -14,6 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use App\Utils\Utils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Validator\Constraints\Length;
 
 /**
  * @Route("/api/paramfraisencadrement")
@@ -48,6 +49,29 @@ class ParamFraisEncadrementController extends AbstractController
 
         return count($paramFraisEncadrements)?$paramFraisEncadrements:[];
     }
+
+    /**
+
+    *
+    * @Rest\Get(path="/{id}/user/filiere", name="user_filiere")
+    * @Rest\View(StatusCode = 200)
+    * @IsGranted("ROLE_FILIERE_LISTE")
+    * @param Request $request
+    * @return array
+    */
+    public function findUserFiliere(UserEntite $user): array
+    {
+        $em = $this->getDoctrine()->getManager();
+      
+        $filieresParametre = $em->createQuery('select f from App\Entity\Filiere f, App\Entity\ParamFraisEncadrement pfe where f=pfe.filiere')
+        ->getResult();
+        $filieres= $em->createQuery('select f from App\Entity\Filiere f, App\Entity\UserFiliere uf '
+. 'where uf.idfiliere=f and uf.iduser=?1 and f not in (?2)')
+->setParameter(1, $user)
+->setParameter(2, $filieresParametre)
+->getResult();
+        return $filieres;
+    }
     /**
      * @Rest\Post(Path="/create", name="param_frais_encadrement_new")
      * @Rest\View(StatusCode=200)
@@ -78,11 +102,13 @@ class ParamFraisEncadrementController extends AbstractController
         $params = $redData['paramFraisEncadrements'];
         //throw $this->createNotFoundException($params[0]['filiere']['id']);
         foreach ($params as $ligneparamfraisencadrement) {
-            $paramFraisEncadrement = new ParamFraisEncadrement();
-            $filiere = $entityManager->getRepository(Filiere::class)->find($ligneparamfraisencadrement['filiere']['id']);
-            $paramFraisEncadrement->setFiliere($filiere);
-            $paramFraisEncadrement->setFraisAnnuel($ligneparamfraisencadrement['fraisAnnuel']);
-            $entityManager->persist($paramFraisEncadrement);
+            if($ligneparamfraisencadrement['fraisAnnuel']){                
+                $paramFraisEncadrement = new ParamFraisEncadrement();
+                $filiere = $entityManager->getRepository(Filiere::class)->find($ligneparamfraisencadrement['filiere']['id']);
+                $paramFraisEncadrement->setFiliere($filiere);
+                $paramFraisEncadrement->setFraisAnnuel($ligneparamfraisencadrement['fraisAnnuel']);
+                $entityManager->persist($paramFraisEncadrement);
+            }
         }
         $entityManager->flush();
         return ;
