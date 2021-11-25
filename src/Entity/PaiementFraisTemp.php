@@ -98,7 +98,7 @@ class PaiementFraisTemp
         return $this->inscriptionacad;
     }
 
-    public function setInscriptionacad(>$inscriptionacad): self
+    public function setInscriptionacad($inscriptionacad): self
     {
         $this->inscriptionacad = $inscriptionacad;
 

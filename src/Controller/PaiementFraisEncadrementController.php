@@ -173,7 +173,7 @@ class PaiementFraisEncadrementController extends AbstractController
             ->setCurrency('XOF')
             ->setRefCommand($ref_command)
             ->setNotificationUrl([
-                'ipn_url' => $this->generateUrl('paiement_frais_encadrement_ipn'), //only https
+                'ipn_url' => 'https://6fdf-41-82-212-194.ngrok.io/public/ipn-paytech', //only https
                 'success_url' => "http://localhost:4200/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/success/{$ref_command}",
                 'cancel_url' =>   "http://localhost:4200/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/failed/{$ref_command}"
             ])
@@ -193,7 +193,7 @@ class PaiementFraisEncadrementController extends AbstractController
         $response = Utils::serializeRequestContent($request);
         if($response['type_event'] == 'sale_complete') {
             /** @var PaiementFraisEncadrement $paiementFraisTemp */
-            $paiementFraisTemp = $entityManager->getRepository(PaiementFraisTemp::class)->findByRefCommand($response['ref_command']);
+            $paiementFraisTemp = $entityManager->getRepository(PaiementFraisTemp::class)->findOneByRefCommand($response['ref_command']);
             $modePaiement = $entityManager->getRepository(ModepaiementController::class)->findByCode('PAYTECH');
             $paiementFraisEncadrement = new PaiementFraisEncadrement();
             $paiementFraisEncadrement
@@ -207,6 +207,24 @@ class PaiementFraisEncadrementController extends AbstractController
         } else {
 
         }
+    }
+
+
+
+    /**
+     * @Rest\Post(Path="/cancel-payetech-payment", name="paiement_frais_encadrement_cancel-payetech-payment")
+     * @Rest\View(StatusCode=200)
+     */
+    public function cancelPaytechPayment(Request $request, EntityManagerInterface $entityManager)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $paiementFraisTemp = $entityManager->getRepository(PaiementFraisTemp::class)->findOneByRefCommand($request->attributes->get('ref_command'));
+        if($paiementFraisTemp){
+            $entityManager->remove($paiementFraisTemp);
+            $entityManager->flush();
+        }
+
+        return true;
     }
 
 
