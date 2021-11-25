@@ -20,6 +20,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use App\Utils\Utils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Validator\Constraints\DateTime;
+use Zend\Code\Scanner\Util;
 
 /**
  * @Route("/api/paiementfraisencadrement")
@@ -171,9 +173,9 @@ class PaiementFraisEncadrementController extends AbstractController
             ->setCurrency('XOF')
             ->setRefCommand($ref_command)
             ->setNotificationUrl([
-                'ipn_url' => "", //only https
-                'success_url' => "http://localhost:4200/#/espace-paiement/ {$paiementFraisTemp->getInscriptionacad()->getId()}",
-                'cancel_url' =>   "http://localhost:4200/#/espace-paiement/ {$paiementFraisTemp->getInscriptionacad()->getId()}"
+                'ipn_url' => $this->generateUrl('paiement_frais_encadrement_ipn'), //only https
+                'success_url' => "http://localhost:4200/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/success/{$ref_command}",
+                'cancel_url' =>   "http://localhost:4200/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/failed/{$ref_command}"
             ])
             ->send();
 
@@ -183,13 +185,28 @@ class PaiementFraisEncadrementController extends AbstractController
 
 
     /**
-     * @Rest\Post(Path="/public/ipn-paytech", name="paiement_frais_encadrement_init_payment")
+     * @Rest\Post(Path="/public/ipn-paytech", name="paiement_frais_encadrement_ipn")
      * @Rest\View(StatusCode=200)
      */
-    public function init(Request $request, EntityManagerInterface $entityManager)
+    public function ipnPaytech(Request $request, EntityManagerInterface $entityManager)
     {
+        $response = Utils::serializeRequestContent($request);
+        if($response['type_event'] == 'sale_complete') {
+            /** @var PaiementFraisEncadrement $paiementFraisTemp */
+            $paiementFraisTemp = $entityManager->getRepository(PaiementFraisTemp::class)->findByRefCommand($response['ref_command']);
+            $modePaiement = $entityManager->getRepository(ModepaiementController::class)->findByCode('PAYTECH');
+            $paiementFraisEncadrement = new PaiementFraisEncadrement();
+            $paiementFraisEncadrement
+                ->setInscriptionacad($paiementFraisTemp->getInscriptionacad())
+                ->setDatePaiement(new DateTime())
+                ->setMethodePaiement($modePaiement)
+                ->setOperateur($response['payment_method']);
+            $entityManager->remove($paiementFraisTemp);
+            $entityManager->flush();
+            return ['statuts' => 'success'];
+        } else {
 
-//        return $jsonResponse;
+        }
     }
 
 

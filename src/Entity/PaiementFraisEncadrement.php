@@ -52,6 +52,11 @@ class PaiementFraisEncadrement
      */
     private $url;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $operateur;
+
     public function getId()
     {
         return $this->id;
@@ -127,5 +132,21 @@ class PaiementFraisEncadrement
         $this->url = $url;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOperateur()
+    {
+        return $this->operateur;
+    }
+
+    /**
+     * @param mixed $operateur
+     */
+    public function setOperateur($operateur): void
+    {
+        $this->operateur = $operateur;
     }
 }
