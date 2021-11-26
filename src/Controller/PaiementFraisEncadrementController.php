@@ -198,6 +198,10 @@ class PaiementFraisEncadrementController extends AbstractController
             ->setTestMode(true)
             ->setCurrency('XOF')
             ->setRefCommand($ref_command)
+            ->setCustomeField([
+                'inscriptionacad_id' => $request->request->get('inscriptionacad'),
+                'date' => new \DateTime(),
+            ])
             ->setNotificationUrl([
                 'ipn_url' => 'https://6fdf-41-82-212-194.ngrok.io/public/ipn-paytech', //only https
                 'success_url' => "http://localhost:4200/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/success/{$ref_command}",
