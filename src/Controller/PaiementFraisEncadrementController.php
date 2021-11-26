@@ -47,8 +47,34 @@ class PaiementFraisEncadrementController extends AbstractController
      */
     public function findByInscriptionacad(\App\Entity\Inscriptionacad $inscriptionacad)
     {
+
         $em = $this->getDoctrine()->getManager();
         $paiementfraisencadrements = $em->getRepository(PaiementFraisEncadrement::class)
+            ->findBy(['inscriptionacad' => $inscriptionacad]);
+        $paramfraisencadrement = $em->getRepository(\App\Entity\ParamFraisEncadrement::class)
+            ->findBy(['filiere' => $inscriptionacad->getIdclasse()->getIdfiliere()]);
+
+        $totalmontantpaye = 0;
+
+        foreach ($paiementfraisencadrements as $paiementfraisencadrement) {
+            $totalmontantpaye = $totalmontantpaye + $paiementfraisencadrement->getMontantPaye();
+        }
+
+        return ['paiementfraisencadrements' => count($paiementfraisencadrements) ? $paiementfraisencadrements : [],
+            'totalmontantpaye' => $totalmontantpaye, 'inscriptionacad' => $inscriptionacad];
+    }
+
+
+    /**
+     * @Rest\Get(path="/inscriptionacad/{id}/student", name="paiement_frais_encadrement_by_ins_acad_for_student")
+     * @Rest\View(StatusCode = 200)
+     */
+    public function findByInscriptionacadForStudent(\App\Entity\Inscriptionacad $inscriptionacad)
+    {
+
+        $etudiant = EtudiantController::getEtudiantConnecte($this);
+        $em = $this->getDoctrine()->getManager();
+        $paiementfraisencadrements =  $inscriptionacad->getIdetudiant() != $etudiant?[] : $em->getRepository(PaiementFraisEncadrement::class)
             ->findBy(['inscriptionacad' => $inscriptionacad]);
         $paramfraisencadrement = $em->getRepository(\App\Entity\ParamFraisEncadrement::class)
             ->findBy(['filiere' => $inscriptionacad->getIdclasse()->getIdfiliere()]);
@@ -175,11 +201,11 @@ class PaiementFraisEncadrementController extends AbstractController
             ->setNotificationUrl([
                 'ipn_url' => 'https://6fdf-41-82-212-194.ngrok.io/public/ipn-paytech', //only https
                 'success_url' => "http://localhost:4200/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/success/{$ref_command}",
-                'cancel_url' =>   "http://localhost:4200/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/failed/{$ref_command}"
+                'cancel_url' => "http://localhost:4200/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/failed/{$ref_command}"
             ])
             ->send();
 
-       // $entityManager->flush();
+        // $entityManager->flush();
         return $jsonResponse;
     }
 
@@ -191,7 +217,7 @@ class PaiementFraisEncadrementController extends AbstractController
     public function ipnPaytech(Request $request, EntityManagerInterface $entityManager)
     {
         $response = Utils::serializeRequestContent($request);
-        if($response['type_event'] == 'sale_complete') {
+        if ($response['type_event'] == 'sale_complete') {
             /** @var PaiementFraisEncadrement $paiementFraisTemp */
             $paiementFraisTemp = $entityManager->getRepository(PaiementFraisTemp::class)->findOneByRefCommand($response['ref_command']);
             $modePaiement = $entityManager->getRepository(ModepaiementController::class)->findByCode('PAYTECH');
@@ -210,7 +236,6 @@ class PaiementFraisEncadrementController extends AbstractController
     }
 
 
-
     /**
      * @Rest\Post(Path="/cancel-payetech-payment", name="paiement_frais_encadrement_cancel-payetech-payment")
      * @Rest\View(StatusCode=200)
@@ -218,15 +243,15 @@ class PaiementFraisEncadrementController extends AbstractController
     public function cancelPaytechPayment(Request $request, EntityManagerInterface $entityManager)
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $paiementFraisTemp = $entityManager->getRepository(PaiementFraisTemp::class)->findOneByRefCommand($request->attributes->get('ref_command'));
-        if($paiementFraisTemp){
+        $paiementFraisTemp = $entityManager->getRepository(PaiementFraisTemp::class)->findOneByRefCommand($request->request->get('ref_command'));
+        if ($paiementFraisTemp) {
             $entityManager->remove($paiementFraisTemp);
             $entityManager->flush();
+            return true;
         }
 
-        return true;
+        return false;
     }
-
 
 
     /**
