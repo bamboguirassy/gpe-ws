@@ -26,8 +26,8 @@ class Utils {
 //    static $lienResetEtudiantPassword = 'http://localhost:4200/resetpassword/';
     static $lienResetEtudiantPassword = 'https://etudiant.univ-thies.sn/#/resetpassword/';
 
-    static  $PAYTECH_API_KEY = 'f382396b45b2203a38a1c53e7ef8f33837d7b82ca1065185d2ed14ebd0fd8014';
-    static $PAYTECH_SECRET_KEY = 'f6514010b8d38a0443848b40d7685b3f6580d2454137c8d78a1474f3dca7edef';
+    static  $PAYTECH_API_KEY = '5d34295cdb894220704871136c37582ff7e8374a464d64a9ad4d4a85e12cf7ab';
+    static $PAYTECH_SECRET_KEY = 'cf61237cbbb52b6fb615599c84a42d81adafced8c83b5f8c3ab8ea56dbd7b768';
 
 
     public static function serializeRequestContent(Request $request) {

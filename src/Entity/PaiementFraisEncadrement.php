@@ -134,19 +134,16 @@ class PaiementFraisEncadrement
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
+
     public function getOperateur()
     {
         return $this->operateur;
     }
 
-    /**
-     * @param mixed $operateur
-     */
-    public function setOperateur($operateur): void
+
+    public function setOperateur($operateur): self
     {
         $this->operateur = $operateur;
+        return $this;
     }
 }
