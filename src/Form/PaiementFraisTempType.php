@@ -15,7 +15,7 @@ class PaiementFraisTempType extends AbstractType
         $builder
             ->add('montant')
             ->add('inscriptionacad')
-            ->add('date')
+//            ->add('date')
             ->add('ref_command')
         ;
     }
