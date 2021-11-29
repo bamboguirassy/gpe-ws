@@ -66,12 +66,12 @@ class ParamFraisEncadrement
         return $this;
     }
 
-    public function getMensualite(): ?int
+    public function getMensualite()
     {
         return $this->mensualite;
     }
 
-    public function setMensualite(?int $mensualite): self
+    public function setMensualite($mensualite)
     {
         $this->mensualite = $mensualite;
 
