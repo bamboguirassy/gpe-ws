@@ -54,8 +54,8 @@ class PaiementFraisEncadrementController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $paiementfraisencadrements = $em->getRepository(PaiementFraisEncadrement::class)
             ->findBy(['inscriptionacad' => $inscriptionacad]);
-        $paramfraisencadrement = $em->getRepository(\App\Entity\ParamFraisEncadrement::class)
-            ->findBy(['filiere' => $inscriptionacad->getIdclasse()->getIdfiliere()]);
+//        $paramfraisencadrement = $em->getRepository(\App\Entity\ParamFraisEncadrement::class)
+//            ->findBy(['filiere' => $inscriptionacad->getIdclasse()->getIdfiliere()]);
 
         $totalmontantpaye = 0;
 
@@ -80,8 +80,8 @@ class PaiementFraisEncadrementController extends AbstractController
         $perm = $inscriptionacad->getIdetudiant() == $etudiant;
         $paiementfraisencadrements =  !$perm? [] : $em->getRepository(PaiementFraisEncadrement::class)
             ->findBy(['inscriptionacad' => $inscriptionacad]);
-        $paramfraisencadrement = $em->getRepository(\App\Entity\ParamFraisEncadrement::class)
-            ->findBy(['filiere' => $inscriptionacad->getIdclasse()->getIdfiliere()]);
+//        $paramfraisencadrement = $em->getRepository(\App\Entity\ParamFraisEncadrement::class)
+//            ->findBy(['filiere' => $inscriptionacad->getIdclasse()->getIdfiliere()]);
 
         $totalmontantpaye = 0;
 
@@ -101,7 +101,7 @@ class PaiementFraisEncadrementController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $redData = Utils::serializeRequestContent($request);
-        $idanneAcad = $redData['idanneeacad'];
+        $idanneAcad = $redData['idanneAcad'];
         $idfiliere = $redData['idfiliere'];
         $idniveau = $redData['idniveau'];
         $tab = [];

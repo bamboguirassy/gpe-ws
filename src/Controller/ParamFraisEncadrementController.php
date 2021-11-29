@@ -107,6 +107,7 @@ class ParamFraisEncadrementController extends AbstractController
                 $filiere = $entityManager->getRepository(Filiere::class)->find($ligneparamfraisencadrement['filiere']['id']);
                 $paramFraisEncadrement->setFiliere($filiere);
                 $paramFraisEncadrement->setFraisAnnuel($ligneparamfraisencadrement['fraisAnnuel']);
+                $paramFraisEncadrement->setMensualite($ligneparamfraisencadrement['mensualite']);
                 $entityManager->persist($paramFraisEncadrement);
             }
         }
