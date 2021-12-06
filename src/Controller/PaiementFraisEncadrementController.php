@@ -206,9 +206,9 @@ class PaiementFraisEncadrementController extends AbstractController
                 'date' => new \DateTime(),
             ])
             ->setNotificationUrl([
-                'ipn_url' => 'https://38b2-41-82-212-194.ngrok.io/api/paiementfraisencadrement/public/ipn-paytech/', //only https
-                'success_url' => "http://localhost:4200/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/success/{$ref_command}",
-                'cancel_url' => "http://localhost:4200/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/failed/{$ref_command}"
+                'ipn_url' => 'https://3ebf-41-82-212-193.ngrok.io/api/paiementfraisencadrement/public/ipn-paytech', //only https
+                'success_url' => "http://localhost:4300/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/success/{$ref_command}",
+                'cancel_url' => "http://localhost:4300/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/failed/{$ref_command}"
             ])
             ->send();
 
@@ -226,17 +226,17 @@ class PaiementFraisEncadrementController extends AbstractController
     {
         $response = Utils::serializeRequestContent($request);
         $r = null;
-        $paiementFraisTemp = $entityManager->getRepository(PaiementFraisTemp::class)->findOneByRefCommand($response['ref_command']);
-        if ($response['type_event'] == 'sale_complete') {
+        $paiementFraisTemp = $entityManager->getRepository(PaiementFraisTemp::class)->findOneByRefCommand($request->request->get('ref_command'));
+        if ($request->request->get('type_event') == 'sale_complete') {
             /** @var PaiementFraisTemp $paiementFraisTemp */
             $modePaiement = $entityManager->getRepository(Modepaiement::class)->findOneByCodemodepaiement('PAYTECH');
             $paiementFraisEncadrement = new PaiementFraisEncadrement();
             $paiementFraisEncadrement
-                ->setInscriptionacad($paiementFraisTemp->getInscriptionacad() ?? $entityManager->getRepository(Inscriptionacad::class)->find((int)$response['custom_field']['inscriptionacad_id']))
-                ->setMontantPaye($paiementFraisTemp->getMontant() ?? (float)$response['item_price'])
+                ->setInscriptionacad($paiementFraisTemp->getInscriptionacad())
+                ->setMontantPaye($paiementFraisTemp->getMontant() ?? (float)$request->request->get('item_price'))
                 ->setDatePaiement(new \DateTime())
                 ->setMethodePaiement($modePaiement)
-                ->setOperateur($response['payment_method']);
+                ->setOperateur($request->request->get('payment_method'));
             $entityManager->persist($paiementFraisEncadrement);
             $r = ['status' => 'success'];
         }else{
