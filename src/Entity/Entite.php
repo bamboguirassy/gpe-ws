@@ -122,6 +122,22 @@ class Entite
      */
     private $identiteparent;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $paytechApiKey;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $paytechSecretKey;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $fraisTransaction;
+    
+
     public function getId(): ?int
     {
         return $this->id;
@@ -295,5 +311,41 @@ class Entite
         return $this;
     }
 
+    public function getPaytechApiKey(): ?string
+    {
+        return $this->paytechApiKey;
+    }
+
+    public function setPaytechApiKey(?string $paytechApiKey): self
+    {
+        $this->paytechApiKey = $paytechApiKey;
+
+        return $this;
+    }
+
+    public function getPaytechSecretKey(): ?string
+    {
+        return $this->paytechSecretKey;
+    }
+
+    public function setPaytechSecretKey(?string $paytechSecretKey): self
+    {
+        $this->paytechSecretKey = $paytechSecretKey;
+
+        return $this;
+    }
+
+    public function getFraisTransaction(): ?int
+    {
+        return $this->fraisTransaction;
+    }
+
+    public function setFraisTransaction(?int $fraisTransaction): self
+    {
+        $this->fraisTransaction = $fraisTransaction;
+
+        return $this;
+    }
+    
 
 }

@@ -24,7 +24,7 @@ class PaiementFraisTemp
     /**
      * @var string
      *
-     * @ORM\Column(name="montant", type="decimal", precision=10, scale=0, nullable=false)
+     * @ORM\Column(name="montant", type="integer", nullable=false)
      */
     private $montant;
 
@@ -57,12 +57,12 @@ class PaiementFraisTemp
         return $this->id;
     }
 
-    public function getMontant(): ?string
+    public function getMontant()
     {
         return $this->montant;
     }
 
-    public function setMontant(string $montant): self
+    public function setMontant($montant)
     {
         $this->montant = $montant;
 

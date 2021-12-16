@@ -187,34 +187,53 @@ class PaiementFraisEncadrementController extends AbstractController
      */
     public function initPayment(Request $request, EntityManagerInterface $entityManager)
     {
-        $ref_command = uniqid();
-        $paiementFraisTemp = new PaiementFraisTemp();
-        $form = $this->createForm(PaiementFraisTempType::class, $paiementFraisTemp);
-        $form->submit(Utils::serializeRequestContent($request));
-        $paiementFraisTemp->setDate(new \DateTime());
-        $paiementFraisTemp->setRefCommand($ref_command);
-        $jsonResponse = (new PayTech(Utils::$PAYTECH_API_KEY, Utils::$PAYTECH_SECRET_KEY))->setQuery([
-            'item_name' => 'Paiement frais encadrement',
-            'item_price' => $paiementFraisTemp->getMontant(),
-            'command_name' => "Paiement des frais d'encadrements pour...}",
-        ])
-            ->setTestMode(true)
-            ->setCurrency('XOF')
-            ->setRefCommand($ref_command)
-            ->setCustomeField([
-                'inscriptionacad_id' => $request->request->get('inscriptionacad'),
-                'date' => new \DateTime(),
+        $em = $this->getDoctrine()->getManager();
+        $reqData = Utils::serializeRequestContent($request);
+        $idinscriptionacad = $reqData['inscriptionacad'];        
+        $inscriptionacad = $entityManager
+            ->getRepository(\App\Entity\Inscriptionacad::class)
+            ->find($idinscriptionacad);
+        $etablissement = $em->createQuery('select eta from App\Entity\Entite eta, App\Entity\Filiere f '
+                        . 'Join f.identite e '
+                        . 'where e.identiteparent=eta and f=?1'
+                )
+                ->setParameter(1, $inscriptionacad->getIdclasse()->getIdfiliere())
+                ->getSingleResult();
+        if (!$etablissement){ 
+            throw $this->createNotFoundException("Impossible de retrouver l'établissement.");
+            } else {
+            $ref_command = uniqid();
+            $paiementFraisTemp = new PaiementFraisTemp();
+            $form = $this->createForm(PaiementFraisTempType::class, $paiementFraisTemp);
+            $form->submit(Utils::serializeRequestContent($request));
+            $paiementFraisTemp->setDate(new \DateTime());
+            $paiementFraisTemp->setRefCommand($ref_command);
+            $montant_item = intval($paiementFraisTemp->getMontant()) + intval($etablissement->getFraisTransaction());
+            $jsonResponse = (new PayTech($etablissement->getPaytechApiKey(), $etablissement->getPaytechSecretKey()))->setQuery([
+                'item_name' => 'Paiement frais encadrement',
+                'item_price' => $montant_item,
+                'command_name' => "Paiement des frais d'encadrements pour...}",
             ])
-            ->setNotificationUrl([
-                'ipn_url' => 'https://3ebf-41-82-212-193.ngrok.io/api/paiementfraisencadrement/public/ipn-paytech', //only https
-                'success_url' => "http://localhost:4300/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/success/{$ref_command}",
-                'cancel_url' => "http://localhost:4300/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/failed/{$ref_command}"
-            ])
-            ->send();
+                ->setTestMode(true)
+                ->setCurrency('XOF')
+                ->setRefCommand($ref_command)
+                ->setCustomeField([
+                    'inscriptionacad_id' => $request->request->get('inscriptionacad'),
+                    'date' => new \DateTime(),
+                ])
+                ->setNotificationUrl([
+                    'ipn_url' => 'https://5438-41-82-212-193.ngrok.io/api/paiementfraisencadrement/public/ipn-paytech', //only https
+                    'success_url' => "http://localhost:4200/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/success/{$ref_command}",
+                    'cancel_url' => "http://localhost:4200/#/espace-paiement/{$paiementFraisTemp->getInscriptionacad()->getId()}/failed/{$ref_command}"
+                ])
+                ->send();
 
-        $entityManager->persist($paiementFraisTemp);
-        $entityManager->flush();
-        return $jsonResponse;
+            $entityManager->persist($paiementFraisTemp);
+            $entityManager->flush();
+            return $jsonResponse;
+            
+         } 
+        
     }
 
 
