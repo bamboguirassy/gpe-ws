@@ -207,8 +207,9 @@ class PreinscriptionController extends AbstractController {
                 ->setParameter(3, $cni)
                 ->getResult();
         $inscriptionEnInstances = $em->createQuery('select ia from App\Entity\Inscriptionacad ia join ia.idetudiant et ' 
-                . 'where et.cni=?1')
+                . 'where et.cni=?1 and ia.etat=?2')
                 ->setParameter(1, $cni)
+                ->setParameter(2, 'I')
                 ->getResult();
         //throw $this->createAccessDeniedException("PreActif ".$preinscriptionActifs[0].getDatenotif());
         if (count($preinscriptionActifs) || count($inscriptionEnInstances)) {
