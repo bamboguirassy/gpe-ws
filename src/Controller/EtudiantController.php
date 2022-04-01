@@ -53,7 +53,7 @@ class EtudiantController extends AbstractController {
                 JOIN ia.idclasse classe
                 JOIN classe.idanneeacad anneeacad
                 WHERE anneeacad = (:lastAnneeEnCours)
-                    AND etu.numinterne LIKE :numeroInterneTerm
+                    AND etu.numinterne = (:numeroInterneTerm)
             )
         ";
 
@@ -73,7 +73,7 @@ class EtudiantController extends AbstractController {
 
         return $entityManager
                         ->createQuery($query)
-                        ->setParameter('numeroInterneTerm', $numeroInterne . '%')
+                        ->setParameter('numeroInterneTerm', $numeroInterne)
                         ->setParameter('lastAnneeEnCours', $lastAnneeEnCours)
                         ->getResult();
     }

@@ -40,7 +40,7 @@ class VisiteMedicale
 
     /**
      * @var \Inscriptionacad
-     * @ORM\OneToOne(targetEntity=Inscriptionacad::class, inversedBy="visiteMedicale", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=Inscriptionacad::class, inversedBy="visiteMedicale", cascade={"persist"})
      * @ORM\JoinColumn(name="inscriptionacad", referencedColumnName="id",nullable=false)
      * @MaxDepth(1)
      */
@@ -57,6 +57,11 @@ class VisiteMedicale
      * @ORM\Column(type="string", length=45)
      */
     private $resultat;
+    
+    /**
+     * @ORM\Column(name="type_handicap", type="string", length=45)
+     */
+    private $typeHandicap;
 
     /**
      * @ORM\Column(name="maladie_chroniques", type="string", length=255, nullable=true)
@@ -137,6 +142,18 @@ class VisiteMedicale
     public function setMaladieChroniques(?string $maladieChroniques): self
     {
         $this->maladieChroniques = $maladieChroniques;
+
+        return $this;
+    }
+    
+    public function getTypeHandicap(): ?string
+    {
+        return $this->typeHandicap;
+    }
+
+    public function setTypeHandicap(?string $typeHandicap): self
+    {
+        $this->typeHandicap = $typeHandicap;
 
         return $this;
     }
