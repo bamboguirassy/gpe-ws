@@ -127,7 +127,7 @@ class VisiteMedicaleController extends AbstractController {
                             ->createQuery($doctorQuery)
                             ->setParameters([
                                 'anneeEnCours' => $lastAnneeEnCours,
-                                'user' => $this->getUser()->getUsername()
+                                'user' => $this->getUser()->getEmail()
                             ])
                             ->setMaxResults(100)
                             ->getResult();

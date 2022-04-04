@@ -17,6 +17,7 @@ class VisiteMedicaleType extends AbstractType
             ->add('commentaire')
             ->add('inscriptionacad')
             ->add('maladieChroniques')
+            ->add('typeHandicap')
         ;
     }
 
