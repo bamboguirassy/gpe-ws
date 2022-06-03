@@ -269,6 +269,9 @@ class EtudiantController extends AbstractController {
      * @IsGranted("ROLE_ETUDIANT_AFFICHAGE")
      */
     public function show(Etudiant $etudiant): Etudiant {
+        if(!in_array($this->getUser()->getIdgroup()->getCodegroupe(), ['SA','DSOS','ADSOS','ADMIN_DSOS','DIR_DSOS','AG_DSOS']) && $etudiant->getEmail()!=$this->getUser()->getEmail()) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à accéder à ce dossier...");
+        }
         return $etudiant;
     }
 

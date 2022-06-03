@@ -43,8 +43,9 @@ class PreinscriptionController extends AbstractController {
             'estinscrit' => false]);
         $tabPreinscription = [];
         $dateDuJour = new \DateTime();
+        $dateDuJourString = date_format($dateDuJour, 'Y-m-d');
         foreach ($preinscriptions as $preinscription) {
-            $active = ($preinscription->getDatenotif() <= $dateDuJour && $preinscription->getDatedelai() >= $dateDuJour);
+            $active = ($preinscription->getDatenotif() <= $dateDuJour && $preinscription->getDatedelai() >= date('Y-m-d', strtotime($dateDuJourString. ' + 1 days')));
             $tabPreinscription[] = ['active' => $active, 'preinscription' => $preinscription];
         }
 
