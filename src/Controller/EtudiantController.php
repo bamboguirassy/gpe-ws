@@ -16,7 +16,6 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use App\Utils\Utils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
-
 /**
  * @Route("/api/etudiant")
  */
@@ -40,6 +39,7 @@ class EtudiantController extends AbstractController {
      *
      * @Rest\Get(path="/search/{numeroInterne}", name="etudiant_search_numinterne")
      * @Rest\View(statusCode = 200)
+     * @IsGranted("ROLE_ETUDIANT_LISTE")
      */
     public function searchByNumeroDossier(Request $request, $numeroInterne, EntityManagerInterface $entityManager) {
 
@@ -70,7 +70,6 @@ class EtudiantController extends AbstractController {
                 ->setMaxResults(1)
                 ->getSingleResult();
 
-
         return $entityManager
                         ->createQuery($query)
                         ->setParameter('numeroInterneTerm', $numeroInterne)
@@ -83,6 +82,7 @@ class EtudiantController extends AbstractController {
      *
      * @Rest\Get(path="/search/term/{term}", name="etudiant_search", requirements={"term"=".+"})
      * @Rest\View(statusCode = 200)
+     * @IsGranted("ROLE_ETUDIANT_LISTE")
      */
     public function searchByTerm(Request $request, $term, EntityManagerInterface $entityManager) {
 
@@ -179,22 +179,22 @@ class EtudiantController extends AbstractController {
         $reqData = Utils::getObjectFromRequest($request);
         if ($etudiant->getNationalite() == NULL) {
             throw $this->createNotFoundException("Votre nationalité n'est pas renseignée, merci de contacter la Scolarité "
-                    . "pour apporter les corrections necessaires.");
+                            . "pour apporter les corrections necessaires.");
         }
         if ($etudiant->getLieunaiss() == NULL) {
             throw $this->createNotFoundException("Votre lieu de naissance n'est pas renseigné, merci de contacter la Scolarité "
-                    . "pour apporter les corrections necessaires.");
+                            . "pour apporter les corrections necessaires.");
         }
         if ($etudiant->getTeletudiant() == NULL) {
             throw $this->createNotFoundException("Votre numéro de téléphone n'est pas renseigné, merci de contacter la Scolarité "
-                    . "pour apporter les corrections necessaires.");
+                            . "pour apporter les corrections necessaires.");
         }
 
         if (isset($reqData->datenaiss)) {
             $etudiant->setDatenaiss(new \DateTime($reqData->datenaiss));
         } else {
             throw $this->createNotFoundException("La date de naissance n'est pas correctement renseignée, merci de contacter la Scolarité "
-                    . "pour apporter les corrections necessaires.");
+                            . "pour apporter les corrections necessaires.");
         }
         $preinscriptionActifs = $em
                 ->createQuery('select p from App\Entity\Preinscription p '
@@ -217,15 +217,15 @@ class EtudiantController extends AbstractController {
                 throw $this->createAccessDeniedException("Votre campagne d'inscription n'est pas encore ouverte, merci de patienter !");
             }
             throw $this->createNotFoundException("Nous n'avons pas pu vous authentifier,"
-                    . " si vous pensez qu’il s’agit d’une erreur,"
-                    . " écrire un mail à dsos@univ-thies.sn en"
-                    . " précisant dans le mail votre INE et votre filière.");
+                            . " si vous pensez qu’il s’agit d’une erreur,"
+                            . " écrire un mail à dsos@univ-thies.sn en"
+                            . " précisant dans le mail votre INE et votre filière.");
         }
         $preinscription = $preinscriptionActifs[0];
         $etudiant->setNuminterne($this->genererNumInterne($preinscription, $this));
-        /*if($etudiant->getCni()=='1309200300042') {
-            return $etudiant;
-        }*/
+        /* if($etudiant->getCni()=='1309200300042') {
+          return $etudiant;
+          } */
 
         //generer mail univ    si ça n'existe pas
 
@@ -269,7 +269,7 @@ class EtudiantController extends AbstractController {
      * @IsGranted("ROLE_ETUDIANT_AFFICHAGE")
      */
     public function show(Etudiant $etudiant): Etudiant {
-        if(!in_array($this->getUser()->getIdgroup()->getCodegroupe(), ['SA','DSOS','ADSOS','ADMIN_DSOS','DIR_DSOS','AG_DSOS']) && $etudiant->getEmail()!=$this->getUser()->getEmail()) {
+        if (!in_array($this->getUser()->getIdgroup()->getCodegroupe(), ['SA', 'DSOS', 'ADSOS', 'ADMIN_DSOS', 'DIR_DSOS', 'AG_DSOS']) && $etudiant->getEmail() != $this->getUser()->getEmail()) {
             throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à accéder à ce dossier...");
         }
         return $etudiant;
@@ -348,6 +348,9 @@ class EtudiantController extends AbstractController {
         if (!$etudiant) {
             throw $this->createNotFoundException("Etudiant introuvable avec le cni :" . $cni);
         }
+        if ($this->getUser()->getIdgroup()->getCodegroupe() != 'SA' && $this->getUser()->getEmail() != $etudiant->getEmailUniv()) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à acceder à cette ressource...");
+        }
         return $etudiant;
     }
 
@@ -355,14 +358,17 @@ class EtudiantController extends AbstractController {
      * @Rest\Get(path="/public/numinterne/{numinterne}", name="etudiant_by_numdossier")
      * @Rest\View(StatusCode=200)
      */
-    public function findByNuminterne($numinterne): Etudiant {
+    public function findByNuminterne($numinterne): array {
         $em = $this->getDoctrine()->getManager();
         //throw $this->createNotFoundException("Etudiant numinterne :" . $numinterne);
         $etudiant = $em->getRepository(Etudiant::class)->findOneByNuminterne($numinterne);
         if (!$etudiant) {
             throw $this->createNotFoundException("Etudiant introuvable avec le numinterne :" . $numinterne);
         }
-        return $etudiant;
+        /*if ($this->getUser()->getIdgroup()->getCodegroupe() != 'SA' && $this->getUser()->getEmail() != $etudiant->getEmailUniv()) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à acceder à cette ressource...");
+        } */
+        return ['id'=>$etudiant->getId(),'prenometudiant'=>$etudiant->getPrenometudiant(),'nometudiant'=>$etudiant->getNometudiant()];
     }
 
     /**
@@ -378,6 +384,9 @@ class EtudiantController extends AbstractController {
      * @Rest\View(StatusCode=200)
      */
     public function findUserByEmail($emailUniv) {
+        if ($this->getUser()->getIdgroup()->getCodegroupe() != 'SA' && $this->getUser()->getEmail() != $emailUniv) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à acceder à cette ressource...");
+        }
         $em = $this->getDoctrine()->getManager();
         $user = $em->createQuery('select fs from App\Entity\FosUser fs '
                         . 'where fs.username =?1')
@@ -419,6 +428,9 @@ class EtudiantController extends AbstractController {
      * @Rest\View(StatusCode=200)
      */
     public function edit(Request $request, Etudiant $etudiant): Etudiant {
+        if ($this->getUser()->getIdgroup()->getCodegroupe() != 'SA' && $this->getUser()->getEmail() != $etudiant->getEmailUniv()) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à acceder à cette ressource...");
+        }
         $oldEmail = $etudiant->getEmail();
         $em = $this->getDoctrine()->getManager();
         $form = $this->createForm(EtudiantType::class, $etudiant);
@@ -451,6 +463,9 @@ class EtudiantController extends AbstractController {
      */
     public function updateInfosByEtudiant(Request $request): Etudiant {
         $etudiant = EtudiantController::getEtudiantConnecte($this);
+        if ($this->getUser()->getIdgroup()->getCodegroupe() != 'SA' && $this->getUser()->getEmail() != $etudiant->getEmailUniv()) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à acceder à cette ressource...");
+        }
         $oldMail = $etudiant->getEmail();
         $form = $this->createForm(EtudiantType::class, $etudiant);
         $form->submit(Utils::serializeRequestContent($request));
@@ -521,7 +536,6 @@ class EtudiantController extends AbstractController {
     public static function genererNumInterne(\App\Entity\Preinscription $preinscription, $controller) {
         $numeroOrdreInscription = $preinscription->getIdanneeacad()->getNbreInscrits();
 
-
         $numeroOrdreInscription++;
         switch (strlen('' . $numeroOrdreInscription)) {
             case 1:
@@ -552,26 +566,25 @@ class EtudiantController extends AbstractController {
         }
         return "" . $numInterne;
     }
-    
-    
+
     /**
      * @Rest\Get(Path="/rotate-photo/{id}", name="rotate_photo_profil")
      * @Rest\View(StatusCode=200)
      */
-    public function setImageRotateProfil(Request $request, Etudiant $etudiant, \App\Utils\FileUploader $uploader){
+    public function setImageRotateProfil(Request $request, Etudiant $etudiant, \App\Utils\FileUploader $uploader) {
         $host = $request->getHttpHost();
         $scheme = $request->getScheme();
         //throw $this->createNotFoundException('upload/etudiants/photos/'.$etudiant->getPhoto());
 
         $degrees = 180;
         // Chargement
-        
-        $source = imagecreatefromjpeg('upload/etudiants/photos/'.$etudiant->getPhoto());
+
+        $source = imagecreatefromjpeg('upload/etudiants/photos/' . $etudiant->getPhoto());
 
         // Rotation
         $rotate = imagerotate($source, $degrees, 0);
-        header("Content-type: image/jpg"); 
-  
+        header("Content-type: image/jpg");
+
         //throw $this->createNotFoundException(''.$rotate);
         // Affichage
         //echo $rotate;
@@ -580,7 +593,7 @@ class EtudiantController extends AbstractController {
 //        imagepng($source);
 //        $stringdata = ob_get_contents(); 
 //        ob_end_clean(); 
-        throw $this->createNotFoundException('encodage => '.($rotate));
+        throw $this->createNotFoundException('encodage => ' . ($rotate));
 
 //        $imageData = base64_encode($stringdata);
 //        file_put_contents($imageData, base64_decode($imageData));
@@ -590,11 +603,11 @@ class EtudiantController extends AbstractController {
         $etudiant->setPhoto($newFileName);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->flush();
-        
+
         // Libération de la mémoire
         imagedestroy($source);
         imagedestroy($rotate);
-        
+
         return $etudiant;
     }
 

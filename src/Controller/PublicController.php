@@ -87,10 +87,9 @@ class PublicController extends AbstractController {
 
         $em->flush();
 
-
         //send confirmation mail
         $message = (new \Swift_Message('Confirmation de compte'))
-                ->setFrom(\App\Utils\Utils::$senderEmail,'Université de Thiès')
+                ->setFrom(\App\Utils\Utils::$senderEmail, 'Université de Thiès')
                 ->setTo($etudiant->getEmail())
                 ->setBody(
                 $this->renderView(
@@ -205,6 +204,58 @@ class PublicController extends AbstractController {
             }
         }
         return $etudiantAccount;
+    }
+
+    /**
+     * @Rest\get(Path="/filieres-and-options-sync", name="find_filieres_and_options_for_sync")
+     * @Rest\View(StatusCode=200)
+     */
+    public function findFilieresAndOptionsForSync() {
+        $em = $this->getDoctrine()->getManager();
+        $filieres = $em->getRepository(\App\Entity\Filiere::class)->findAll();
+        $dataMap = [];
+        foreach ($filieres as $filiere) {
+            $specialites = $em->getRepository(\App\Entity\Specialite::class)->findByIdfiliere($filiere);
+            $specialiteArray = [];
+            foreach ($specialites as $specialite) {
+                $specialiteArray[] = ['id' => $specialite->getId(), 'nom' => $specialite->getLibellespecialite(), 'code' => $specialite->getCodespecialite()];
+            }
+            $dataMap[] = ['filiere' => ['id' => $filiere->getId(), 'code' => $filiere->getCodefiliere(), 'nom' => $filiere->getLibellefiliere(), 'cycle' => $filiere->getIdcycle()->getLibellecycle()], 'specialites' => $specialiteArray];
+        }
+
+        return $dataMap;
+    }
+
+    /**
+     * @Rest\get(Path="/anneeacad-sync", name="find_anneeacad_for_sync")
+     * @Rest\View(StatusCode=200)
+     */
+    public function findAnneeacadForSync() {
+        $em = $this->getDoctrine()->getManager();
+        $anneeacads = $em->getRepository(\App\Entity\Anneeacad::class)->findAll();
+        $dataMap = [];
+        foreach ($anneeacads as $anneeacad) {
+            $dataMap[] = ['id' => $anneeacad->getId(), 'code' => $anneeacad->getCodeanneeacad(), 'nom' => $anneeacad->getLibelleanneeacad(), 'active' => $anneeacad->getEncours()];
+        }
+
+        return $dataMap;
+    }
+
+    /**
+     * @Rest\post(Path="/find-user", name="find_user_by_email")
+     * @Rest\View(StatusCode=200)
+     */
+    public function findUserByEmail(\Symfony\Component\HttpFoundation\Request $request) {
+        $em = $this->getDoctrine()->getManager();
+        $reqData = \App\Utils\Utils::getObjectFromRequest($request);
+        if (!isset($reqData->email)) {
+            throw $this->createNotFoundException("Email introuvable...");
+        }
+        $user = $em->getRepository(FosUser::class)->findOneByEmail($reqData->email);
+        if ($user) {
+            return ['email' => $user->getEmail(), 'prenom' => $user->getPrenom(), 'nom' => $user->getNom()];
+        }
+        return null;
     }
 
 }

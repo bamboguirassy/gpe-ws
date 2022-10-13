@@ -31,6 +31,7 @@ class InscriptionacadController extends AbstractController
     /**
      * @Rest\Get(path="/", name="inscriptionacad_index")
      * @Rest\View(StatusCode = 200)
+     * @IsGranted("ROLE_INSCRIPTION ACADEMIQUE_LISTE")
      */
     public function index()
     {
@@ -128,6 +129,7 @@ class InscriptionacadController extends AbstractController
     /**
      * @Rest\Post(path="/inscriptionacad-filiere/", name="inscriptionacad_by_filiere", requirements={"id"="\d+"})
      * @Rest\View(StatusCode = 200, serializerEnableMaxDepthChecks=true)
+     * @IsGranted("ROLE_INSCRIPTION ACADEMIQUE_LISTE")
      */
     public function findByFiliere(Request $request)
     {
@@ -167,6 +169,7 @@ class InscriptionacadController extends AbstractController
     /**
      * @Rest\Get(path="/classe/{id}", name="inscriptionacad_by_classe")
      * @Rest\View(StatusCode = 200)
+     * @IsGranted("ROLE_INSCRIPTION ACADEMIQUE_LISTE")
      */
     public function findByClasse(\App\Entity\Classe $classe)
     {
@@ -318,7 +321,7 @@ class InscriptionacadController extends AbstractController
     /**
      * @Rest\Get(path="/{id}", name="inscriptionacad_show",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
-     * @IsGranted("ROLE_INSCRIPTIONACAD_AFFICHAGE")
+     * @IsGranted("ROLE_INSCRIPTION ACADEMIQUE_AFFICHAGE")
      */
     public function show(Inscriptionacad $inscriptionacad): Inscriptionacad
     {
@@ -387,7 +390,7 @@ class InscriptionacadController extends AbstractController
             $em->flush();
             $preinscription = $preinscriptions[0];
         } else {
-            throw $this->createNotFoundException("La préinscription est introuvable pour termine le processus d'inscription");
+            throw $this->createNotFoundException("La préinscription est introuvable pour terminer le processus d'inscription");
         }
 
         // Envoyer un email de confirmation

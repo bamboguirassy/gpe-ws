@@ -87,6 +87,14 @@ class PreinscriptionController extends AbstractController {
                 ->findByCni($cni);
 
         if (count($etudiants)) {
+            // verifier si l'étudiant a un mail univ sinon générer
+            // date 29/06/2022
+            if(!$etudiants[0]->getEmailUniv()) {
+                $mail = \App\Ldap\LdapManager::getInstance()->addPrimoEntrant($etudiants[0], $preinscriptionActifs[0], $this);
+                $etudiants[0]->setEmailUniv($mail);
+                $etudiants[0]->setNotifmail(0);
+                $em->flush();
+            }
             // verifier si l'étudiant a une inscription acad active
             $inscriptionacads = $em->getRepository("App\Entity\Inscriptionacad")
                     ->findByIdetudiant($etudiants[0]);
@@ -222,6 +230,8 @@ class PreinscriptionController extends AbstractController {
     /**
      * @Rest\Post(path="/for/filter/anneeacad/{id}", name="preinscription_for_filter", requirements={"id"="\d+"})
      * @Rest\View(StatusCode = 200, serializerEnableMaxDepthChecks=true)
+     * @IsGranted("ROLE_PREINSCRIPTION_LISTE")
+
      */
     public function findForFilterAction(Request $request, Anneeacad $anneeacad) {
         ini_set('memory_limit', '512M');
