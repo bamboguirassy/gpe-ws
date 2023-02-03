@@ -96,6 +96,12 @@ class Filiere
      */
     private $idtypefiliere;
 
+    /**
+     * @ORM\OneToOne(targetEntity=ParamFraisEncadrement::class, mappedBy="filiere")
+     */
+    private $paramFraisEncadrement;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -208,6 +214,19 @@ class Filiere
 
         return $this;
     }
+
+    public function getParamFraisEncadrement(): ?ParamFraisEncadrement
+    {
+        return $this->paramFraisEncadrement;
+    }
+
+    public function setParamFraisEncadrement(?ParamFraisEncadrement $paramFraisEncadrement): self
+    {
+        $this->paramFraisEncadrement = $paramFraisEncadrement;
+
+        return $this;
+    }
+
 
 
 }

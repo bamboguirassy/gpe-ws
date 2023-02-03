@@ -1,0 +1,48 @@
+
+<p-toast></p-toast>
+<!-- form paiementFraisEncadrement info -->
+<form *ngIf="'PaiementFraisEncadrement'|editable" class="form" role="form" #paiementFraisEncadrementForm="ngForm" autocomplete="off" (ngSubmit)="updatePaiementFraisEncadrement()">
+  <p-fieldset legend="Modification utilisateur" [toggleable]="true">
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="paiementFraisEncadrementForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+    <!-- debut body -->
+    <div class="row">
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="datePaiement">DatePaiement</label>
+                    <input [(ngModel)]="paiementFraisEncadrement.datePaiement" class="form-control" type="text" name="datePaiement" id="datePaiement">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="montantPaye">MontantPaye</label>
+                    <input [(ngModel)]="paiementFraisEncadrement.montantPaye" class="form-control" type="text" name="montantPaye" id="montantPaye">
+                </div>
+            </div>
+                            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="col-form-label form-control-label" for="methodePaiement">MethodePaiement</label>
+                    <input [(ngModel)]="paiementFraisEncadrement.methodePaiement" class="form-control" type="text" name="methodePaiement" id="methodePaiement">
+                </div>
+            </div>
+                
+      
+    </div>
+    <!-- fin body -->
+    <p-toolbar>
+      <button type="button" (click)="location.back()" class="btn btn-outline-secondary pull-left"><i
+          class="fa fa-eraser" aria-hidden="true"></i>
+        Retour</button>
+      <button [disabled]="paiementFraisEncadrementForm.invalid" type="submit" class="btn btn-warning pull-right">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+        Enregistrer</button>
+    </p-toolbar>
+  </p-fieldset>
+</form>
+<!-- /form paiementFraisEncadrement info -->

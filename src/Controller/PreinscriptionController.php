@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Preinscription;
 use App\Entity\Etudiant;
+use App\Entity\Anneeacad;
 use App\Form\PreinscriptionType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,20 +39,21 @@ class PreinscriptionController extends AbstractController {
     public function findActivePreinscriptionByEtudiant(Etudiant $etudiant): array {
         $preinscriptions = $this->getDoctrine()->getManager()
                 ->getRepository(Preinscription::class)
-                ->findBy(['cni'=>$etudiant->getCni(),
-                    'estinscrit'=>false]);
+                ->findBy(['cni' => $etudiant->getCni(),
+            'estinscrit' => false]);
         $tabPreinscription = [];
         $dateDuJour = new \DateTime();
+        $dateDuJourString = date_format($dateDuJour, 'Y-m-d');
         foreach ($preinscriptions as $preinscription) {
-            $active = ($preinscription->getDatenotif()<=$dateDuJour && $preinscription->getDatedelai()>=$dateDuJour);
-            $tabPreinscription[] = ['active'=>$active,'preinscription'=>$preinscription];
+            $active = ($preinscription->getDatenotif() <= $dateDuJour && $preinscription->getDatedelai() >= date('Y-m-d', strtotime($dateDuJourString. ' + 1 days')));
+            $tabPreinscription[] = ['active' => $active, 'preinscription' => $preinscription];
         }
 
         return count($tabPreinscription) ? $tabPreinscription : [];
     }
 
     /**
-     * @Rest\Get(path="/public/request-etudiant-creation/{cni}", name="request_etudiant_creation")
+     * @Rest\Get(path="/public/request-etudiant-creation/{cni}", name="request_etudiant_creation", requirements={"cni"=".+"})
      * @Rest\View(StatusCode = 200)
      */
     public function requestNewEtudiantCreation($cni) {
@@ -76,13 +78,23 @@ class PreinscriptionController extends AbstractController {
             if (count($preinscriptionInactifs)) {
                 throw $this->createAccessDeniedException("Votre campagne d'inscription n'est pas encore ouverte, merci de patienter !");
             }
-            throw $this->createNotFoundException("Nous n'avons pas pu vous authentifier, si vous pensez qu'il s'agit d'une erreur,"
-                    . " merci de vous rapprocher de la DSOS de l'université de Thiès.");
+            throw $this->createNotFoundException("Nous n'avons pas pu vous authentifier,"
+                    . " si vous pensez qu’il s’agit d’une erreur,"
+                    . " écrire un mail à dsos@univ-thies.sn en"
+                    . " précisant dans le mail votre INE et votre filière.");
         }
         $etudiants = $em->getRepository('App\Entity\Etudiant')
                 ->findByCni($cni);
 
         if (count($etudiants)) {
+            // verifier si l'étudiant a un mail univ sinon générer
+            // date 29/06/2022
+            if(!$etudiants[0]->getEmailUniv()) {
+                $mail = \App\Ldap\LdapManager::getInstance()->addPrimoEntrant($etudiants[0], $preinscriptionActifs[0], $this);
+                $etudiants[0]->setEmailUniv($mail);
+                $etudiants[0]->setNotifmail(0);
+                $em->flush();
+            }
             // verifier si l'étudiant a une inscription acad active
             $inscriptionacads = $em->getRepository("App\Entity\Inscriptionacad")
                     ->findByIdetudiant($etudiants[0]);
@@ -164,7 +176,7 @@ class PreinscriptionController extends AbstractController {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($preinscription);
         $entityManager->flush();
-
+ 
         return $preinscription;
     }
 
@@ -187,9 +199,9 @@ class PreinscriptionController extends AbstractController {
 
         return $preinscriptions;
     }
-    
+
     /**
-     * @Rest\Get(path="/public/verifier-inscription-etudiant-active/{cni}", name="verifier-inscription-etudiant-active")
+     * @Rest\Get(path="/public/verifier-inscription-etudiant-active/{cni}", name="verifier-inscription-etudiant-active", requirements={"cni"=".+"})
      * @Rest\View(StatusCode = 200)
      */
     public function verifierInscriptionEtudiantActif($cni) {
@@ -198,17 +210,122 @@ class PreinscriptionController extends AbstractController {
         $preinscriptionActifs = $em
                 ->createQuery('select p from App\Entity\Preinscription p '
                         . 'where p.datenotif<=?1 and p.datedelai>=?2 '
-                        . 'and p.cni=?3 and p.estinscrit=?4')
+                        . 'and p.cni=?3')
                 ->setParameter(1, new \DateTime())
                 ->setParameter(2, new \DateTime())
                 ->setParameter(3, $cni)
-                ->setParameter(4, false)
+                ->getResult();
+        $inscriptionEnInstances = $em->createQuery('select ia from App\Entity\Inscriptionacad ia join ia.idetudiant et ' 
+                . 'where et.cni=?1 and ia.etat=?2')
+                ->setParameter(1, $cni)
+                ->setParameter(2, 'I')
                 ->getResult();
         //throw $this->createAccessDeniedException("PreActif ".$preinscriptionActifs[0].getDatenotif());
-        if(count($preinscriptionActifs)){
+        if (count($preinscriptionActifs) || count($inscriptionEnInstances)) {
             $isInscriptionActive = true;
         }
-        return  $isInscriptionActive; 
+        return $isInscriptionActive;
+    }
+    
+    /**
+     * @Rest\Post(path="/for/filter/anneeacad/{id}", name="preinscription_for_filter", requirements={"id"="\d+"})
+     * @Rest\View(StatusCode = 200, serializerEnableMaxDepthChecks=true)
+     * @IsGranted("ROLE_PREINSCRIPTION_LISTE")
+
+     */
+    public function findForFilterAction(Request $request, Anneeacad $anneeacad) {
+        ini_set('memory_limit', '512M');
+        $em = $this->getDoctrine()->getManager();
+        $redData = Utils::serializeRequestContent($request);
+        $estInscrit = $redData['estInscrit'];
+        $etablissement = $redData['etablissement'];        
+        $filiere = $redData['filiere'];
+        $niveau = $redData['niveau'];
+        if($estInscrit==2){            
+            if(isset($filiere) && isset($niveau)){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'where p.idfiliere=?1 and p.idanneeacad=?2 and p.idniveau=?3')
+                        ->setParameter(1, $filiere)
+                        ->setParameter(2, $anneeacad)
+                        ->setParameter(3, $niveau)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+            if(isset($filiere) && $niveau == NULL ){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'where p.idfiliere=?1 and p.idanneeacad=?2')
+                        ->setParameter(1, $filiere)
+                        ->setParameter(2, $anneeacad)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+            if(isset($etablissement) && (!isset($filiere) || $filiere == NULL) ){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'JOIN p.idfiliere f '
+                                . 'where f.identite=?1 and p.idanneeacad=?2')
+                        ->setParameter(1, $etablissement)
+                        ->setParameter(2, $anneeacad)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+            if(!isset($etablissement) || $etablissement == NULL){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'where p.idanneeacad=?1')
+                        ->setParameter(1, $anneeacad)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+        }
+           else {
+            if(isset($filiere) && isset($niveau)){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'where p.idfiliere=?1 and p.idanneeacad=?2 and p.idniveau=?3 and p.estinscrit=?4')
+                        ->setParameter(1, $filiere)
+                        ->setParameter(2, $anneeacad)
+                        ->setParameter(3, $niveau)
+                        ->setParameter(4, $estInscrit)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+            if(isset($filiere) && $niveau == NULL ){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'where p.idfiliere=?1 and p.idanneeacad=?2 and p.estinscrit=?3')
+                        ->setParameter(1, $filiere)
+                        ->setParameter(2, $anneeacad)
+                        ->setParameter(3, $estInscrit)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+            if(isset($etablissement) && (!isset($filiere) || $filiere == NULL) ){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'JOIN p.idfiliere f '
+                                . 'where f.identite=?1 and p.idanneeacad=?2 and p.estinscrit=?3')
+                        ->setParameter(1, $etablissement)
+                        ->setParameter(2, $anneeacad)
+                        ->setParameter(3, $estInscrit)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+            if(!isset($etablissement) || $etablissement == NULL){                
+                $preinscriptions = $em->createQuery('select p from App\Entity\Preinscription p '
+                                . 'where p.idanneeacad=?1 and p.estinscrit=?2')
+                        ->setParameter(1, $anneeacad)
+                        ->setParameter(2, $estInscrit)
+                        ->getResult();
+
+                    return $preinscriptions;
+            }
+        }
+
+        return;
+        
     }
 
 }

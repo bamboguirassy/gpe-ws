@@ -13,9 +13,11 @@ class VisiteMedicaleType extends AbstractType
     {
         $builder
             ->add('date')
-            ->add('apte')
+            ->add('resultat')
             ->add('commentaire')
             ->add('inscriptionacad')
+            ->add('maladieChroniques')
+            ->add('typeHandicap')
         ;
     }
 

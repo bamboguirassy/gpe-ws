@@ -1,0 +1,20 @@
+{%extends "emails/email-template.html.twig"%}
+{% block title %}  Bonjour <b>{{documentEtudiant.etudiant.prenometudiant}} {{documentEtudiant.etudiant.nometudiant}}</b> {% endblock %}
+
+{% block paragraphe2 %}
+    <p>
+        Bonjour,
+        Votre document <strong>{{ documentEtudiant.typeDocument.libelletypedocument ?? documentEtudiant.titreDocument }}</strong> a été supprimé dans <strong>Espace Etudiant</strong>
+        
+    </p>
+    <span>
+      La DSOS vous demande de bien vouloir entrer dans votre dossier (http://etudiant.univ-thies.sn)
+       et de recharger le document: <span style="font-weight: bold" > {{ documentEtudiant.typeDocument.libelletypedocument ?? documentEtudiant.titreDocument }}. </span>
+    </span>
+       <br>
+       <span>Il faut obligatoirement renseigner ce document pour que votre dossier soit valide... </span>
+{% endblock %}
+
+{% block paragraphe3 %}
+<hr>
+{% endblock %}

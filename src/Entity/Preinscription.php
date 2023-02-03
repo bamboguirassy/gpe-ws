@@ -2,7 +2,10 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\MaxDepth;
 
 /**
  * Preinscription
@@ -147,6 +150,7 @@ class Preinscription
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="idAnneeAcad", referencedColumnName="id")
      * })
+     * @MaxDepth(1)
      */
     private $idanneeacad;
 
@@ -157,6 +161,7 @@ class Preinscription
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="idFiliere", referencedColumnName="id")
      * })
+     * @MaxDepth(1)
      */
     private $idfiliere;
 
@@ -167,6 +172,7 @@ class Preinscription
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="idNiveau", referencedColumnName="id")
      * })
+     * @MaxDepth(1)
      */
     private $idniveau;
 
@@ -199,6 +205,7 @@ class Preinscription
      * })
      */
     private $idregimeinscription;
+
 
     public function getId()
     {
@@ -490,6 +497,7 @@ class Preinscription
 
         return $this;
     }
+
 
 
 }

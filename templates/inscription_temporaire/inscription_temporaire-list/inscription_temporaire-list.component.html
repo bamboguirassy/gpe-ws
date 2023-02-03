@@ -1,0 +1,181 @@
+<p-toast></p-toast>
+<div class="row" *ngIf="'InscriptionTemporaire'|listable">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <p-fieldset legend="Liste des inscriptionTemporaires" [toggleable]="true">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+          <p-toolbar>
+            <button *ngIf="'InscriptionTemporaire'|listable" type="button" class="btn btn-outline-secondary" (click)="refreshList()">
+              <i class="fa fa-refresh" aria-hidden="true"></i> Raffraichir les données
+            </button>
+            <button *ngIf="'InscriptionTemporaire'|deletable" (click)="deleteSelectedInscriptionTemporaires()" type="button"
+              class="btn btn-outline-danger pull-right ml-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'InscriptionTemporaire'|creable" [routerLink]="['/'+inscriptionTemporaireSrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary pull-right ml-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+          <p-table #tt [value]="inscriptionTemporaires" [paginator]="true" [rows]="50" sortMode="multiple" selectionMode="multiple"
+            [(selection)]="selectedInscriptionTemporaires" [resizableColumns]="true" [responsive]="true"
+            [contextMenu]="contextMenu" [(contextMenuSelection)]="selectedInscriptionTemporaire" [scrollable]="true"
+            scrollHeight="400px" [globalFilterFields]="globalFilterFields" dataKey="id">
+            <ng-template pTemplate="caption">
+              Liste des inscriptionTemporaires<br>
+              <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+              <input type="text" pInputText size="50" placeholder="Rechercher dans le tableau"
+                (input)="tt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+              <div class="ui-helper-clearfix" style="text-align: left">
+                <button *ngIf="'InscriptionTemporaire'|listable" type="button" pButton icon="pi pi-file-pdf" iconPos="left" label="PDF"
+                  (click)="exportPdf()" class="ui-button-warning pull-right ml-1"></button>
+                <button *ngIf="'InscriptionTemporaire'|listable" type="button" pButton icon="pi pi-file-excel" iconPos="left"
+                  label="EXCEL" (click)="exportExcel()" style="margin-right: 0.5em;" class="ui-button-success pull-right"></button>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="colgroup">
+              <colgroup>
+                                  <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                    </colgroup>
+            </ng-template>
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                                <th [pSortableColumn]="'idclasse'" pResizableColumn>
+                  Idclasse <p-sortIcon [field]="'idclasse'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'idspecialite'" pResizableColumn>
+                  Idspecialite <p-sortIcon [field]="'idspecialite'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'idregimeinscription'" pResizableColumn>
+                  Idregimeinscription <p-sortIcon [field]="'idregimeinscription'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'idmodaliteenseignement'" pResizableColumn>
+                  Idmodaliteenseignement <p-sortIcon [field]="'idmodaliteenseignement'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'idetudiant'" pResizableColumn>
+                  Idetudiant <p-sortIcon [field]="'idetudiant'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'idbourse'" pResizableColumn>
+                  Idbourse <p-sortIcon [field]="'idbourse'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'passage'" pResizableColumn>
+                  Passage <p-sortIcon [field]="'passage'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'idmodepaiement'" pResizableColumn>
+                  Idmodepaiement <p-sortIcon [field]="'idmodepaiement'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'montantinscriptionacad'" pResizableColumn>
+                  Montantinscriptionacad <p-sortIcon [field]="'montantinscriptionacad'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'coutformation'" pResizableColumn>
+                  Coutformation <p-sortIcon [field]="'coutformation'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'numquittance'" pResizableColumn>
+                  Numquittance <p-sortIcon [field]="'numquittance'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'source'" pResizableColumn>
+                  Source <p-sortIcon [field]="'source'"></p-sortIcon>
+              </th>
+                          <th [pSortableColumn]="'croust'" pResizableColumn>
+                  Croust <p-sortIcon [field]="'croust'"></p-sortIcon>
+              </th>
+                    </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-inscriptionTemporaire let-editing="editing">
+              <tr [pEditableRow]="inscriptionTemporaire" [pSelectableRow]="inscriptionTemporaire" [pContextMenuRow]="inscriptionTemporaire">
+                <td style="width: 3em">
+                  <p-tableCheckbox [value]="inscriptionTemporaire"></p-tableCheckbox>
+                </td>
+                                                  <td class="ui-resizable-column">
+                  {{ inscriptionTemporaire.idclasse }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionTemporaire.idspecialite }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionTemporaire.idregimeinscription }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionTemporaire.idmodaliteenseignement }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionTemporaire.idetudiant }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionTemporaire.idbourse }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionTemporaire.passage }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionTemporaire.idmodepaiement }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionTemporaire.montantinscriptionacad }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionTemporaire.coutformation }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionTemporaire.numquittance }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionTemporaire.source }}
+                </td>
+                                        <td class="ui-resizable-column">
+                  {{ inscriptionTemporaire.croust ? 'Yes' : 'No' }}
+                </td>
+                          </tr>
+            </ng-template>
+            <ng-template pTemplate="footer" let-columns>
+              <tr>
+                <td style="width: 3em">
+                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </td>
+                                   <td>Idclasse</td>
+                             <td>Idspecialite</td>
+                             <td>Idregimeinscription</td>
+                             <td>Idmodaliteenseignement</td>
+                             <td>Idetudiant</td>
+                             <td>Idbourse</td>
+                             <td>Passage</td>
+                             <td>Idmodepaiement</td>
+                             <td>Montantinscriptionacad</td>
+                             <td>Coutformation</td>
+                             <td>Numquittance</td>
+                             <td>Source</td>
+                             <td>Croust</td>
+                    </tr>
+            </ng-template>
+          </p-table>
+          <p-contextMenu #contextMenu [model]="cMenuItems"></p-contextMenu>
+          <p-toolbar>
+            <button *ngIf="'InscriptionTemporaire'|deletable" (click)="deleteSelectedInscriptionTemporaires()" type="button"
+              class="btn btn-outline-danger mr-1">
+              <i class="fa fa-trash-o" aria-hidden="true"></i> Supprimer selection
+            </button>
+            <button *ngIf="'InscriptionTemporaire'|creable" [routerLink]="['/'+inscriptionTemporaireSrv.getRoutePrefix(),'new']"
+              routerLinkActive="router-link-active" type="button" class="btn btn-outline-primary mr-1">
+              <i class="fa fa-plus-square-o" aria-hidden="true"></i> Nouveau
+            </button>
+          </p-toolbar>
+        </div>
+      </div>
+    </p-fieldset>
+  </div>
+</div>

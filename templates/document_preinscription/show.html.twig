@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}DocumentPreinscription{% endblock %}
+
+{% block body %}
+    <h1>DocumentPreinscription</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ document_preinscription.id }}</td>
+            </tr>
+            <tr>
+                <th>Filename</th>
+                <td>{{ document_preinscription.filename }}</td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td>{{ document_preinscription.url }}</td>
+            </tr>
+            <tr>
+                <th>DateAjout</th>
+                <td>{{ document_preinscription.dateAjout ? document_preinscription.dateAjout|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Titre</th>
+                <td>{{ document_preinscription.titre }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('document_preinscription_index') }}">back to list</a>
+
+    <a href="{{ path('document_preinscription_edit', {'id': document_preinscription.id}) }}">edit</a>
+
+    {{ include('document_preinscription/_delete_form.html.twig') }}
+{% endblock %}

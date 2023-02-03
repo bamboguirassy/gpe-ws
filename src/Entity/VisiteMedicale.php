@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\MaxDepth;
+
 
 /**
  * VisiteMedicale
@@ -29,13 +31,6 @@ class VisiteMedicale
     private $date;
 
     /**
-     * @var bool
-     *
-     * @ORM\Column(name="apte", type="boolean", nullable=false)
-     */
-    private $apte;
-
-    /**
      * @var string|null
      *
      * @ORM\Column(name="commentaire", type="text", length=65535, nullable=true)
@@ -45,10 +40,33 @@ class VisiteMedicale
 
     /**
      * @var \Inscriptionacad
-     * @ORM\OneToOne(targetEntity=Inscriptionacad::class, inversedBy="visiteMedicale", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=Inscriptionacad::class, inversedBy="visiteMedicale", cascade={"persist"})
      * @ORM\JoinColumn(name="inscriptionacad", referencedColumnName="id",nullable=false)
+     * @MaxDepth(1)
      */
     private $inscriptionacad;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="user", type="string", length=45, nullable=false)
+     */
+    private $user;
+
+    /**
+     * @ORM\Column(type="string", length=45)
+     */
+    private $resultat;
+    
+    /**
+     * @ORM\Column(name="type_handicap", type="string", length=45)
+     */
+    private $typeHandicap;
+
+    /**
+     * @ORM\Column(name="maladie_chroniques", type="string", length=255, nullable=true)
+     */
+    private $maladieChroniques;
 
     public function getId(): ?int
     {
@@ -63,18 +81,6 @@ class VisiteMedicale
     public function setDate($date): self
     {
         $this->date = $date;
-
-        return $this;
-    }
-
-    public function getApte(): ?bool
-    {
-        return $this->apte;
-    }
-
-    public function setApte(bool $apte): self
-    {
-        $this->apte = $apte;
 
         return $this;
     }
@@ -102,6 +108,54 @@ class VisiteMedicale
 
         return $this;
     }
+    
+   
+    public function setUser($user)
+    {
+        $this->user = $user;
 
+        return $this;
+    }
+
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function getResultat(): ?string
+    {
+        return $this->resultat;
+    }
+
+    public function setResultat(string $resultat): self
+    {
+        $this->resultat = $resultat;
+
+        return $this;
+    }
+
+    public function getMaladieChroniques(): ?string
+    {
+        return $this->maladieChroniques;
+    }
+
+    public function setMaladieChroniques(?string $maladieChroniques): self
+    {
+        $this->maladieChroniques = $maladieChroniques;
+
+        return $this;
+    }
+    
+    public function getTypeHandicap(): ?string
+    {
+        return $this->typeHandicap;
+    }
+
+    public function setTypeHandicap(?string $typeHandicap): self
+    {
+        $this->typeHandicap = $typeHandicap;
+
+        return $this;
+    }
 
 }

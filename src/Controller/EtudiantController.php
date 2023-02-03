@@ -39,6 +39,7 @@ class EtudiantController extends AbstractController {
      *
      * @Rest\Get(path="/search/{numeroInterne}", name="etudiant_search_numinterne")
      * @Rest\View(statusCode = 200)
+     * @IsGranted("ROLE_ETUDIANT_LISTE")
      */
     public function searchByNumeroDossier(Request $request, $numeroInterne, EntityManagerInterface $entityManager) {
 
@@ -52,7 +53,7 @@ class EtudiantController extends AbstractController {
                 JOIN ia.idclasse classe
                 JOIN classe.idanneeacad anneeacad
                 WHERE anneeacad = (:lastAnneeEnCours)
-                    AND etu.numinterne LIKE :numeroInterneTerm
+                    AND etu.numinterne = (:numeroInterneTerm)
             )
         ";
 
@@ -64,25 +65,24 @@ class EtudiantController extends AbstractController {
         ';
 
         $lastAnneeEnCours = $entityManager
-            ->createQuery($subQuery)
-            ->setParameter('enCours', true)
-            ->setMaxResults(1)
-            ->getSingleResult();
-
+                ->createQuery($subQuery)
+                ->setParameter('enCours', true)
+                ->setMaxResults(1)
+                ->getSingleResult();
 
         return $entityManager
-            ->createQuery($query)
-            ->setParameter('numeroInterneTerm', $numeroInterne . '%')
-            ->setParameter('lastAnneeEnCours', $lastAnneeEnCours)
-            ->getResult();
-
+                        ->createQuery($query)
+                        ->setParameter('numeroInterneTerm', $numeroInterne)
+                        ->setParameter('lastAnneeEnCours', $lastAnneeEnCours)
+                        ->getResult();
     }
 
     /**
      * Recherche un etudiant par cni, prenom, nom, ine, numéro de dossier connaissant le numéro interne
      *
-     * @Rest\Get(path="/search/term/{term}", name="etudiant_search")
+     * @Rest\Get(path="/search/term/{term}", name="etudiant_search", requirements={"term"=".+"})
      * @Rest\View(statusCode = 200)
+     * @IsGranted("ROLE_ETUDIANT_LISTE")
      */
     public function searchByTerm(Request $request, $term, EntityManagerInterface $entityManager) {
 
@@ -99,10 +99,9 @@ class EtudiantController extends AbstractController {
         ";
 
         return $entityManager
-            ->createQuery($query)
-            ->setParameter('term', $term . '%')
-            ->getResult();
-
+                        ->createQuery($query)
+                        ->setParameter('term', $term . '%')
+                        ->getResult();
     }
 
     /**
@@ -178,8 +177,24 @@ class EtudiantController extends AbstractController {
         $form = $this->createForm(EtudiantType::class, $etudiant);
         $form->submit(Utils::serializeRequestContent($request));
         $reqData = Utils::getObjectFromRequest($request);
+        if ($etudiant->getNationalite() == NULL) {
+            throw $this->createNotFoundException("Votre nationalité n'est pas renseignée, merci de contacter la Scolarité "
+                            . "pour apporter les corrections necessaires.");
+        }
+        if ($etudiant->getLieunaiss() == NULL) {
+            throw $this->createNotFoundException("Votre lieu de naissance n'est pas renseigné, merci de contacter la Scolarité "
+                            . "pour apporter les corrections necessaires.");
+        }
+        if ($etudiant->getTeletudiant() == NULL) {
+            throw $this->createNotFoundException("Votre numéro de téléphone n'est pas renseigné, merci de contacter la Scolarité "
+                            . "pour apporter les corrections necessaires.");
+        }
+
         if (isset($reqData->datenaiss)) {
             $etudiant->setDatenaiss(new \DateTime($reqData->datenaiss));
+        } else {
+            throw $this->createNotFoundException("La date de naissance n'est pas correctement renseignée, merci de contacter la Scolarité "
+                            . "pour apporter les corrections necessaires.");
         }
         $preinscriptionActifs = $em
                 ->createQuery('select p from App\Entity\Preinscription p '
@@ -201,11 +216,16 @@ class EtudiantController extends AbstractController {
             if (count($preinscriptionInactifs)) {
                 throw $this->createAccessDeniedException("Votre campagne d'inscription n'est pas encore ouverte, merci de patienter !");
             }
-            throw $this->createNotFoundException("Nous n'avons pas pu vous authentifier, si vous pensez qu'il s'agit d'une erreur,"
-                    . " merci de vous rapprocher de la DSOS de l'université de Thiès.");
+            throw $this->createNotFoundException("Nous n'avons pas pu vous authentifier,"
+                            . " si vous pensez qu’il s’agit d’une erreur,"
+                            . " écrire un mail à dsos@univ-thies.sn en"
+                            . " précisant dans le mail votre INE et votre filière.");
         }
         $preinscription = $preinscriptionActifs[0];
-        $etudiant->setNuminterne($this->genererNumInterne($preinscription));
+        $etudiant->setNuminterne($this->genererNumInterne($preinscription, $this));
+        /* if($etudiant->getCni()=='1309200300042') {
+          return $etudiant;
+          } */
 
         //generer mail univ    si ça n'existe pas
 
@@ -249,6 +269,9 @@ class EtudiantController extends AbstractController {
      * @IsGranted("ROLE_ETUDIANT_AFFICHAGE")
      */
     public function show(Etudiant $etudiant): Etudiant {
+        if (!in_array($this->getUser()->getIdgroup()->getCodegroupe(), ['SA', 'DSOS', 'ADSOS', 'ADMIN_DSOS', 'DIR_DSOS', 'AG_DSOS']) && $etudiant->getEmail() != $this->getUser()->getEmail()) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à accéder à ce dossier...");
+        }
         return $etudiant;
     }
 
@@ -316,7 +339,7 @@ class EtudiantController extends AbstractController {
     }
 
     /**
-     * @Rest\Get(path="/cni/{cni}", name="etudiant_by_cni")
+     * @Rest\Get(path="/cni/{cni}", name="etudiant_by_cni", requirements={"cni"=".+"})
      * @Rest\View(StatusCode=200)
      */
     public function findByCni($cni): Etudiant {
@@ -325,21 +348,27 @@ class EtudiantController extends AbstractController {
         if (!$etudiant) {
             throw $this->createNotFoundException("Etudiant introuvable avec le cni :" . $cni);
         }
+        if ($this->getUser()->getIdgroup()->getCodegroupe() != 'SA' && $this->getUser()->getEmail() != $etudiant->getEmailUniv()) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à acceder à cette ressource...");
+        }
         return $etudiant;
     }
-    
+
     /**
      * @Rest\Get(path="/public/numinterne/{numinterne}", name="etudiant_by_numdossier")
      * @Rest\View(StatusCode=200)
      */
-    public function findByNuminterne($numinterne): Etudiant {
+    public function findByNuminterne($numinterne): array {
         $em = $this->getDoctrine()->getManager();
         //throw $this->createNotFoundException("Etudiant numinterne :" . $numinterne);
         $etudiant = $em->getRepository(Etudiant::class)->findOneByNuminterne($numinterne);
         if (!$etudiant) {
             throw $this->createNotFoundException("Etudiant introuvable avec le numinterne :" . $numinterne);
         }
-        return $etudiant;
+        /*if ($this->getUser()->getIdgroup()->getCodegroupe() != 'SA' && $this->getUser()->getEmail() != $etudiant->getEmailUniv()) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à acceder à cette ressource...");
+        } */
+        return ['id'=>$etudiant->getId(),'prenometudiant'=>$etudiant->getPrenometudiant(),'nometudiant'=>$etudiant->getNometudiant()];
     }
 
     /**
@@ -355,54 +384,43 @@ class EtudiantController extends AbstractController {
      * @Rest\View(StatusCode=200)
      */
     public function findUserByEmail($emailUniv) {
+        if ($this->getUser()->getIdgroup()->getCodegroupe() != 'SA' && $this->getUser()->getEmail() != $emailUniv) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à acceder à cette ressource...");
+        }
         $em = $this->getDoctrine()->getManager();
-        $etudiants = $em->createQuery('select fs from App\Entity\FosUser fs '
+        $user = $em->createQuery('select fs from App\Entity\FosUser fs '
                         . 'where fs.username =?1')
                 ->setParameter(1, $emailUniv)
                 ->getResult()
         ;
 
-        return count($etudiants)?$etudiants[0]:null;
+        return count($user) ? $user[0] : null;
     }
+
     /**
      * @Rest\Post(path="/send-by-email/{id}", name="send_email")
      * @Rest\View(StatusCode=200)
      */
-    public function sendEmail(Etudiant $etudiant,  \Swift_Mailer $mailer, Request $request) {
+    public function sendEmail(Etudiant $etudiant, \Swift_Mailer $mailer, Request $request) {
         $requestData = Utils::getObjectFromRequest($request);
         $objet = $requestData->objet;
         $contenu = $requestData->contenu;
-                $mail =(new \Swift_Message($objet))
-                        ->setFrom(Utils::$senderEmail)
-                        ->setTo($etudiant->getEmail())
-                         ->setCc($etudiant->getEmailUniv())
-                        ->setBody($contenu, 'text/html');
-       $mailer->send($mail);
-       return $etudiant;
-       
-        
-        
-       
+        $mail = (new \Swift_Message($objet))
+                ->setFrom(Utils::$senderEmail)
+                ->setTo($etudiant->getEmail())
+                ->setCc($etudiant->getEmailUniv())
+                ->setBody($contenu, 'text/html');
+        $mailer->send($mail);
+        return $etudiant;
     }
-
-
-    /*
-     * $em->createQuery("select ia from App\Entity\Inscriptionacad ia, "
-      . "App\Entity\Etudiant et where ia.idclasse=?1 and ia.idetudiant=et and et.cni=?2 ")
-      ->setParameter(1, $classe)
-      ->setParameter(2, $preinscription->getCni())
-      ->getResult();
-     */
 
     public static function getEtudiantConnecte($controller) {
         $etudiants = $controller->getDoctrine()->getManager()->createQuery('select et from App\Entity\Etudiant et '
                         . 'where et.emailUniv=?1')
                 ->setParameter(1, $controller->getUser()->getEmail())
                 ->getResult();
-        if (count($etudiants) < 1) {
-            return null;
-        }
-        return $etudiants[0];
+
+        return count($etudiants) ? $etudiants[0] : null;
     }
 
     /**
@@ -410,6 +428,9 @@ class EtudiantController extends AbstractController {
      * @Rest\View(StatusCode=200)
      */
     public function edit(Request $request, Etudiant $etudiant): Etudiant {
+        if ($this->getUser()->getIdgroup()->getCodegroupe() != 'SA' && $this->getUser()->getEmail() != $etudiant->getEmailUniv()) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à acceder à cette ressource...");
+        }
         $oldEmail = $etudiant->getEmail();
         $em = $this->getDoctrine()->getManager();
         $form = $this->createForm(EtudiantType::class, $etudiant);
@@ -442,6 +463,9 @@ class EtudiantController extends AbstractController {
      */
     public function updateInfosByEtudiant(Request $request): Etudiant {
         $etudiant = EtudiantController::getEtudiantConnecte($this);
+        if ($this->getUser()->getIdgroup()->getCodegroupe() != 'SA' && $this->getUser()->getEmail() != $etudiant->getEmailUniv()) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à acceder à cette ressource...");
+        }
         $oldMail = $etudiant->getEmail();
         $form = $this->createForm(EtudiantType::class, $etudiant);
         $form->submit(Utils::serializeRequestContent($request));
@@ -509,9 +533,8 @@ class EtudiantController extends AbstractController {
      * fonction qui permet de recuperer le dernier numero d'inscription academique
      * et le met à 5 chiffres si non existe
      */
-    public static function genererNumInterne(\App\Entity\Preinscription $preinscription) {
+    public static function genererNumInterne(\App\Entity\Preinscription $preinscription, $controller) {
         $numeroOrdreInscription = $preinscription->getIdanneeacad()->getNbreInscrits();
-
 
         $numeroOrdreInscription++;
         switch (strlen('' . $numeroOrdreInscription)) {
@@ -529,10 +552,63 @@ class EtudiantController extends AbstractController {
                 break;
         }
 
+        $em = $controller->getDoctrine()->getManager();
 
         $annee = $preinscription->getIdanneeacad()->getCodeanneeacad();
         $numInterne = substr($annee, -2) . '' . $preinscription->getIdfiliere()->getCodenum() . '' . $numeroOrdreInscription;
-        return $numInterne;
+        // verifier si c'est pas déja utilisé
+        $etudiants = $em->getRepository('App\Entity\Etudiant')
+                ->findByNuminterne($numInterne);
+        while (count($etudiants)) {
+            $numInterne = intval($numInterne) + 1;
+            $etudiants = $em->getRepository('App\Entity\Etudiant')
+                    ->findByNuminterne($numInterne);
+        }
+        return "" . $numInterne;
+    }
+
+    /**
+     * @Rest\Get(Path="/rotate-photo/{id}", name="rotate_photo_profil")
+     * @Rest\View(StatusCode=200)
+     */
+    public function setImageRotateProfil(Request $request, Etudiant $etudiant, \App\Utils\FileUploader $uploader) {
+        $host = $request->getHttpHost();
+        $scheme = $request->getScheme();
+        //throw $this->createNotFoundException('upload/etudiants/photos/'.$etudiant->getPhoto());
+
+        $degrees = 180;
+        // Chargement
+
+        $source = imagecreatefromjpeg('upload/etudiants/photos/' . $etudiant->getPhoto());
+
+        // Rotation
+        $rotate = imagerotate($source, $degrees, 0);
+        header("Content-type: image/jpg");
+
+        //throw $this->createNotFoundException(''.$rotate);
+        // Affichage
+        //echo $rotate;
+        //imagepng($rotate);
+//        ob_start();
+//        imagepng($source);
+//        $stringdata = ob_get_contents(); 
+//        ob_end_clean(); 
+        throw $this->createNotFoundException('encodage => ' . ($rotate));
+
+//        $imageData = base64_encode($stringdata);
+//        file_put_contents($imageData, base64_decode($imageData));
+        $file = new \Symfony\Component\HttpFoundation\File\File($stringdata);
+        $newFileName = $uploader->setTargetDirectory('etudiant_photo_directory')->upload($file, $etudiant->getNuminterne(), $etudiant->getPhoto()); // old fileName
+        $etudiant->setPhotoLink("$scheme://$host/" . $uploader->getTargetDirectory() . $newFileName);
+        $etudiant->setPhoto($newFileName);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->flush();
+
+        // Libération de la mémoire
+        imagedestroy($source);
+        imagedestroy($rotate);
+
+        return $etudiant;
     }
 
 }

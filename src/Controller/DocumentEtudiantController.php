@@ -26,16 +26,14 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 /**
  * @Route("/api/document-etudiant")
  */
-class DocumentEtudiantController extends AbstractController
-{
+class DocumentEtudiantController extends AbstractController {
 
     /**
      * @Rest\Post(path="/create", name="document_etudiant_new")
      * @Rest\View(statusCode=201)
      * @IsGranted("ROLE_DOCUMENTETUDIANT_NOUVEAU")
      */
-    public function create(Request $request, EntityManagerInterface $entityManager, FileUploader $uploader)
-    {
+    public function create(Request $request, EntityManagerInterface $entityManager, FileUploader $uploader) {
         $documentEtudiant = new DocumentEtudiant();
         $httpHost = $request->getHttpHost();
         $protocolVersion = $request->getScheme();
@@ -54,9 +52,9 @@ class DocumentEtudiantController extends AbstractController
                     AND de.etudiant=:etudiant 
                     AND td.codetypedocument != :otherCode
             ')->setParameter('typeDocument', $documentEtudiant->getTypeDocument())
-                ->setParameter('etudiant', $documentEtudiant->getEtudiant())
-                ->setParameter('otherCode', 'OTHER')
-                ->getResult();
+                    ->setParameter('etudiant', $documentEtudiant->getEtudiant())
+                    ->setParameter('otherCode', 'OTHER')
+                    ->getResult();
 
             if (count($documentEtudiantOld)) {
                 $documentEtudiantOld = $documentEtudiantOld[0];
@@ -76,27 +74,26 @@ class DocumentEtudiantController extends AbstractController
                 $entityManager->flush();
             }
         } catch (NoResultException $e) {
-
+            
         } catch (NonUniqueResultException $e) {
-
+            
         }
 
         $deserializedDocument = Utils::getObjectFromRequest($request);
         $newFilename = $uploader->decodeAndUploadTo($deserializedDocument, $this->getParameter('document_etudiant_directory'));
 
         $documentEtudiant
-            ->setFilename($newFilename)
-            ->setDateAjout(new \DateTime())
-            ->setEstValide(false);
+                ->setFilename($newFilename)
+                ->setDateAjout(new \DateTime())
+                ->setEstValide(false);
 
         $documentEtudiant
-            ->setUrl($protocolVersion . '://' . $httpHost . '/' . $this->getParameter('document_etudiant_directory') . $newFilename);
+                ->setUrl($protocolVersion . '://' . $httpHost . '/' . $this->getParameter('document_etudiant_directory') . $newFilename);
         $entityManager->persist($documentEtudiant);
         $entityManager->flush();
 
         return $documentEtudiant;
     }
-
 
     /**
      * @param Request $request
@@ -106,8 +103,7 @@ class DocumentEtudiantController extends AbstractController
      * @IsGranted("ROLE_DOCUMENTETUDIANT_EDITION")
      * @return DocumentEtudiant
      */
-    public function updateOther(Request $request, DocumentEtudiant $documentEtudiant, EntityManagerInterface $entityManager, FileUploader $uploader)
-    {
+    public function updateOther(Request $request, DocumentEtudiant $documentEtudiant, EntityManagerInterface $entityManager, FileUploader $uploader) {
         $httpHost = $request->getHttpHost();
         $protocolVersion = $request->getScheme();
         $form = $this->createForm(DocumentEtudiantType::class, $documentEtudiant);
@@ -132,28 +128,26 @@ class DocumentEtudiantController extends AbstractController
         $newFilename = $uploader->decodeAndUploadTo($deserializedDocument, $this->getParameter('document_etudiant_directory'));
 
         $documentEtudiant
-            ->setFilename($newFilename)
-            ->setDateAjout(new \DateTime())
-            ->setEstValide(false);
+                ->setFilename($newFilename)
+                ->setDateAjout(new \DateTime())
+                ->setEstValide(false);
 
         $documentEtudiant
-            ->setUrl($protocolVersion . '://' . $httpHost . '/' . $this->getParameter('document_etudiant_directory') . $newFilename);
+                ->setUrl($protocolVersion . '://' . $httpHost . '/' . $this->getParameter('document_etudiant_directory') . $newFilename);
         $entityManager->persist($documentEtudiant);
         $entityManager->flush();
 
         return $documentEtudiant;
     }
 
-
     /**
      * @Rest\Get(path="/etudiant/{id}", name="find_by_etudiant", requirements = {"id"="\d+"})
      * @Rest\View(statusCode=200)
      */
-    public function findByEtudiant(Request $request, Etudiant $etudiant, EntityManagerInterface $entityManager)
-    {
+    public function findByEtudiant(Request $request, Etudiant $etudiant, EntityManagerInterface $entityManager) {
         return $entityManager
-            ->getRepository(DocumentEtudiant::class)
-            ->findByEtudiant($etudiant);
+                        ->getRepository(DocumentEtudiant::class)
+                        ->findByEtudiant($etudiant);
     }
 
     /**
@@ -161,8 +155,7 @@ class DocumentEtudiantController extends AbstractController
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_DOCUMENTETUDIANT_SUPPRESSION")
      */
-    public function delete(Request $request, DocumentEtudiant $documentEtudiant): DocumentEtudiant
-    {
+    public function delete(Request $request, DocumentEtudiant $documentEtudiant,\Swift_Mailer $mailer): DocumentEtudiant {
         $entityManager = $this->getDoctrine()->getManager();
 
         if ($documentEtudiant->getFilename()) {
@@ -177,7 +170,28 @@ class DocumentEtudiantController extends AbstractController
             }
             $entityManager->remove($documentEtudiant);
             $entityManager->flush();
+
+            //send confirmation mail
+            $message = (new \Swift_Message('Suppression de document - GPE'))
+                    ->setFrom(\App\Utils\Utils::$senderEmail, 'Université Iba Der THIAM de Thiès')
+                    ->setTo([$documentEtudiant->getEtudiant()->getEmail(), $documentEtudiant->getEtudiant()->getEmailUniv()])
+                    ->setBody(
+                    $this->renderView(
+                            'emails/document/delete-document.html.twig', ['documentEtudiant' => $documentEtudiant]
+                    ), 'text/html'
+            );
+            // 
+            $i = 0;
+            $isMailSent = $mailer->send($message);
+            while (!$isMailSent) {
+                $isMailSent = $mailer->send($message);
+                $i++;
+                if ($i == 5 && !$isMailSent) {
+                    throw $this->createAccessDeniedException("Impossible d'envoyer le mail à l'étudiant malgré 5 tentatives d'envoie...");
+                }
+            }
         }
         return $documentEtudiant;
     }
+
 }
