@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\ParamFraisEncadrement;
 use App\Entity\Filiere;
+use App\Entity\FosUser;
 use App\Entity\UserEntite;
 use App\Form\ParamFraisEncadrementType;
 use App\Repository\ParamFraisEncadrementRepository;
@@ -39,7 +40,7 @@ class ParamFraisEncadrementController extends AbstractController
          * @Rest\View(StatusCode = 200)
          *
          */
-    public function findByUser(UserEntite $user): array
+    public function findByUser(FosUser $user): array
     {
         $em = $this->getDoctrine()->getManager();
         $paramFraisEncadrements = $em->createQuery('select pfe from App\Entity\ParamFraisEncadrement pfe, App\Entity\UserFiliere uf '
@@ -59,7 +60,7 @@ class ParamFraisEncadrementController extends AbstractController
     * @param Request $request
     * @return array
     */
-    public function findUserFiliere(UserEntite $user): array
+    public function findUserFiliere(FosUser $user): array
     {
         $em = $this->getDoctrine()->getManager();
       
