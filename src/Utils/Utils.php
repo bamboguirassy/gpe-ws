@@ -28,6 +28,7 @@ class Utils {
 
     static  $PAYTECH_API_KEY = '5d34295cdb894220704871136c37582ff7e8374a464d64a9ad4d4a85e12cf7ab';
     static $PAYTECH_SECRET_KEY = 'cf61237cbbb52b6fb615599c84a42d81adafced8c83b5f8c3ab8ea56dbd7b768';
+    static $months = ['01'=>'Janvier','02'=>'Février','03'=>'Mars','04'=>'Avril','05'=>'Mai','06'=>'Juin','07'=>"Juillet",'08'=>'Aout','09'=>'Septembre','10'=>'Octobre','11'=>'Novembre','12'=>'Décembre'];
 
 
     public static function serializeRequestContent(Request $request) {

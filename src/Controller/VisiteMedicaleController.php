@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Anneeacad;
 use App\Entity\FosGroup;
 use App\Entity\Profil;
 use App\Entity\VisiteMedicale;
@@ -14,8 +15,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use App\Utils\Utils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\Validator\Constraints\DateTime;
-
 /**
  * @Route("/api/visitemedicale")
  */
@@ -65,6 +64,53 @@ class VisiteMedicaleController extends AbstractController {
         $entityManager->flush();
 
         return $visiteMedicale;
+    }
+
+    /**
+     * @Rest\Get(path="/monthstats-anneeacad/{id}", name="visite_medicale_with_month_stats",requirements = {"id"="\d+"})
+     * @Rest\View(StatusCode=200)
+     */
+    public function findMonthsStatistics(Anneeacad $anneeacad, EntityManagerInterface $em) {
+        $monthTab =[];
+        foreach(Utils::$months as $month=>$monthName) {
+            $visitsCount = $em->createQuery(
+                "SELECT count(v)
+                 FROM App\Entity\VisiteMedicale v join v.inscriptionacad ia join ia.idclasse classe
+                 WHERE classe.idanneeacad=:idannee and v.date like :datePara "
+            )->setParameter("idannee",$anneeacad)
+            ->setParameter("datePara","%-".$month."-%")
+            ->getSingleScalarResult();
+                $monthTab[] = ['mois'=>$month,'monthName'=>$monthName,'visitsCount'=>$visitsCount];
+        }        
+        return $monthTab;
+    }
+
+    /**
+     * @Rest\Get(path="/doctor-stats-annee/{id}", name="visite_medicale_count_by_doctors",requirements = {"id"="\d+"})
+     * @Rest\View(StatusCode=200)
+     */
+    public function findDoctorsStatistics(Anneeacad $anneeacad, EntityManagerInterface $em) {
+            $doctorVisitsCount = $em->createQuery(
+                "SELECT v.user, count(v) as visitsCount
+                 FROM App\Entity\VisiteMedicale v join v.inscriptionacad ia join ia.idclasse classe
+                 WHERE classe.idanneeacad=:idannee group by v.user"
+            )->setParameter("idannee",$anneeacad)
+            ->getResult();
+        return $doctorVisitsCount;
+    }
+
+    /**
+     * @Rest\Get(path="/handicap-stats-annee/{id}", name="visite_medicale_count_by_handicap",requirements = {"id"="\d+"})
+     * @Rest\View(StatusCode=200)
+     */
+    public function findHandicapStatistics(Anneeacad $anneeacad, EntityManagerInterface $em) {
+            $doctorVisitsCount = $em->createQuery(
+                "SELECT v.typeHandicap, count(v) as visitsCount
+                 FROM App\Entity\VisiteMedicale v join v.inscriptionacad ia join ia.idclasse classe
+                 WHERE classe.idanneeacad=:idannee and v.typeHandicap is not null group by v.typeHandicap"
+            )->setParameter("idannee",$anneeacad)
+            ->getResult();
+        return $doctorVisitsCount;
     }
 
     /**
