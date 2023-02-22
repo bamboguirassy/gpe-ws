@@ -83,7 +83,6 @@ class InscriptionacadController extends AbstractController
             ->getResult();
 
         return count($inscritionacads) ? $inscritionacads[0] : NULL;
-
     }
 
     /**
@@ -110,8 +109,10 @@ class InscriptionacadController extends AbstractController
     public function findByPreinscription(Preinscription $preinscription)
     {
         $em = $this->getDoctrine()->getManager();
-        $classe = $em->getRepository(Classe::class)->findOneBy(['idniveau' => $preinscription->getIdniveau(),
-            'idfiliere' => $preinscription->getIdfiliere(), 'idanneeacad' => $preinscription->getIdanneeacad()]);
+        $classe = $em->getRepository(Classe::class)->findOneBy([
+            'idniveau' => $preinscription->getIdniveau(),
+            'idfiliere' => $preinscription->getIdfiliere(), 'idanneeacad' => $preinscription->getIdanneeacad()
+        ]);
         if (!$classe) {
             throw $this->createNotFoundException("Classe introuvable pour la preinscription selectionnée");
         }
@@ -159,9 +160,9 @@ class InscriptionacadController extends AbstractController
                 ->setParameter(1, $classes)
                 ->getResult();
             //formatter date
-//            foreach ($inscriptionacads as $inscriptionacad) {
-//                $inscriptionacad->setDateinscacad(AppManager::formatDateTime($inscriptionacad->getDateinscacad()));
-//            }
+            //            foreach ($inscriptionacads as $inscriptionacad) {
+            //                $inscriptionacad->setDateinscacad(AppManager::formatDateTime($inscriptionacad->getDateinscacad()));
+            //            }
         }
         return count($inscriptionacads) ? $inscriptionacads : [];
     }
@@ -222,7 +223,6 @@ class InscriptionacadController extends AbstractController
                 'inscriptionacad' => $inscriptionacad,
                 'paiementFraisEncadrements' => $bindedPaiementFraisEncadrements
             ];
-
         }
 
         return $result;
@@ -261,9 +261,11 @@ class InscriptionacadController extends AbstractController
         $inscriptionacad->setIdetudiant($etudiant);
 
         $classe = $entityManager->getRepository(Classe::class)
-            ->findOneBy(['idfiliere' => $preinscription->getIdfiliere(),
+            ->findOneBy([
+                'idfiliere' => $preinscription->getIdfiliere(),
                 'idniveau' => $preinscription->getidniveau(),
-                'idanneeacad' => $preinscription->getIdanneeacad()]);
+                'idanneeacad' => $preinscription->getIdanneeacad()
+            ]);
         if (!$classe) {
             throw $this->createNotFoundException("Aucune classe trouvée pour effectuer l'inscription...");
         }
@@ -385,9 +387,69 @@ class InscriptionacadController extends AbstractController
                 throw $this->createAccessDeniedException("Un problème a été detecté; plusieurs préinscriptions trouvées !!!");
             }
             $preinscriptions[0]->setEstinscrit(true);
-            $em->persist($this->createInscriptionAcadFromTemp($inscriptionTemporaire));
+            $inscriptionacad = $this->createInscriptionAcadFromTemp($inscriptionTemporaire);
+            $em->persist($inscriptionacad);
             $em->remove($inscriptionTemporaire);
             $em->flush();
+            $filiere = $inscriptionacad->getIdclasse()->getIdfiliere();
+            if ($filiere->getIdentite()) {
+                $departement = $filiere->getIdentite();
+                if ($filiere->getIdentite()->getIdentiteparent()) {
+                    $etablissement = $filiere->getIdentite()->getIdentiteparent();
+                } else {
+                    $etablissement = $filiere->getIdentite();
+                }
+            }
+            $optionLabel = '';
+            if($inscriptionacad->getIdspecialite()) {
+                if($inscriptionacad->getIdspecialite()->getCodespecialite()!='TC') {
+                    $optionLabel = $inscriptionacad->getIdspecialite()->getLibellespecialite();
+                } else {
+                    $optionLabel = 'Néant';
+                }
+            }
+            if($inscriptionacad->getPassage()=='P') {
+                $passage= "Passant";
+            } else if($inscriptionacad->getPassage()=='C') {
+                $passage = "Conditionnel";
+            } else {
+                $passage = "Redoublant";
+            }
+            $message = (new \Swift_Message("[Notif inscription] -"
+                . " Inscription en {$inscriptionacad->getIdclasse()->getCodeclasse()}"))
+                ->setFrom(Utils::$senderEmail, 'SPET GPE')
+                ->setTo($inscriptionacad->getIdetudiant()->getEmailuniv())
+                ->setBcc('dsos@univ-thies.sn')
+                ->setBody(
+                    "Bonjour <strong>{$inscriptionacad->getIdetudiant()->getPrenometudiant()} {$inscriptionacad->getIdetudiant()->getNometudiant()}</strong>. <br> "
+                        . "Vous venez d'effectuer votre inscription en  <strong>{$inscriptionacad->getIdclasse()->getLibelleclasse()}</strong> pour l'année universitaire <strong>{$inscriptionacad->getIdclasse()->getIdanneeacad()->getLibelleanneeacad()}</strong>. <br>
+                    Etablissement: <strong>{$etablissement->getLibelleentite()}</strong><br>
+                    Département: <strong>{$departement->getLibelleentite()}</strong><br>
+                    Filiere: <strong>{$filiere->getLibellefiliere()}</strong><br>
+                    Option: <strong>{$optionLabel}</strong><br>
+                    Année universitaire: <strong>{$inscriptionacad->getIdclasse()->getIdanneeacad()->getLibelleanneeacad()}</strong><br>
+                    Niveau: <strong>{$inscriptionacad->getIdclasse()->getIdniveau()->getLibelleniveau()}</strong><br>
+                    Situation passage: <strong>{$passage}</strong><br>
+                    Date de paiement: Aucune<br>
+                    Montant: Prépayé<br>
+                    Numéro Transaction: <strong>{$inscriptionacad->getNumquittance()}</strong><br>
+                    <br><br>
+                    <u>Informations personnelles :</u> <br>
+                    <strong>{$inscriptionacad->getIdetudiant()->getPrenometudiant()} {$inscriptionacad->getIdetudiant()->getNometudiant()}</strong> <br>
+                    Né(e) le <strong>{$inscriptionacad->getIdetudiant()->getDatenaiss()->format('d/m/Y')}</strong> à <strong>{$inscriptionacad->getIdetudiant()->getLieunaiss()}</strong> <br>
+                    Nationalité: <strong>{$inscriptionacad->getIdetudiant()->getNationalite()->getNationalite()}</strong><br>
+                    INE: <strong>{$inscriptionacad->getIdetudiant()->getIne()}</strong><br>
+                    Numéro CNI/Passport: <strong>{$inscriptionacad->getIdetudiant()->getCni()}</strong><br><br>
+                    Votre inscription est bien enregistrée. <br>
+                    Si il y'a des informations incorrectes que vous pouvez corriger, nous vous demandons de les corriger. <br>
+                    Si il y'a des informations erronées que vous n'êtes pas habilitées à corriger, veuillez contacter la DSOS (dsos@univ-thies.sn) pour demander la rectification. <br>
+                    <br><br>
+                    Dans votre dossier étudiant, vous devez charger dans la partie documents, les documents qui sont exigés pour que votre inscription soit validée. 
+                    <br><br>
+                    Bien cordialement.",
+                    'text/html'
+                );
+            $mailer->send($message);
             $preinscription = $preinscriptions[0];
         } else {
             throw $this->createNotFoundException("La préinscription est introuvable pour terminer le processus d'inscription");
@@ -400,8 +462,10 @@ class InscriptionacadController extends AbstractController
             ->setTo($preinscription->getEmail())
             ->setBody(
                 $this->renderView(
-                    'emails/preinscription/confirmation-notification.html.twig', ['preinscription' => $preinscription]
-                ), 'text/html'
+                    'emails/preinscription/confirmation-notification.html.twig',
+                    ['preinscription' => $preinscription]
+                ),
+                'text/html'
             );
         $i = 0;
         $isMailSent = $mailer->send($message);
@@ -501,35 +565,80 @@ class InscriptionacadController extends AbstractController
                     'idfiliere' => $inscriptionacad->getIdclasse()->getIdfiliere(),
                     'idanneeacad' => $inscriptionacad->getIdclasse()->getIdanneeacad(),
                     'idniveau' => $inscriptionacad->getIdclasse()->getIdniveau(),
-                    'estinscrit' => FALSE]);
+                    'estinscrit' => FALSE
+                ]);
             if ($preinscriptions) {
                 $preinscriptions[0]->setEstinscrit(TRUE);
             }
             // $em->remove($inscriptionTemporaire);
             // find and remove all inscription temps on payment confirm => MF - 31/03/2021
             $inscriptionTemps = $em->getRepository('App\Entity\InscriptionTemporaire')
-                ->findBy(['idetudiant' => $inscriptionacad->getIdetudiant(),
-                    'idclasse' => $inscriptionacad->getIdclasse()]);
+                ->findBy([
+                    'idetudiant' => $inscriptionacad->getIdetudiant(),
+                    'idclasse' => $inscriptionacad->getIdclasse()
+                ]);
             foreach ($inscriptionTemps as $inscriptionTemp) {
                 $em->remove($inscriptionTemp);
             }
-
-
             $em->persist($informationPaiementInscription);
             $em->flush();
+            $filiere = $inscriptionacad->getIdclasse()->getIdfiliere();
+            if ($filiere->getIdentite()) {
+                $departement = $filiere->getIdentite();
+                if ($filiere->getIdentite()->getIdentiteparent()) {
+                    $etablissement = $filiere->getIdentite()->getIdentiteparent();
+                } else {
+                    $etablissement = $filiere->getIdentite();
+                }
+            }
+            $optionLabel = '';
+            if($inscriptionacad->getIdspecialite()) {
+                if($inscriptionacad->getIdspecialite()->getCodespecialite()!='TC') {
+                    $optionLabel = $inscriptionacad->getIdspecialite()->getLibellespecialite();
+                } else {
+                    $optionLabel = 'Néant';
+                }
+            }
+            if($inscriptionacad->getPassage()=='P') {
+                $passage= "Passant";
+            } else if($inscriptionacad->getPassage()=='C') {
+                $passage = "Conditionnel";
+            } else {
+                $passage = "Redoublant";
+            }
             $message = (new \Swift_Message("[Notif inscription] -"
-                . " Inscription de {$inscriptionacad->getIdetudiant()->getPrenometudiant()} {$inscriptionacad->getIdetudiant()->getNometudiant()}"
-                . " en {$inscriptionacad->getIdclasse()->getCodeclasse()}"))
+                . " Inscription en {$inscriptionacad->getIdclasse()->getCodeclasse()}"))
                 ->setFrom(Utils::$senderEmail, 'SPET GPE')
                 ->setTo($inscriptionacad->getIdetudiant()->getEmailuniv())
                 ->setBcc('dsos@univ-thies.sn')
                 ->setBody(
-                    "Bonjour {$inscriptionacad->getIdetudiant()->getPrenometudiant()} {$inscriptionacad->getIdetudiant()->getNometudiant()}. <br> "
-                    . "Le paiement de {$inscriptionacad->getMontantinscriptionacad()} Franc CFA pour votre inscription en {$inscriptionacad->getIdclasse()->getLibelleclasse()} a reussi "
-                    . " avec le numéro de transaction {$inscriptionacad->getNumquittance()}. "
-                    . "Vous pouvez maintenant procéder à la visite médicale si vous n'en êtes pas exempté. "
-                    . "A très bientôt !"
-                    , 'text/html'
+                    "Bonjour <strong>{$inscriptionacad->getIdetudiant()->getPrenometudiant()} {$inscriptionacad->getIdetudiant()->getNometudiant()}</strong>. <br> "
+                        . "Vous venez d'effectuer votre inscription en  <strong>{$inscriptionacad->getIdclasse()->getLibelleclasse()}</strong> pour l'année universitaire <strong>{$inscriptionacad->getIdclasse()->getIdanneeacad()->getLibelleanneeacad()}</strong>. <br>
+                    Etablissement: <strong>{$etablissement->getLibelleentite()}</strong><br>
+                    Département: <strong>{$departement->getLibelleentite()}</strong><br>
+                    Filiere: <strong>{$filiere->getLibellefiliere()}</strong><br>
+                    Option: <strong>{$optionLabel}</strong><br>
+                    Année universitaire: <strong>{$inscriptionacad->getIdclasse()->getIdanneeacad()->getLibelleanneeacad()}</strong><br>
+                    Niveau: <strong>{$inscriptionacad->getIdclasse()->getIdniveau()->getLibelleniveau()}</strong><br>
+                    Situation passage: <strong>{$passage}</strong><br>
+                    Date de paiement: <strong>{$informationPaiementInscription->getDate()->format('d/m/Y H:i:s')}</strong><br>
+                    Montant: <strong>{$inscriptionacad->getMontantinscriptionacad()} FCFA</strong><br>
+                    Numéro Transaction: <strong>{$inscriptionacad->getNumquittance()}</strong><br>
+                    <br><br>
+                    <u>Informations personnelles :</u> <br>
+                    <strong>{$inscriptionacad->getIdetudiant()->getPrenometudiant()} {$inscriptionacad->getIdetudiant()->getNometudiant()}</strong> <br>
+                    Né(e) le <strong>{$inscriptionacad->getIdetudiant()->getDatenaiss()->format('d/m/Y')}</strong> à <strong>{$inscriptionacad->getIdetudiant()->getLieunaiss()}</strong> <br>
+                    Nationalité: <strong>{$inscriptionacad->getIdetudiant()->getNationalite()->getNationalite()}</strong><br>
+                    INE: <strong>{$inscriptionacad->getIdetudiant()->getIne()}</strong><br>
+                    Numéro CNI/Passport: <strong>{$inscriptionacad->getIdetudiant()->getCni()}</strong><br><br>
+                    Votre inscription est bien enregistrée. <br>
+                    Si il y'a des informations incorrectes que vous pouvez corriger, nous vous demandons de les corriger. <br>
+                    Si il y'a des informations erronées que vous n'êtes pas habilitées à corriger, veuillez contacter la DSOS (dsos@univ-thies.sn) pour demander la rectification. <br>
+                    <br><br>
+                    Dans votre dossier étudiant, vous devez charger dans la partie documents, les documents qui sont exigés pour que votre inscription soit validée. 
+                    <br><br>
+                    Bien cordialement.",
+                    'text/html'
                 );
             $mailer->send($message);
             return 1;
@@ -585,6 +694,4 @@ class InscriptionacadController extends AbstractController
         $inscriptionacad->setSource($inscriptionTemporaire->getSource());
         return $inscriptionacad;
     }
-
 }
-
