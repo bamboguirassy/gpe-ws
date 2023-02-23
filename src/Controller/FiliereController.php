@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Filiere;
+use App\Entity\FosUser;
 use App\Form\FiliereType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,6 +32,30 @@ class FiliereController extends AbstractController {
                 ->getResult();
 
         return count($filieres) ? $filieres : [];
+    }
+
+    /**
+     * @Rest\Post(path="/public/find-authorized-filieres", name="filiere_user_authorized_id")
+     * @Rest\View(StatusCode = 200)
+     * @return array
+     */
+    public function findUserFiliereIds(Request $request): array {
+        $em = $this->getDoctrine()->getManager();
+        $data = Utils::serializeRequestContent($request);
+        // verifier si le champ email est renseigné
+        if(!isset($data['email'])) {
+            throw $this->createNotFoundException("L'email de l'utilisateur est introuvable.");
+        }
+         $filieres = $em->createQuery('select f from App\Entity\Filiere f, App\Entity\UserFiliere uf join uf.iduser user '
+                        . 'where uf.idfiliere=f and user.email=?1 order by f.libellefiliere asc')
+                ->setParameter(1, $data['email'])
+                ->getResult();
+        $ids = [];
+        foreach ($filieres as $filiere) {
+            $ids[] = $filiere->getId();
+        }
+
+        return count($ids) ? $ids : [];
     }
 
     /**
