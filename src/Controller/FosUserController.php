@@ -66,11 +66,11 @@ class FosUserController extends AbstractController
             ->getRepository(FosUser::class)
             ->findOneBy(compact('email'));
 
-        if(!$user) throw new BadRequestHttpException("Cette adresse e-mail n'est associé à aucun compte.");
+        if (!$user) throw new BadRequestHttpException("Cette adresse e-mail n'est associé à aucun compte.");
 
         if (!$user->isEnabled()) throw new BadRequestHttpException("Votre compte n'est pas encore actif");
 
-        if (!in_array($user->getIdgroup()->getCodegroupe(),['ADMIN', 'ETU', 'DSOS','SA','ADSOS','ADMIN_DSOS','MEDECIN','MedChef'])) throw new BadRequestHttpException("Vous n'êtes pas autorisé à vous connecter à la plateforme");
+        if (!in_array($user->getIdgroup()->getCodegroupe(), ['ADMIN', 'ETU', 'DSOS', 'SA', 'ADSOS', 'ADMIN_DSOS', 'MEDECIN', 'MedChef'])) throw new BadRequestHttpException("Vous n'êtes pas autorisé à vous connecter à la plateforme");
 
         return $user;
     }
@@ -99,14 +99,18 @@ class FosUserController extends AbstractController
             ->setTo($linkedUser->getEmail())
             ->setBody(
                 $this->renderView(
-                    'emails/forgot-password/etudiant.html.twig', ['user' => $linkedUser,
-                        'link' => \App\Utils\Utils::$lienResetEtudiantPassword . $linkedUser->getConfirmationToken()]
-                ), 'text/html'
+                    'emails/forgot-password/etudiant.html.twig',
+                    [
+                        'user' => $linkedUser,
+                        'link' => \App\Utils\Utils::$lienResetEtudiantPassword . $linkedUser->getConfirmationToken()
+                    ]
+                ),
+                'text/html'
             );
         // 19/03/2021 - Moussa Fofana - Verifier s'il s'agit d'un étudiant
         $etudiants  = $em->getRepository(\App\Entity\Etudiant::class)
-                ->findByEmailUniv($email);
-        if(count($etudiants)>0) {
+            ->findByEmailUniv($email);
+        if (count($etudiants) > 0) {
             $emailPerso = $etudiants[0]->getEmail();
             $message->setCc($emailPerso);
         }
@@ -182,12 +186,12 @@ class FosUserController extends AbstractController
 
         return $linkedUser;
     }
-    
-     /**
+
+    /**
      * @Rest\Post(path="/change-password/", name="user_change_password")
      * @Rest\View(StatusCode=200)
      */
-    
+
     public function changerPassword(Request $request, \Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface $passwordEncoder): FosUser
     {
         $em = $this->getDoctrine()->getManager();
@@ -197,16 +201,16 @@ class FosUserController extends AbstractController
         $passworactuel = $updateData->currentPassword;
         $userManager = $this->getUser();
         $verification = password_verify($passworactuel, $this->getUser()->getPassword());
-        
+
         if ($verification) {
-             if($password != $password2){
-                throw $this->createNotFoundException("'Les deux mots de passe ne concordent pas.");               
-             }
+            if ($password != $password2) {
+                throw $this->createNotFoundException("'Les deux mots de passe ne concordent pas.");
+            }
         } else {
             throw $this->createNotFoundException("Mot de passe introuvable");
         }
 
-       
+
         $userManager->setConfirmationToken(null);
         $userManager->setPasswordRequestedAt(null);
         $userManager->setPassword($passwordEncoder->encodePassword($userManager, $password));
@@ -215,7 +219,7 @@ class FosUserController extends AbstractController
 
         return $userManager;
     }
-    
+
 
     /**
      * @Rest\Post(Path="/create", name="fos_user_new")
@@ -313,4 +317,43 @@ class FosUserController extends AbstractController
         return $fosUsers;
     }
 
+    /**
+     * Implementer un web service qui vérifie si le mail passé en paramètre existe dans la base de données
+     * et que l'utilisateur a accès à la plateforme FOPA
+     * @Rest\Post(path="/public/check-fopa-email", name="check_fopa_email")
+     * @Rest\View(StatusCode=200)
+     */
+    public function checkFopaEmail(Request $request): array
+    {
+        $em = $this->getDoctrine()->getManager();
+        $email = json_decode($request->getContent())->email;
+        $user = $em->getRepository(FosUser::class)->findOneByEmail($email);
+        if (!$user) {
+            return [
+                'email' => null,
+                'message' => "Cet email n'existe pas dans la base de données.",
+                'verified' => false,
+                'groupe_code' => null,
+                'error' => true
+            ];
+        }
+        // verifier si le code du  groupe de l'utilisateur est dans les groupes autorisés
+        $autorized_groups_codes = ['ETU','SA', 'COMPTA','RF'];
+        if (!in_array($user->getIdgroup()->getCodegroupe(), $autorized_groups_codes)) {
+            return [
+                'email' => null,
+                'message' => "Vous n'avez pas accès à la plateforme FOPA.",
+                'verified' => false,
+                'groupe_code' => null,
+                'error' => true
+            ];
+        }
+        return [
+            'email' => $user->getEmail(),
+            'message' => "Authentification reussie",
+            'verified' => true,
+            'groupe_code' => $user->getIdgroup()->getCodegroupe(),
+            'error' => false
+        ];
+    }
 }
