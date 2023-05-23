@@ -350,6 +350,7 @@ class FosUserController extends AbstractController
         }
         return [
             'email' => $user->getEmail(),
+            'name'=>"{$user->getPrenom()} {$user->getNom()}",
             'message' => "Authentification reussie",
             'verified' => true,
             'groupe_code' => $user->getIdgroup()->getCodegroupe(),

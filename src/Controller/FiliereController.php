@@ -123,6 +123,26 @@ class FiliereController extends AbstractController {
     }
 
     /**
+     * Proposer un web service qui met uniquement à jour le champ typeFormation de filiere
+     * @Rest\Put(path="/{id}/edit-type-formation", name="filiere_edit_type_formation",requirements = {"id"="\d+"})
+     * @Rest\View(StatusCode=200)
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     */
+    public function editTypeFormation(Request $request, Filiere $filiere): Filiere {
+        // recuperer le champ type_formation de la requete
+        $data = Utils::serializeRequestContent($request);
+        $typeFormation = $data['type_formation'];
+        // verifier que la valeur de type de formation est dans [publique, privee, mixte]
+        if (!in_array($typeFormation, ['publique', 'privee', 'mixte'])) {
+            throw $this->createNotFoundException("La valeur du champ typeFormation doit être dans [publique, privee, mixte]");
+        }
+        $filiere->setTypeFormation($typeFormation);
+        $this->getDoctrine()->getManager()->flush();
+
+        return $filiere;
+    }
+
+    /**
      * @Rest\Put(path="/{id}/clone", name="filiere_clone",requirements = {"id"="\d+"})
      * @Rest\View(StatusCode=200)
      * @IsGranted("ROLE_FILIERE_CLONE")

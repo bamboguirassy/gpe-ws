@@ -43,6 +43,14 @@ class Filiere
     private $codenum;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="type_formation", type="string", length=100, nullable=false)
+     * rajouté le 23 Mai 2023 pour FOPA
+     */
+    private $typeFormation;
+
+    /**
      * @var string|null
      *
      * @ORM\Column(name="description", type="text", length=0, nullable=true)
@@ -223,6 +231,20 @@ class Filiere
     public function setParamFraisEncadrement(?ParamFraisEncadrement $paramFraisEncadrement): self
     {
         $this->paramFraisEncadrement = $paramFraisEncadrement;
+
+        return $this;
+    }
+
+    // definir les accesseurs pour le champ typeFormation
+    // rajouté le 23 Mai 2023 pour FOPA
+    public function getTypeFormation(): ?string
+    {
+        return $this->typeFormation;
+    }
+
+    public function setTypeFormation(string $typeFormation): self
+    {
+        $this->typeFormation = $typeFormation;
 
         return $this;
     }
