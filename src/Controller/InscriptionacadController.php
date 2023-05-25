@@ -268,6 +268,48 @@ class InscriptionacadController extends AbstractController
     }
 
     /**
+     *  Met à jour le champ typeRegimePaiement pour une liste d'inscriptionacad
+     * @Rest\Put(path="/edit-type-regime-paiement", name="inscriptionacad_update_type_regime_paiement_list")
+     * @Rest\View(StatusCode = 200)
+     * @IsGranted("ROLE_INSCRIPTION ACADEMIQUE_EDITION")
+     */
+    public function updateTypeRegimePaiementList(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $typeRegimePaiement = $request->get('type_regime_paiement');
+        $ids = $request->get('ids');
+        // lancer une exception si le type de régime de paiement n'est pas fourni
+        if (!$typeRegimePaiement) {
+            throw $this->createAccessDeniedException('Type de régime de paiement obligatoire');
+        }
+        // lancer une exception si le type de régime de paiement n'est pas valide
+        if (!in_array($typeRegimePaiement, ['Non Payant', 'Payant'])) {
+            throw $this->createAccessDeniedException('Type de régime de paiement invalide, veuillez choisir entre Non Payant et Payant');
+        }
+        // lancer une exception si la liste des ids n'est pas fournie
+        if (!$ids) {
+            throw $this->createAccessDeniedException('Liste des ids obligatoire');
+        }
+        // use try catch
+        try {
+            $inscriptionacads = $em->createQuery('select ia from App\Entity\Inscriptionacad ia where ia.id in (?1)')
+                ->setParameter(1, $ids)
+                ->getResult();
+            // verifier si tous les ids sont valides
+            if (count($inscriptionacads) != count($ids)) {
+                throw $this->createAccessDeniedException('Certains ids ne sont pas valides');
+            }    
+            foreach ($inscriptionacads as $inscriptionacad) {
+                $inscriptionacad->setTypeRegimePaiement($typeRegimePaiement);
+            }
+            $em->flush();
+        } catch (\Exception $e) {
+            throw $this->createAccessDeniedException('Erreur lors de la mise à jour du type de régime de paiement');
+        }
+        return ["error"=>false, "message"=>"Mise à jour effectuée avec succès"];
+    }
+
+    /**
      * @Rest\Get(path="/inscriptions/{id}/etudiant", name="inscriptionacad_etudiant")
      * @Rest\View(StatusCode = 200)
      */
