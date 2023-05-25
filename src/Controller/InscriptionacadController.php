@@ -226,6 +226,48 @@ class InscriptionacadController extends AbstractController
     }
 
     /**
+     * Met à jour le champ typeRegimePaiement d'une inscriptionacad
+     * @Rest\Put(path="/{id}/edit-type-regime-paiement", name="inscriptionacad_update_type_regime_paiement",requirements = {"id"="\d+"})
+     * @Rest\View(StatusCode = 200)
+     * @IsGranted("ROLE_INSCRIPTION ACADEMIQUE_EDITION")
+     */
+    public function updateTypeRegimePaiement(\App\Entity\Inscriptionacad $inscriptionacad, Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $typeRegimePaiement = $request->get('type_regime_paiement');
+        // lancer une exception si le type de régime de paiement n'est pas fourni
+        if (!$typeRegimePaiement) {
+            throw $this->createAccessDeniedException('Type de régime de paiement obligatoire');
+        }
+        // lancer une exception si le type de régime de paiement n'est pas valide
+        if (!in_array($typeRegimePaiement, ['Non Payant', 'Payant'])) {
+            throw $this->createAccessDeniedException('Type de régime de paiement invalide, veuillez choisir entre Non Payant et Payant');
+        }
+        // use try catch
+        try {
+            $inscriptionacad->setTypeRegimePaiement($typeRegimePaiement);
+            $em->flush();
+        } catch (\Exception $e) {
+            throw $this->createAccessDeniedException('Erreur lors de la mise à jour du type de régime de paiement');
+        }
+        return [
+            "inscription_id" => $inscriptionacad->getId(),
+            "prenom" => $inscriptionacad->getIdetudiant()->getPrenometudiant(),
+            "nom" => $inscriptionacad->getIdetudiant()->getNometudiant(),
+            "lieu_naissance" => $inscriptionacad->getIdetudiant()->getLieunaiss(),
+            "telephone" => $inscriptionacad->getIdetudiant()->getTeletudiant(),
+            "email_personnel" => $inscriptionacad->getIdetudiant()->getEmail(),
+            "email_universitaire" => $inscriptionacad->getIdetudiant()->getEmailUniv(),
+            "cni_or_passport" => $inscriptionacad->getIdetudiant()->getCni(),
+            "numero_carte_etudiant" => $inscriptionacad->getIdetudiant()->getNuminterne(),
+            "sexe" => $inscriptionacad->getIdetudiant()->getGenre(),
+            "photo_link" => $inscriptionacad->getIdetudiant()->getPhotoLink(),
+            "type_regime_paiement" => $inscriptionacad->getTypeRegimePaiement(),
+            "nationalite" => $inscriptionacad->getIdetudiant()->getNationalite()->getNationalite(),
+        ];
+    }
+
+    /**
      * @Rest\Get(path="/inscriptions/{id}/etudiant", name="inscriptionacad_etudiant")
      * @Rest\View(StatusCode = 200)
      */
