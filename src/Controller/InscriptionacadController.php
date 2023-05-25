@@ -193,7 +193,8 @@ class InscriptionacadController extends AbstractController
         $inscriptionacads = $em->createQuery('select ia.id as inscription_id,et.prenometudiant as prenom,
          et.nometudiant as nom, 
          et.lieunaiss as lieu_naissance,
-         et.teletudiant as telephone, et.email, et.cni as cni_or_passport,et.numinterne as numero_carte_etudiant,  et.genre as sexe,
+         et.teletudiant as telephone, et.email as email_personnel, et.emailUniv as email_universitaire, et.cni as cni_or_passport,et.numinterne as numero_carte_etudiant,
+           et.genre as sexe, et.photoLink as photo_link,
           ia.typeRegimePaiement as type_regime_paiement, nat.nationalite   '
             . 'from App\Entity\Inscriptionacad ia join ia.idetudiant et
              join et.nationalite nat where ia.idclasse=?1 and ia.etat=?2')
@@ -201,6 +202,27 @@ class InscriptionacadController extends AbstractController
             ->setParameter(2, "V")
             ->getResult();
         return count($inscriptionacads) ? $inscriptionacads : [];
+    }
+
+    /**
+     * Récupere les détails d'une inscriptionacad à partir de son id avec quelques champs
+     * @Rest\Get(path="/{id}/simple", name="inscriptionacad_by_id_simple",requirements = {"id"="\d+"})
+     * @Rest\View(StatusCode = 200)
+     * @IsGranted("ROLE_INSCRIPTION ACADEMIQUE_AFFICHAGE")
+     */
+    public function findInscriptionacadByIdSimple(\App\Entity\Inscriptionacad $inscriptionacad)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $inscriptionacad = $em->createQuery('select ia.id as inscription_id,et.prenometudiant as prenom,
+         et.nometudiant as nom, 
+         et.lieunaiss as lieu_naissance,
+         et.teletudiant as telephone, et.email as email_personnel, et.emailUniv as email_universitaire, et.cni as cni_or_passport,et.numinterne as numero_carte_etudiant,  et.genre as sexe, et.photoLink as photo_link,
+          ia.typeRegimePaiement as type_regime_paiement, nat.nationalite   '
+            . 'from App\Entity\Inscriptionacad ia join ia.idetudiant et
+             join et.nationalite nat where ia.id=?1')
+            ->setParameter(1, $inscriptionacad->getId())
+            ->getResult();
+        return count($inscriptionacad) ? $inscriptionacad[0] : [];
     }
 
     /**
