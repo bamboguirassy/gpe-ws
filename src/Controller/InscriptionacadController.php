@@ -181,6 +181,29 @@ class InscriptionacadController extends AbstractController
     }
 
     /**
+     * Récuperer la liste des inscriptionacads validée par classe avec 
+     * seulement quelques champs
+     * @Rest\Get(path="/classe/{id}/validated-simple", name="inscriptionacad_validated_by_classe_simple", requirements={"id"="\d+"})
+     * @Rest\View(StatusCode = 200)
+     * @IsGranted("ROLE_INSCRIPTION ACADEMIQUE_LISTE")
+     */
+    public function findValidatedByClasseSimple(\App\Entity\Classe $classe)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $inscriptionacads = $em->createQuery('select ia.id as inscription_id,et.prenometudiant as prenom,
+         et.nometudiant as nom, 
+         et.lieunaiss as lieu_naissance,
+         et.teletudiant as telephone, et.email, et.cni as cni_or_passport,et.numinterne as numero_carte_etudiant,  et.genre as sexe,
+          ia.typeRegimePaiement as type_regime_paiement, nat.nationalite   '
+            . 'from App\Entity\Inscriptionacad ia join ia.idetudiant et
+             join et.nationalite nat where ia.idclasse=?1 and ia.etat=?2')
+            ->setParameter(1, $classe)
+            ->setParameter(2, "V")
+            ->getResult();
+        return count($inscriptionacads) ? $inscriptionacads : [];
+    }
+
+    /**
      * @Rest\Get(path="/inscriptions/{id}/etudiant", name="inscriptionacad_etudiant")
      * @Rest\View(StatusCode = 200)
      */
@@ -401,16 +424,16 @@ class InscriptionacadController extends AbstractController
                 }
             }
             $optionLabel = '';
-            if($inscriptionacad->getIdspecialite()) {
-                if($inscriptionacad->getIdspecialite()->getCodespecialite()!='TC') {
+            if ($inscriptionacad->getIdspecialite()) {
+                if ($inscriptionacad->getIdspecialite()->getCodespecialite() != 'TC') {
                     $optionLabel = $inscriptionacad->getIdspecialite()->getLibellespecialite();
                 } else {
                     $optionLabel = 'Néant';
                 }
             }
-            if($inscriptionacad->getPassage()=='P') {
-                $passage= "Passant";
-            } else if($inscriptionacad->getPassage()=='C') {
+            if ($inscriptionacad->getPassage() == 'P') {
+                $passage = "Passant";
+            } else if ($inscriptionacad->getPassage() == 'C') {
                 $passage = "Conditionnel";
             } else {
                 $passage = "Redoublant";
@@ -592,16 +615,16 @@ class InscriptionacadController extends AbstractController
                 }
             }
             $optionLabel = '';
-            if($inscriptionacad->getIdspecialite()) {
-                if($inscriptionacad->getIdspecialite()->getCodespecialite()!='TC') {
+            if ($inscriptionacad->getIdspecialite()) {
+                if ($inscriptionacad->getIdspecialite()->getCodespecialite() != 'TC') {
                     $optionLabel = $inscriptionacad->getIdspecialite()->getLibellespecialite();
                 } else {
                     $optionLabel = 'Néant';
                 }
             }
-            if($inscriptionacad->getPassage()=='P') {
-                $passage= "Passant";
-            } else if($inscriptionacad->getPassage()=='C') {
+            if ($inscriptionacad->getPassage() == 'P') {
+                $passage = "Passant";
+            } else if ($inscriptionacad->getPassage() == 'C') {
                 $passage = "Conditionnel";
             } else {
                 $passage = "Redoublant";
