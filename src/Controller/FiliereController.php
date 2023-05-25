@@ -46,9 +46,8 @@ class FiliereController extends AbstractController {
     {
         $em = $this->getDoctrine()->getManager();
         $filieres = $em->createQuery('select f from App\Entity\Filiere f, App\Entity\UserFiliere uf '
-            . 'where uf.idfiliere=f and uf.iduser=?1 and f.typeFormation in (?2) order by f.libellefiliere asc')
+            . 'where uf.idfiliere=f and uf.iduser=?1 order by f.libellefiliere asc')
             ->setParameter(1, $this->getUser())
-            ->setParameter(2, ["mixte","privee"])
             ->getResult();
         $tabFiliere = [];
         foreach ($filieres as $filiere) {
