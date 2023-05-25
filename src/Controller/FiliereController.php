@@ -34,6 +34,38 @@ class FiliereController extends AbstractController {
         return count($filieres) ? $filieres : [];
     }
 
+
+
+    /**
+     * Récuperer la liste des filières et niveaux autorisés pour l'utilisateur connecté
+     * @Rest\Get(path="/with-niveaux", name="filiere_with_nivaux_index")
+     * @Rest\View(StatusCode = 200)
+     * @IsGranted("ROLE_FILIERE_LISTE")
+     */
+    public function findWithNiveaux(): array
+    {
+        $em = $this->getDoctrine()->getManager();
+        $filieres = $em->createQuery('select f from App\Entity\Filiere f, App\Entity\UserFiliere uf '
+            . 'where uf.idfiliere=f and uf.iduser=?1 and f.typeFormation in (?2) order by f.libellefiliere asc')
+            ->setParameter(1, $this->getUser())
+            ->setParameter(2, ["mixte","privee"])
+            ->getResult();
+        $tabFiliere = [];
+        foreach ($filieres as $filiere) {
+            $filiereniveaus = $em->createQuery('select fn from App\Entity\Filiereniveau fn where fn.idfiliere=?1 order by fn.idniveau asc')
+                ->setParameter(1, $filiere)
+                ->getResult();
+                // créer un tableau de filiere niveau avec quelques champs de filiere et niveau
+                $tabNiveaux = [];
+                foreach ($filiereniveaus as $filiereniveau) {
+                    $tabNiveaux[] = ['id' => $filiereniveau->getId(),'nom'=>$filiereniveau->getIdniveau()->getLibelleniveau(),'code'=>$filiereniveau->getIdniveau()->getCodeniveau()];
+                }
+
+                $tabFiliere[] = ['filiere' => ['nom'=>"{$filiere->getIdcycle()->getLibellecycle()} {$filiere->getLibellefiliere()}",'code'=>$filiere->getCodefiliere(),'id'=>$filiere->getId(),'type_formation'=>$filiere->getTypeFormation()], 'filiereniveaus' => $tabNiveaux];
+        }
+        return count($tabFiliere) ? $tabFiliere : [];
+    }
+
     /**
      * @Rest\Post(path="/public/find-authorized-filieres", name="filiere_user_authorized_id")
      * @Rest\View(StatusCode = 200)

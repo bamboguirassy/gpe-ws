@@ -286,6 +286,19 @@ class Inscriptionacad
      * @ORM\OneToOne(targetEntity=VisiteMedicale::class, mappedBy="inscriptionacad", cascade={"persist", "remove"})
      */
     private $visiteMedicale;
+    
+    /**
+     * Champ pour le type de regime paiement
+     * @ORM\Column(name="type_regime_paiement", type="string", length=100, nullable=true)
+     */
+    private $typeRegimePaiement;
+
+    /**
+     * Champ pour le type de regime inscription
+     * @ORM\Column(name="type_regime_inscription",type="string", length=100, nullable=true)
+     */
+    private $typeRegimeInscription;
+    
 
     public function getId()
     {
@@ -716,4 +729,32 @@ class Inscriptionacad
 
         return $this;
     }
+
+    // accessors for typeRegimePaiement
+    public function getTypeRegimePaiement()
+    {
+        return $this->typeRegimePaiement;
+    }
+
+    public function setTypeRegimePaiement($typeRegimePaiement): self
+    {
+        $this->typeRegimePaiement = $typeRegimePaiement;
+
+        return $this;
+    }
+
+    // accessors for typeRegimeInscription
+    public function getTypeRegimeInscription()
+    {
+        return $this->typeRegimeInscription;
+    }
+
+    public function setTypeRegimeInscription($typeRegimeInscription): self
+    {
+        $this->typeRegimeInscription = $typeRegimeInscription;
+
+        return $this;
+    }
+
+
 }
