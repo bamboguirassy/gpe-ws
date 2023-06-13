@@ -217,9 +217,9 @@ class InscriptionacadController extends AbstractController
          et.nometudiant as nom, 
          et.lieunaiss as lieu_naissance,
          et.teletudiant as telephone, et.email as email_personnel, et.emailUniv as email_universitaire, et.cni as cni_or_passport,et.numinterne as numero_carte_etudiant,  et.genre as sexe, et.photoLink as photo_link,
-          ia.typeRegimePaiement as type_regime_paiement, nat.nationalite   '
+          ia.typeRegimePaiement as type_regime_paiement, nat.nationalite, sp.libellespecialite as option, aa.libelleanneeacad as annee_academique, n.libelleniveau as niveau, f.libellefiliere as filiere '
             . 'from App\Entity\Inscriptionacad ia join ia.idetudiant et
-             join et.nationalite nat where ia.id=?1')
+             join et.nationalite nat join ia.idclasse c join ia.idspecialite sp join c.idanneeacad aa join c.idfiliere f join c.idniveau n where ia.id=?1')
             ->setParameter(1, $inscriptionacad->getId())
             ->getResult();
         return count($inscriptionacad) ? $inscriptionacad[0] : [];

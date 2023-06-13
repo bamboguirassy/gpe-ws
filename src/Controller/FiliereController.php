@@ -59,7 +59,7 @@ class FiliereController extends AbstractController
             // créer un tableau de filiere niveau avec quelques champs de filiere et niveau
             $tabNiveaux = [];
             foreach ($filiereniveaus as $filiereniveau) {
-                $tabNiveaux[] = ['id' => $filiereniveau->getId(), 'nom' => $filiereniveau->getIdniveau()->getLibelleniveau(), 'code' => $filiereniveau->getIdniveau()->getCodeniveau()];
+                $tabNiveaux[] = ['id' => $filiereniveau->getId(), 'nom' => $filiereniveau->getIdniveau()->getLibelleniveau(), 'code' => $filiereniveau->getIdniveau()->getCodeniveau(),'niveau_id'=>$filiereniveau->getIdniveau()->getId()];
             }
 
             $tabFiliere[] = ['filiere' => ['nom' => "{$filiere->getIdcycle()->getLibellecycle()} {$filiere->getLibellefiliere()}", 'code' => $filiere->getCodefiliere(), 'id' => $filiere->getId(), 'type_formation' => $filiere->getTypeFormation()], 'filiereniveaus' => $tabNiveaux];
